@@ -1,0 +1,234 @@
+/* Philips_Alliance Input erase green focus */
+.keyboard-content.hover, .keyboard-content.focus, .keyboard-content.active {
+/*   border: 0px none; */
+  outline:blue solid 0px !important;
+}
+
+.keyboard-content:active, .keyboard-content:hover, .keyboard-content:focus, .keyboard-content:link, .keyboard-content:visited {
+/*   border: 0px none; */
+  outline:blue solid 0px !important;
+}
+
+.keyboard-content.hover, .keyboard-content.focus, .keyboard-content.active {
+/*   border: 0px none; */
+  outline:blue solid 0px !important;
+}
+
+.keyboard-content:active, .keyboard-content:hover, .keyboard-content:focus, .keyboard-content:link, .keyboard-content:visited {
+/*   border: 0px none; */
+  outline:blue solid 0px !important;
+}
+
+
+.key.hover, .key.focus, .key.active {
+/*   border: 0px none; */
+  outline:blue solid 0px !important;
+}
+
+.key:active, .key:hover, .key:focus, .key:link, .key:visited {
+/*   border: 0px none; */
+  outline:blue solid 0px !important;
+}
+
+.key.hover, .key.focus, .key.active {
+/*   border: 0px none; */
+  outline:blue solid 0px !important;
+}
+
+.key:active, .key:hover, .key:focus, .key:link, .key:visited {
+/*   border: 0px none; */
+  outline:blue solid 0px !important;
+}
+
+
+.keyboard-cover.hover, .keyboard-cover.focus, .keyboard-cover.active {
+/*   border: 0px none; */
+  outline:blue solid 0px !important;
+}
+
+.keyboard-cover:active, .keyboard-cover:hover, .keyboard-cover:focus, .keyboard-cover:link, .keyboard-cover:visited {
+/*   border: 0px none; */
+  outline:blue solid 0px !important;
+}
+
+.keyboard-cover.hover, .keyboard-cover.focus, .keyboard-cover.active {
+/*   border: 0px none; */
+  outline:blue solid 0px !important;
+}
+
+.keyboard-cover:active, .keyboard-cover:hover, .keyboard-cover:focus, .keyboard-cover:link, .keyboard-cover:visited {
+/*   border: 0px none; */
+  outline:blue solid 0px !important;
+}
+
+/* ePhilips_Alliance Input erase green focus */
+
+/* keyboard */
+.keyboard-content {
+	position: absolute;
+	left: 40px;
+	z-index: 1000;
+	width: 1200px;
+	height: 225px;
+	background: rgba(80, 80, 80, 0.85);
+	padding: 5px 10px 5px 5px;
+	font-family: sans-serif;
+}
+
+	.keyboard-content .line {
+		width: 100%;
+		height: 50px;
+		padding: 0 5px 5px 0;
+		line-height: 50px;
+	}
+
+		.keyboard-content .line .key {
+			display: inline-block;
+			text-align: center;
+			color: white;
+			padding: 5px 0 5px 5px;
+			vertical-align: top;
+			box-sizing: border-box;
+		}
+
+			.keyboard-content .line .key .content {
+				background: black;
+				display: inline-block;
+				width: 100%;
+				height: 100%;
+				font-size: 28px;
+			}
+
+		.keyboard-content .line.suggest {
+			padding: 5px 5px 0px 5px;
+			line-height: 50px;
+			position: absolute;
+			left: 0;
+			top: -55px;
+			height: 50px;
+			width: 1205px;
+			background: rgba(80, 80, 80, 0.85);
+		}
+
+			.keyboard-content .line.suggest .key {
+				display: inline-block;
+				height: 54px;
+			}
+
+				.keyboard-content .line.suggest .key .content {
+					background: transparent;
+					font-size: 20px;
+					overflow: hidden;
+					text-overflow: ellipsis;
+					white-space: nowrap;
+				}
+
+.arabic .keyboard-content .line.suggest .key .content {
+	direction: rtl;
+	font-family: sans-serif;
+}
+
+.keyboard-content .line .key.focus {
+	cursor: pointer;
+}
+
+	.keyboard-content .line .key.focus .content {
+		background: #afdeff;
+		color: Black;
+	}
+
+.keyboard-content .line .key .CAPSLOCK {
+	font-size: 24px;
+}
+
+.keyboard-content .line .key .BSP {
+	background: black url('../img/keyboard/backspace.png') no-repeat;
+	background-position: 17px center;
+}
+
+.keyboard-content .line .key .DONE {
+	background: black url('../img/keyboard/return.png') no-repeat;
+	background-position: 106px 5px;
+}
+
+.keyboard-content .line .key .SHIFT {
+	background: black url('../img/keyboard/shift.png') no-repeat;
+	background-position: 58px center;
+}
+
+.keyboard-content .line .key .SPACE {
+	background: black url('../img/keyboard/space.png') no-repeat;
+	background-position: center center;
+}
+
+.keyboard-content .line .key .CA {
+	background: black url('../img/keyboard/backspace-all.png') no-repeat;
+	background-position: 17px center;
+}
+
+.keyboard-content .line .key .LC {
+	background: black url('../img/keyboard/left.png') no-repeat;
+	background-position: 17px center;
+}
+
+.keyboard-content .line .key .RC {
+	background: black url('../img/keyboard/right.png') no-repeat;
+	background-position: 17px center;
+}
+
+.keyboard-content .line .key .GEAR {
+	background: black url('../img/keyboard/gear.png') no-repeat;
+	background-position: center center;
+}
+
+.keyboard-content .line .key.focus .BSP {
+	background: #afdeff url('../img/keyboard/backspace-active.png') no-repeat;
+	background-position: 17px center;
+}
+
+.keyboard-content .line .key.focus .DONE {
+	background: #afdeff url('../img/keyboard/return-active.png') no-repeat;
+	background-position: 106px 5px;
+}
+
+.keyboard-content .line .key.focus .SHIFT {
+	background: #afdeff url('../img/keyboard/shift-active.png') no-repeat;
+	background-position: 58px center;
+}
+
+.keyboard-content .line .key.focus .SPACE {
+	background: #afdeff url('../img/keyboard/space-active.png') no-repeat;
+	background-position: center center;
+}
+
+.keyboard-content .line .key.focus .CA {
+	background: #afdeff url('../img/keyboard/backspace-all-active.png') no-repeat;
+	background-position: 17px center;
+}
+
+.keyboard-content .line .key.focus .LC {
+	background: #afdeff url('../img/keyboard/left-active.png') no-repeat;
+	background-position: 17px center;
+}
+
+.keyboard-content .line .key.focus .RC {
+	background: #afdeff url('../img/keyboard/right-active.png') no-repeat;
+	background-position: 17px center;
+}
+
+.keyboard-content .line .key.focus .GEAR {
+	background: #afdeff url('../img/keyboard/gear-active.png') no-repeat;
+	background-position: center center;
+}
+
+.keyboard-cover {
+	width: 1280px;
+	height: 720px;
+	background: rgba(0,0,0,0.1);
+	position: absolute;
+	z-index: 999;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}

@@ -1,0 +1,123 @@
+﻿<!DOCTYPE html>
+<html>
+    <head>
+	<title></title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+	<link rel="stylesheet" type="text/css" href="css/main.css" />
+	<link rel="stylesheet" type="text/css" href="css/keyboard.css" />
+
+	<script src="js/core/jquery.js"></script>
+	<script src="js/core/jasmine.js"></script>
+	<script src="js/core/json2.js"></script>
+	<script src="js/core/md5.js"></script>
+	<script src="js/core/moment.js"></script>
+	<script src="js/core/mustache.js"></script>
+	<script src="js/core/helpers.js"></script>
+	<script src="js/core/main.js"></script>
+
+	<script src="js/core/module/developer.js"></script>
+	<script src="js/core/module/events.js"></script>
+	<script src="js/core/module/device.js"></script>
+	<script src="js/core/module/storage.js"></script>
+	<script src="js/core/module/control.js"></script>
+	<script src="js/core/module/defer.js"></script>
+	<script src="js/core/module/deferrable.js"></script>
+	<script src="js/core/module/focus.js"></script>
+	<script src="js/core/module/mouse.js"></script>
+	<script src="js/core/module/promise.js"></script>
+	<script src="js/core/module/router.js"></script>
+	<script src="js/core/module/input.js"></script>
+	<script src="js/core/module/keyboard.js"></script>
+	<script src="js/core/module/scene.js"></script>
+	<script src="js/core/module/snippet.js"></script>
+	<script src="js/core/module/model.js"></script>
+	<script src="js/core/module/collection.js"></script>
+	<script src="js/core/module/ajax.js"></script>
+	<script src="js/core/module/i18n.js"></script>
+	<script src="js/core/module/player.js"></script>
+	<script src="js/core/module/player_audio.js"></script>
+	<script src="js/core/module/playready.js"></script>
+	<script src="js/core/module/subtitles.js"></script>
+	<script src="js/core/module/template.js"></script>
+  <script src="js/core/module/analytics.js"></script>
+
+	<!-- Samsung TV driver, 2012+ -->
+	<script src="js/core/device/samsung.js"></script>
+	<script src="js/core/device/samsung/storage.js"></script>
+	<script src="js/core/device/samsung/player.js"></script>
+
+	<!-- LGE TV driver, 2012+ -->
+	<script src="js/core/device/lg.js"></script>
+	<script src="js/core/device/lg/player.js"></script>
+
+	<!-- Philips TV driver, 4.0+ -->
+	<script src="js/core/device/philips.js"></script>
+	<script src="js/core/device/philips/player.js"></script>
+
+	<!-- Dune HD driver, 1.0+ -->
+	<script src="js/core/device/dunehd.js"></script>
+	<script src="js/core/device/dunehd/player.js"></script>
+	<script src="js/core/device/dunehd/storage.js"></script>
+	
+	<!-- Smart TV Alliance driver -->
+	<script src="js/core/device/alliance.js"></script>
+	<script src="js/core/device/alliance/player.js"></script>
+	
+	<!-- Panasonic Viera driver, 2012+ -->
+	<script src="js/core/device/viera.js"></script>
+	<script src="js/core/device/viera/storage.js"></script>
+
+	<!-- Playstation driver, 3+ -->
+	<script src="js/core/device/playstation.js"></script>
+	<script src="js/core/device/playstation/player.js"></script>
+	<script src="js/core/device/playstation/storage.js"></script>
+	
+	<!-- WebOS library - !!! DO NOT MINIMIZE !!! -->
+	<script src="js/core/device/webos/webOS.js"></script>
+	<!-- WebOS driver, 1.0+ -->
+	<script src="js/core/device/webos.js"></script>
+
+	<!-- Sony driver -->
+	<script src="js/core/device/sony.js"></script>
+	<script src="js/core/device/sony/storage.js"></script>
+	<script src="js/core/device/sony/player.js"></script>
+
+	<!-- Toshiba driver -->
+	<script src="js/core/device/toshiba.js"></script>
+	<script src="js/core/device/toshiba/player.js"></script>
+	
+	<!-- Hyundai/GoGen/Vestel driver -->
+	<script src="js/core/device/vestel.js"></script>
+	<script src="js/core/device/vestel/player-old.js"></script>
+	
+	<!-- Languages -->
+	<script src="js/i18n/en.js"></script>
+	<script src="js/i18n/cs.js"></script>
+
+	<script src="js/scene/welcome.js"></script>
+	<script src="js/scene/test.js"></script>
+
+	<script src="config.js"></script>
+	<script src="js/app.js"></script>
+    </head>
+    <body>
+	<div id="viewport">
+		<div id="scene-welcome" class="scene" style="display: none">
+		<h1 class="title"></h1>
+		<p class="info"></p>
+		<div class="buttons-area">
+		    <div class="button focusable" data-action="en">English</div>
+		    <div class="button focusable" data-action="cs">Čeština</div>
+				<div class="button focusable" data-action="test">Keyboard scene</div>
+		</div>
+	    </div>
+		<div id="scene-test" class="scene" style="display: none">
+			<input type="text" value="hodnota" id="originput" />
+			<div class="input-cover"></div>
+			<div class="button btnorig focusable" data-action="orig">Keyboard to original input</div>
+			<div class="button btnmine focusable" data-action="mine">Keyboard to new input</div>
+		</div>
+	</div>
+    </body>
+</html>
