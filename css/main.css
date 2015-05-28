@@ -112,4 +112,5 @@ body { font-family: arial; font-size: 18px; color: #000; width: 1280px; height: 
 	padding: 0 10px;
 	width: 322px;
 	overflow: hidden;
+	white-space: nowrap;
 }
