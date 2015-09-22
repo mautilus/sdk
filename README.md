@@ -15,7 +15,7 @@ Applications based on Mautilus Smart TV SDK™ share the same source code across
 [http://smarttv.mautilus.com/SDK](http://smarttv.mautilus.com/SDK)
 
 ### 3. Architecture
-![Architecture](https://photos-1.dropbox.com/t/2/AABnj7V7h-8jIhbuj5sw1LsZ5WOPcN0qsEbF-ofP8lzFyg/12/289058125/png/32x32/1/_/1/2/Mautilus_SmartTV_SDK_Schema.png/EKyan5cCGNtVIAIoAg/4_ZY6dJxEeiotZYPeV_BLlrVeBab4LUPMWPLF2RdkEI?size=1600x1200&size_mode=2)
+![Architecture](./img/Mautilus_SmartTV_SDK_Schema.png?raw=true)
 
 ### 4. Examples
 
