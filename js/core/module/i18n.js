@@ -103,6 +103,18 @@ I18n = (function(Events) {
 			return l;
 
 		},
+		translateHTML: function(target) {
+			var scope = this;
+			$('[data-i18n]', target).each(function() {
+				var el = $(this);
+				var tr = el.attr('data-i18n').match(/^(\w+)(.*?)$/);
+				var t;
+	
+				if (tr && (t = scope.translate(tr[1]))) {
+					el.html(t + tr[2]);
+				}
+			});
+		},
 		getLanguage: function(langCode) {
 			for (var i in this.languages) {
 				if (this.languages[i][0] === langCode) {

@@ -1,0 +1,35 @@
+.icon-player-rwd {
+	background-image: url('../img/icons/icon_player_backward.png');
+}
+
+.focus > .icon-player-rwd,
+.activ > .icon-player-rwd {
+	background-image: url('../img/icons/icon_player_backward_active.png');
+}
+
+.icon-player-fwd {
+	background-image: url('../img/icons/icon_player_forward.png');
+}
+
+.focus > .icon-player-fwd,
+.activ > .icon-player-fwd {
+	background-image: url('../img/icons/icon_player_forward_active.png');
+}
+
+.icon-player-play {
+	background-image: url('../img/icons/icon_player_play.png');
+}
+
+.focus > .icon-player-play,
+.activ > .icon-player-play {
+	background-image: url('../img/icons/icon_player_play_active.png');
+}
+
+.icon-player-pause {
+	background-image: url('../img/icons/icon_player_pause.png') !important;
+}
+
+.focus > .icon-player-pause,
+.activ > .icon-player-pause{
+	background-image: url('../img/icons/icon_player_pause_active.png') !important;
+}

@@ -101,7 +101,7 @@ Ajax = (function(Events, Deferrable) {
 				data: null,
 				processData: true,
 				timeout: this.config.timeout || 30000,
-				jsonpCallback: null,
+				jsonpCallback: undefined,
 				headers: {},
 				// optional jQuery ajax params [object]
 				options: null

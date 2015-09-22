@@ -1,0 +1,170 @@
+/* size is exactly 1280x720 */
+body, p, div, span, h1, h2, h3, h4, h5, ul, li, html, body {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	font-family: sans-serif;
+	font-size: 16px;
+	color: #000;
+	width: 1280px;
+	height: 720px;
+	overflow: hidden;
+	background: #fff;
+}
+
+/* main view */
+#viewport {
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 1;
+	margin: 0;
+	padding: 0;
+	width: 1280px;
+	height: 720px;
+	overflow: hidden;
+	background: transparent;
+}
+
+.scene {
+	display: none;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 1280px;
+	height: 720px;
+}
+
+#scene-main #channels {
+	box-sizing: border-box;
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	width: 30%;
+	background: #eee;
+	border-right: 2px solid #ddd;
+}
+
+#scene-main #channels ul {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+#scene-main #channels ul li {
+	padding: 1rem;
+	border-bottom: 2px solid #ddd;
+	color: #777;
+}
+
+#scene-main #channels ul li .name {
+	font-weight: bold;
+}
+
+#scene-main #channels ul li.focus,
+#scene-main #channels ul li.active {
+	background-color: #fff;
+	color: #000;
+	margin-right: -2px;
+}
+
+#scene-main #channels ul li.focus {
+	color: blue;
+}
+
+#scene-main #articles {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	width: 70%;
+	overflow: auto;
+}
+
+#scene-main #articles ul {
+	margin: 0;
+	padding: 1rem 2rem;
+	list-style: none;
+}
+
+#scene-main #articles ul li {
+	position: relative;
+	padding: 1.5rem;
+	border-bottom: 2px solid #ddd;
+	border-left: 0.3rem solid transparent;
+	box-sizing: border-box;
+}
+
+#scene-main #articles ul li.bookmark {
+	border-left: 0.3rem solid yellow;
+}
+
+#scene-main #articles ul li h3 {
+	margin: 0 0 0.3rem 0;
+	font-size: 1.8rem;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+#scene-main #articles ul li .pubdate {
+	color: #777;
+	font-style: italic;
+}
+
+#scene-main #articles ul li .content {
+	margin-top: 1rem;
+	 line-height: 150%;
+}
+
+#scene-main #articles ul li p {
+	margin: 0;
+	padding: 0;
+}
+
+#scene-main #articles ul li .enter {
+	position: absolute;
+	top: 0.5rem;
+	right: 0;
+	padding: 0.5rem 1rem;
+	background: #d0d0d0;
+	opacity: 0.7;
+	display: none;
+}
+
+#scene-main #articles ul li .buttons {
+	position: absolute;
+	top: 0.5rem;
+	right: 0;
+	padding: 0.5rem 1rem;
+	background: #d0d0d0;
+}
+
+#scene-main #articles ul li .buttons span {
+	display: inline-block;
+	background: #fff;
+	border-radius: 0.3rem;
+	padding: 0.3rem 0.6rem;
+	margin: 0 0.3rem;
+	color: #777;
+}
+
+#scene-main #articles ul li .buttons span.focus {
+	color: #fff;
+	background-color: blue;
+}
+
+#scene-main #articles ul li.focus {
+	background-color: #f4f4f4;
+}
+
+#scene-main #articles ul li.focus h3 {
+	color: blue;
+}
+
+#scene-main #articles ul li.focus .enter {
+	display: block;
+}

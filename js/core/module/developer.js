@@ -693,7 +693,7 @@ Developer = (function() {
 		 */
 		appendUIStyles: function() {
 			var s = document.createElement('style');
-			s.innerText = "\
+			var cssText = "\
 #developer-ui {\
 position: absolute;\
 z-index: 9999999;\
@@ -758,6 +758,12 @@ color: #fff;\
 background: green;\
 }\
 ";
+			if(typeof(s.textContent) !== "undefined") {
+				s.textContent = cssText;  // new style
+			} else {
+				s.innerText = cssText;   // old style - not supported by Firefox
+			}
+			
 			document.head.appendChild(s);
 		}
 	});

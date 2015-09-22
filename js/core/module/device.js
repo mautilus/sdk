@@ -21,6 +21,7 @@ Device = (function(Events) {
 		isDEFAULT: false,
 		isLG: false,
 		isSAMSUNG: false,
+		isTIZEN: false,
 		isPHILIPS: false,
 		isDUNEHD: false,
 		isVIERA: false,

@@ -1,0 +1,191 @@
+﻿<!DOCTYPE html>
+<html>
+	<head>
+		<title>PlayerKeyboardInfo Demo</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=1280">
+
+		<!-- build:[href] css/main.min.css -->
+		<link rel="stylesheet" type="text/css" href="css/main.css" />
+		<!-- /build -->
+		<!-- build:remove -->
+		<link rel="stylesheet" type="text/css" href="css/font.css" />
+		<link rel="stylesheet" type="text/css" href="css/icons.css" />
+		<link rel="stylesheet" type="text/css" href="../../css/keyboard.css" />
+		<!-- /build -->
+
+		<!-- build:js js/source.min.js -->
+		<script src="../../js/core/jquery.js"></script>
+		<script src="../../js/core/jasmine.js"></script>
+		<script src="../../js/core/json2.js"></script>
+		<script src="../../js/core/md5.js"></script>
+		<script src="../../js/core/moment.js"></script>
+		<script src="../../js/core/mustache.js"></script>
+		<script src="../../js/core/helpers.js"></script>
+		<script src="../../js/core/main.js"></script>
+
+		<script src="../../js/core/module/developer.js"></script>
+		<script src="../../js/core/module/events.js"></script>
+		<script src="../../js/core/module/device.js"></script>
+		<script src="../../js/core/module/storage.js"></script>
+		<script src="../../js/core/module/control.js"></script>
+		<script src="../../js/core/module/defer.js"></script>
+		<script src="../../js/core/module/deferrable.js"></script>
+		<script src="../../js/core/module/focus.js"></script>
+		<script src="../../js/core/module/mouse.js"></script>
+		<script src="../../js/core/module/promise.js"></script>
+		<script src="../../js/core/module/router.js"></script>
+		<script src="../../js/core/module/input.js"></script>
+		<script src="../../js/core/module/keyboard.js"></script>
+		<script src="../../js/core/module/scene.js"></script>
+		<script src="../../js/core/module/snippet.js"></script>
+		<script src="../../js/core/module/model.js"></script>
+		<script src="../../js/core/module/collection.js"></script>
+		<script src="../../js/core/module/ajax.js"></script>
+		<script src="../../js/core/module/i18n.js"></script>
+		<script src="../../js/core/module/player.js"></script>
+		<script src="../../js/core/module/player_audio.js"></script>
+		<script src="../../js/core/module/playready.js"></script>
+		<script src="../../js/core/module/subtitles.js"></script>
+		<script src="../../js/core/module/template.js"></script>
+		<script src="../../js/core/module/analytics.js"></script>
+
+		<!-- Samsung TV driver, 2012+ -->
+		<script src="../../js/core/device/samsung.js"></script>
+		<script src="../../js/core/device/samsung/storage.js"></script>
+		<script src="../../js/core/device/samsung/player.js"></script>
+
+		<!-- Tizen driver, 2012+ -->
+		<script src="../../js/core/device/tizen.js"></script>
+		<script src="../../js/core/device/tizen/player.js"></script>
+
+		<!-- LGE TV driver, 2012+ -->
+		<script src="../../js/core/device/lg.js"></script>
+		<script src="../../js/core/device/lg/player.js"></script>
+
+		<!-- Philips TV driver, 4.0+ -->
+		<script src="../../js/core/device/philips.js"></script>
+		<script src="../../js/core/device/philips/player.js"></script>
+
+		<!-- Dune HD driver, 1.0+ -->
+		<script src="../../js/core/device/dunehd.js"></script>
+		<script src="../../js/core/device/dunehd/player.js"></script>
+		<script src="../../js/core/device/dunehd/storage.js"></script>
+
+		<!-- Smart TV Alliance driver -->
+		<script src="../../js/core/device/alliance.js"></script>
+		<script src="../../js/core/device/alliance/player.js"></script>
+
+		<!-- Panasonic Viera driver, 2012+ -->
+		<script src="../../js/core/device/viera.js"></script>
+		<script src="../../js/core/device/viera/storage.js"></script>
+
+		<!-- Playstation driver, 3+ -->
+		<script src="../../js/core/device/playstation.js"></script>
+		<script src="../../js/core/device/playstation/player.js"></script>
+		<script src="../../js/core/device/playstation/storage.js"></script>
+
+		<!-- WebOS library - !!! DO NOT MINIMIZE !!! -->
+		<script src="../../js/core/device/webos/webOS.js"></script>
+		<!-- WebOS driver, 1.0+ -->
+		<script src="../../js/core/device/webos.js"></script>
+
+		<!-- Sony driver -->
+		<script src="../../js/core/device/sony.js"></script>
+		<script src="../../js/core/device/sony/storage.js"></script>
+		<script src="../../js/core/device/sony/player.js"></script>
+
+		<!-- Toshiba driver -->
+		<script src="../../js/core/device/toshiba.js"></script>
+		<script src="../../js/core/device/toshiba/player.js"></script>
+
+		<!-- Hyundai/GoGen/Vestel driver -->
+		<script src="../../js/core/device/vestel.js"></script>
+		<script src="../../js/core/device/vestel/player-old.js"></script>
+
+		<!-- Languages -->
+		<script src="js/i18n/en.js"></script>
+		<script src="js/i18n/cs.js"></script>
+
+		<!-- Scenes -->
+		<script src="js/scene/splashscreen.js"></script>
+		<script src="js/scene/welcome.js"></script>
+		<script src="js/scene/keyboard.js"></script>
+		<script src="js/scene/info.js"></script>
+		<script src="js/scene/player.js"></script>
+
+		<!-- Snippets -->
+		<script src="js/snippet/color_navigation.js"></script>
+		<script src="js/snippet/player_controls.js"></script>
+		<!-- /build -->
+
+		<script src="config.js"></script>
+
+		<!-- build:js js/app.min.js -->
+		<script src="js/app.js"></script>
+		<!-- /build -->
+	</head>
+	<body>
+		<div id="viewport">
+			<div id="scene-splashscreen" class="scene" style="display: none">
+				<div class="title">Player Keyboard Info Demo</div>
+			</div>
+
+			<div id="scene-welcome" class="scene" style="display: none">
+				<ul class="list">
+					<li class="item focusable ico-player" data-id="player">
+						<span class="title" data-i18n="Player"></span>
+						<span class="subtitle" data-i18n="Try_the_player"></span>
+					</li>
+					<li class="item focusable ico-keyboard" data-id="keyboard">
+						<span class="title" data-i18n="Keyboard"></span>
+						<span class="subtitle" data-i18n="Try_the_keyboard"></span>
+					</li>
+					<li class="item focusable ico-info" data-id="info">
+						<span class="title" data-i18n="Info"></span>
+						<span class="subtitle" data-i18n="Download SDK"></span>
+					</li>
+				</ul>
+			</div>
+
+			<div id="scene-info" class="scene" style="display: none">
+			</div>
+
+			<div id="scene-keyboard" class="scene" style="display: none">
+				<div class="title" data-i18n="Keyboard"></div>
+				<div id="test-input" class="focusable"></div>
+			</div>
+
+			<div id="scene-player" class="scene" style="display: none">
+				<div id="snippet-player-controls">
+					<div class="wrap">
+						<div class="time">
+							<span class="current-time">0:00</span>
+							<span class="duration">-0:00</span>
+						</div>
+						<div class="progress-bar">
+							<div class="inner">
+								<div class="scrubber"></div>
+							</div>
+						</div>
+						<div class="controls">
+							<ul>
+								<li class="rwd focusable" data-value="rwd">
+									<span class="icon-player-rwd"></span>
+								</li>
+								<li class="play focusable" data-value="play">
+									<span class="icon-player-play"></span>
+								</li>
+								<li class="fwd focusable" data-value="fwd">
+									<span class="icon-player-fwd"></span>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div id="snippet-color-navigation"></div>
+		</div>
+	</body>
+</html>

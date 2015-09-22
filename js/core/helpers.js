@@ -87,6 +87,19 @@ function secondsToHours(seconds) {
 	return hours + ':' + ('0' + minutes).slice(-2) + ':' + ('0' + seconds).slice(-2);
 }
 
+/**
+ * Convert seconds to minutes, e.g. 05:23
+ * 
+ * @param {Number} seconds
+ * @returns {String};
+ */
+function secondsToMinutes(seconds) {
+	var minutes = Math.floor((seconds) / 60);
+		seconds = Math.floor(seconds - (minutes * 60));
+
+	return ('0' + minutes).slice(-2) + ':' + ('0' + seconds).slice(-2);
+}
+
 /* Modify objects */
 
 /*
@@ -97,7 +110,7 @@ function secondsToHours(seconds) {
 String.prototype.trim = function () { return this.replace(/^\s+|\s+$/g, ''); };
 
 /*
- * This function replace all occurence of string inside the string.
+ * This function replace all occurrence of string inside the string.
  * 
  * @param {String} a string which the function is looking for
  * @param {String} b string for replace
@@ -105,7 +118,7 @@ String.prototype.trim = function () { return this.replace(/^\s+|\s+$/g, ''); };
  */
 String.prototype.replaceAll = function (a, b) {
 	if (!a || !b) return this;
-	return this.replace(new RegExp(a, "gm"), b);
+	return this.replace(new RegExp(a, 'gm'), b);
 };
 
 /*

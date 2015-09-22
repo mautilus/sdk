@@ -157,7 +157,7 @@ Router = (function(Events, Deferrable) {
 				
 				this.trigger('scene', name, this.activeScene, args);
 				
-		this.activeScene.render.apply(this.activeScene, arguments);		// PP!
+				this.activeScene.render.apply(this.activeScene, arguments);		// PP!
 
 				if(this.activeScene.config.focusOnRender !== false){
 					this.activeScene.focus();
@@ -168,6 +168,8 @@ Router = (function(Events, Deferrable) {
 
 			if ((scene = this.getScene(name)) !== false) {
 				if (this.activeScene === scene && this.activeScene.isVisible) {
+					this.history.shift();										// TS
+					this.history.unshift(args);									// TS
 					this.activeScene.refresh(args.slice(1));
 					
 					if(this.activeScene.config.focusOnRender !== false){
@@ -222,6 +224,7 @@ Router = (function(Events, Deferrable) {
 				}
 				
 				returnScene = (args && args[0] ? this.getScene(args[0]) : null);
+				if (returnScene) returnScene.onBeforeGoBack(this.activeSceneName);
 				promise = new Promise();
 				
 				this.go.apply(this, args).then(function(status){

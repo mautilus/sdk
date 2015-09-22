@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=1280">
+
+		<!-- build:[href] css/main.min.css -->
+		<link rel="stylesheet" type="text/css" href="css/main.css" />
+		<!-- /build -->
+
+		<!-- build:js js/source.min.js -->
+		<script src="../../js/core/jquery.js"></script>
+		<script src="../../js/core/jasmine.js"></script>
+		<script src="../../js/core/json2.js"></script>
+		<script src="../../js/core/md5.js"></script>
+		<script src="../../js/core/moment.js"></script>
+		<script src="../../js/core/mustache.js"></script>
+		<script src="../../js/core/helpers.js"></script>
+		<script src="../../js/core/main.js"></script>
+
+		<script src="../../js/core/module/developer.js"></script>
+		<script src="../../js/core/module/events.js"></script>
+		<script src="../../js/core/module/device.js"></script>
+		<script src="../../js/core/module/storage.js"></script>
+		<script src="../../js/core/module/control.js"></script>
+		<script src="../../js/core/module/defer.js"></script>
+		<script src="../../js/core/module/deferrable.js"></script>
+		<script src="../../js/core/module/focus.js"></script>
+		<script src="../../js/core/module/mouse.js"></script>
+		<script src="../../js/core/module/promise.js"></script>
+		<script src="../../js/core/module/router.js"></script>
+		<script src="../../js/core/module/scene.js"></script>
+		<script src="../../js/core/module/snippet.js"></script>
+		<script src="../../js/core/module/model.js"></script>
+		<script src="../../js/core/module/collection.js"></script>
+		<script src="../../js/core/module/ajax.js"></script>
+		<script src="../../js/core/module/i18n.js"></script>
+		<script src="../../js/core/module/player.js"></script>
+		<script src="../../js/core/module/playready.js"></script>
+		<script src="../../js/core/module/subtitles.js"></script>
+
+		<!-- Samsung TV driver, 2012+ -->
+		<script src="../../js/core/device/samsung.js"></script>
+		<script src="../../js/core/device/samsung/storage.js"></script>
+		<script src="../../js/core/device/samsung/player.js"></script>
+
+		<!-- Tizen driver, 2012+ -->
+		<script src="../../js/core/device/tizen.js"></script>
+		<script src="../../js/core/device/tizen/player.js"></script>
+
+		<!-- LGE TV driver, 2012+ -->
+		<script src="../../js/core/device/lg.js"></script>
+		<script src="../../js/core/device/lg/player.js"></script>
+
+		<!-- Philips TV driver, 4.0+ -->
+		<script src="../../js/core/device/philips.js"></script>
+		<script src="../../js/core/device/philips/player.js"></script>
+
+		<!-- Dune HD driver, 1.0+ -->
+		<script src="../../js/core/device/dunehd.js"></script>
+		<script src="../../js/core/device/dunehd/player.js"></script>
+		<script src="../../js/core/device/dunehd/storage.js"></script>
+
+		<!-- Smart TV Alliance driver -->
+		<script src="../../js/core/device/alliance.js"></script>
+		<script src="../../js/core/device/alliance/player.js"></script>
+
+		<!-- Panasonic Viera driver, 2012+ -->
+		<script src="../../js/core/device/viera.js"></script>
+		<script src="../../js/core/device/viera/storage.js"></script>
+
+		<!-- Playstation driver, 3+ -->
+		<script src="../../js/core/device/playstation.js"></script>
+		<script src="../../js/core/device/playstation/player.js"></script>
+		<script src="../../js/core/device/playstation/storage.js"></script>
+
+		<!-- WebOS library - !!! DO NOT MINIMIZE !!! -->
+		<script src="../../js/core/device/webos/webOS.js"></script>
+		<!-- WebOS driver, 1.0+ -->
+		<script src="../../js/core/device/webos.js"></script>
+
+		<!-- Sony driver -->
+		<script src="../../js/core/device/sony.js"></script>
+		<script src="../../js/core/device/sony/storage.js"></script>
+		<script src="../../js/core/device/sony/player.js"></script>
+
+		<!-- Toshiba driver -->
+		<script src="../../js/core/device/toshiba.js"></script>
+		<script src="../../js/core/device/toshiba/player.js"></script>
+
+		<!-- Hyundai/GoGen/Vestel driver -->
+		<script src="../../js/core/device/vestel.js"></script>
+		<script src="../../js/core/device/vestel/player-old.js"></script>
+
+		<!-- Scenes -->
+		<script src="js/scene/main.js"></script>
+
+		<!-- Snippets -->
+		<script src="js/snippet/channels.js"></script>
+		<script src="js/snippet/articles.js"></script>
+		<script src="js/snippet/buttons.js"></script>
+
+		<!-- Collections -->
+		<script src="js/collection/channels.js"></script>
+
+		<!-- Models -->
+		<script src="js/model/channel.js"></script>
+		<!-- /build -->
+
+		<script src="config.js"></script>
+
+		<!-- build:js js/app.min.js -->
+		<script src="js/app.js"></script>
+		<!-- /build -->
+
+		<!-- Mustache templates -->
+		<script id="tpl-channel" type="text/html">
+			<li class="focusable" data-id="{{id}}">
+				<div class="name">{{name}}</div>
+				<span class="feed">{{feed}}</span>
+			</li>
+		</script>
+
+		<script id="tpl-article" type="text/html">
+			<li class="focusable article">
+				<h3 class="title">{{title}}</h3>
+				<span class="pubdate">{{pubDate}}</span>
+				<div class="content">
+					{{description}}
+				</div>
+				<div class="enter">Press Enter</div>
+			</li>
+		</script>
+
+		<script id="tpl-buttons" type="text/html">
+			<div class="buttons">
+				<span class="focusable" data-btn="bookmark">Bookmark</span>
+				<span class="focusable" data-btn="remove">Remove</span>
+			</div>
+		</script>
+
+	</head>
+	<body>
+		<div id="viewport">
+			<div id="scene-main" class="scene"></div>
+		</div>
+	</body>
+</html>

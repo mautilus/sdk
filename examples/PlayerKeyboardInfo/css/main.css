@@ -1,0 +1,506 @@
+/*
+*********************************************************
+* GLOBAL STYLE
+*********************************************************
+*/
+
+/* size is exactly 1280x720 */
+body, p, div, span, h1, h2, h3, h4, h5, ul, li, html {
+	margin: 0;
+	padding: 0;
+}
+
+ul {
+	list-style: none;
+}
+
+a {
+	border: 0;
+	outline: none !important;
+	text-decoration: none;
+	color: #ffffff;
+}
+
+body {
+	position: relative;
+	font-family: 'ubuntu';
+	font-size: 20px; 
+	font-weight: 300;
+	color: #000000;
+	width: 1280px;
+	height: 720px;
+	overflow: hidden;
+	background: transparent;
+}
+
+/* main view */
+#viewport {
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 1;
+	margin: 0;
+	padding: 0;
+	width: 1280px;
+	height: 720px;
+	overflow: hidden;
+	background: transparent;
+}
+
+/* global objects */
+.focusable,
+.clickable {
+	cursor: pointer;
+}
+
+/* notification object */
+#notifications {
+	position: absolute;
+	z-index: 99;
+	top: 0;
+	left: 0;
+	right: 0;
+}
+
+#notifications .msg {
+	padding: 20px;
+	color: #ffffff;
+	text-align: left;
+	background: rgba(0, 0, 0, 0.7);
+	margin-bottom: 2px;
+	font-size: 22px;
+	font-weight: 400;
+}
+
+/* throbber object */
+.throbber {
+	position: absolute;
+	z-index: 98;
+	top: 360px;
+	left: 50%;
+	width: 71px;
+	height: 71px;
+	margin: -35px 0 0 -35px;
+	background: transparent url('../img/throbber.png') no-repeat 0 0;
+}
+
+.scene {
+	width: 1280px;
+	height: 720px;
+	color: #ffffff;
+}
+
+/*
+*********************************************************
+* SCENE SPLASHSCREEN SCENE
+*********************************************************
+*/
+
+#scene-splashscreen {
+	background: #252525;
+}
+
+#scene-splashscreen .title {
+	font-size: 120px;
+	text-align: center;
+	padding-top: 400px;
+	font-weight: 400;
+	color: rgba(0,0,0,0.5);
+	text-shadow: 0px 2px 3px rgba(0,0,0,0.4);
+}
+
+/*
+*********************************************************
+* SCENE WELCOME SCENE
+*********************************************************
+*/
+
+#scene-welcome {
+	position: relative;
+	background: #252525;
+}
+
+#scene-welcome .list {
+	width: 100%;
+	padding: 127px 0px 0px;
+	text-align: center;
+	font-size: 0px;
+}
+
+	#scene-welcome .item {
+		display: inline-block;
+		width: 250px;
+		height: 470px;
+		margin: 3px 15px 3px;
+		vertical-align: top;
+		background: #0b0707;
+		border-radius: 5px;
+		font-size: 20px;
+	}
+
+	#scene-welcome .item .title {
+		display: block;
+		padding: 0px 29px 0px;
+		margin: 290px 0px 0px;
+		text-align: center;
+		font-size: 34px;
+		font-weight: 400;
+	}
+
+	#scene-welcome .item .title:after {
+		content: '';
+		display: block;
+		height: 1px;
+		width: 100%;
+		margin: 18px 0px 18px;
+		background: rgba(255,255,255,0.5);
+	}
+
+	#scene-welcome .item .subtitle {
+		display: block;
+		text-align: center;
+		color: rgba(255,255,255, 0.8);
+	}
+
+	#scene-welcome .item.focus {
+		border: 3px solid #ffffff;
+		margin: 0px 12px 0px;
+		box-shadow: 0px 0px 10px #ffffff;
+	}
+
+	#scene-welcome .ico-player {
+		background: url('../img/bg_player.png') top right;
+		background-color: #0084aa;
+	}
+
+	#scene-welcome .ico-keyboard {
+		background: url('../img/bg_input.png') top right;
+		background-color: #799a00;
+	}
+
+	#scene-welcome .ico-info {
+		background: url('../img/bg_info.png') top right;
+		background-color: #c54d01;
+	}
+
+/*
+*********************************************************
+* SCENE INFO SCENE
+*********************************************************
+*/
+
+#scene-info {
+	background: #d85a02;
+}
+
+#scene-info .title {
+	display: block;
+	padding: 150px 0px 0px;
+	text-align: center;
+	font-size: 60px;
+	font-weight: 400;
+}
+
+#scene-info .title:after {
+	content: '';
+	display: block;
+	height: 1px;
+	width: 260px;
+	margin: 30px auto 30px;
+	background: rgba(255, 255, 255, 0.75);
+}
+
+#scene-info .subtitle {
+	display: block;
+	text-align: center;
+	font-size: 30px;
+	color: rgba(255, 255, 255, 0.7);
+}
+
+#scene-info .subtitle .par {
+	display: block;
+	line-height: 48px;
+}
+
+#scene-info .subtitle .url{
+	color: rgba(255, 255, 255, 0.9);
+}
+
+/*
+*********************************************************
+* SCENE KEYBOARD SCENE
+*********************************************************
+*/
+
+#scene-keyboard {
+	background: #93be00;
+}
+
+#scene-keyboard .title {
+	display: block;
+	padding: 120px 0px 0px;
+	text-align: center;
+	font-size: 60px;
+	font-weight: 400;
+}
+
+#scene-keyboard .title:after {
+	content: '';
+	display: block;
+	height: 1px;
+	width: 260px;
+	margin: 30px auto 30px;
+	background: rgba(255, 255, 255, 0.75);
+}
+
+#test-input {
+	width: 430px;
+	padding: 15px 20px 15px;
+	margin: 50px auto 0px;
+	height: 40px;
+	background: #ffffff;
+	border-radius: 5px;
+	line-height: 40px;
+	font-size: 30px;
+	color: #2c2c2d;
+	position: relative;
+	font-weight: 400;
+}
+
+#test-input.focus {
+	border: 3px solid #ffffff;
+	margin-top:47px;
+	box-shadow: 0px 0px 10px #ffffff;
+	background: rgba(255, 255, 255, 0.3);
+}
+
+#test-input .input {
+	overflow: hidden;
+}
+
+.keyboard-content .line .key.focus .content {
+	background-color: #a3cd41 !important;
+}
+
+/*
+*********************************************************
+* COLOR NAVIGATION SNIPPET
+*********************************************************
+*/
+
+#snippet-color-navigation {
+	width: 100%;
+	height: 40px;
+	position: absolute;
+	top: 680px;
+	left: 0px;
+}
+
+.color-buttons {
+	height: 40px;
+	padding: 0px 20px 0px 50px;
+	background-color: rgba(0, 0, 0, 0.2);
+	text-align: right;
+}
+
+	.color-buttons > .item {
+		display: inline-block;
+		vertical-align: top;
+		padding: 3px 30px 0px 0px;
+		font-size: 20px;
+		line-height: 20px;
+		color: rgba(255, 255, 255, 0.7);
+	}
+
+	.color-buttons > .item:hover {
+		color: rgba(255, 255, 255, 1);
+	}
+
+	.color-buttons > .item:before {
+		position: relative;
+		top: 5px;
+		display: inline-block;
+		width: 28px;
+		height: 23px;
+		content: '';
+		margin: 0px 10px 0px 0px;
+		background-image: url(../img/colorbuttons.png);
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+	}
+
+	.color-buttons > .item.red:before {
+		background-position: -30px 0px;
+	}
+
+	.color-buttons > .item.green:before {
+		background-position: -60px 0px;
+	}
+
+	.color-buttons > .item.blue:before {
+		background-position: -120px 0px;
+	}
+
+	.color-buttons > .item.yellow:before {
+		background-position: -90px 0px;
+	}
+
+/*
+*********************************************************
+* SCENE VIDEO PLAYER
+*********************************************************
+*/
+
+#scene-player {
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	background: transparent;
+}
+
+#scene-player.seek-process {
+	background: #000000 !important;
+}
+
+#scene-player.sett-process {
+	background: #000000 !important;
+}
+
+#scene-player > #snippet-player-controls {
+	position: absolute;
+	display: none;
+	bottom: 0px;
+	left: 0px;
+	width: 100%;
+}
+
+#scene-player.ui-visible > #snippet-player-controls {
+	display: block;
+}
+
+/*
+*********************************************************
+* SNIPPET PLAYER CONTROLS
+*********************************************************
+*/
+
+#snippet-player-controls {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	height: 199px;
+	background: url('../img/player_background_grad_0.png') repeat;
+}
+
+#snippet-player-controls > .wrap {
+	position: relative;
+	padding: 82px 140px 14px 140px;
+}
+
+#snippet-player-controls > .wrap > .time {
+	position: absolute;
+	top: 63px;
+	left: 0;
+	width: 100%;
+	height: 40px;
+	line-height: 40px;
+	color: #ffffff;
+	font-size: 28px;
+	opacity: 0.5;
+	background: transparent;
+}
+
+#snippet-player-controls > .wrap > .time > .current-time {
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 180px;
+	text-align: right;
+	background: transparent;
+}
+
+#snippet-player-controls > .wrap > .time > .duration {
+	position: absolute;
+	top: 0;
+	right: 0;
+	height: 100%;
+	width: 180px;
+	text-align: left;
+	background: transparent;
+}
+
+#snippet-player-controls > .wrap > .progress-bar {
+	position: relative;
+	width: 100%;
+	height: 5px;
+	background: rgba(255, 255, 255, 0.2);
+	margin: 0 0 20px 0;
+}
+
+#snippet-player-controls > .wrap > .progress-bar > .inner {
+	position: relative;
+	height: 100%;
+	width: 0px;
+	background: rgba(255, 255, 255, 0.5);
+}
+
+#snippet-player-controls > .wrap > .controls {
+	position: relative;
+	width: 400px;
+	height: 80px;
+	margin: 0 auto;
+}
+
+#snippet-player-controls > .wrap > .controls > ul {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	width: 100%;
+	height: 100%;
+}
+
+#snippet-player-controls > .wrap > .controls > ul > li {
+	display: block;
+	width: 80px;
+	height: 80px;
+	margin: 0 80px 0 0;
+	background: transparent;
+	float: left;
+}
+
+#snippet-player-controls > .wrap > .controls > ul > li:last-child {
+	margin: 0 0 0 0;
+}
+
+#snippet-player-controls > .wrap > .controls > ul > li.focus {
+	background: url('../img/button_focus_bg.png') repeat !important;
+}
+
+#snippet-player-controls > .wrap > .controls > ul > li > span {
+	display: inline-block;
+	width: 100%;
+	height: 100%;
+	background-repeat: no-repeat;
+	background-position: center center;
+}
+
+#snippet-player-controls {
+	height: 269px !important;
+	background: -webkit-linear-gradient(rgba(0, 0, 0, 0.0) 0%, rgba(0, 0, 0, 0.05) 5%, rgba(0, 0, 0, 0.32) 20%, rgba(0, 0, 0, 0.48) 29%, rgba(0, 0, 0, 0.56) 34%, rgba(0, 0, 0, 0.64) 40%, rgba(0, 0, 0, 0.80) 60%, rgba(0, 0, 0, 0.89) 81%, rgba(0, 0, 0, 0.95) 100%);
+	background: -moz-linear-gradient(rgba(0, 0, 0, 0.0) 0%, rgba(0, 0, 0, 0.05) 5%, rgba(0, 0, 0, 0.32) 20%, rgba(0, 0, 0, 0.48) 29%, rgba(0, 0, 0, 0.56) 34%, rgba(0, 0, 0, 0.64) 40%, rgba(0, 0, 0, 0.80) 60%, rgba(0, 0, 0, 0.89) 81%, rgba(0, 0, 0, 0.95) 100%);
+	background: -o-linear-gradient(rgba(0, 0, 0, 0.0) 0%, rgba(0, 0, 0, 0.05) 5%, rgba(0, 0, 0, 0.32) 20%, rgba(0, 0, 0, 0.48) 29%, rgba(0, 0, 0, 0.56) 34%, rgba(0, 0, 0, 0.64) 40%, rgba(0, 0, 0, 0.80) 60%, rgba(0, 0, 0, 0.89) 81%, rgba(0, 0, 0, 0.95) 100%);
+	background: -webkit-gradient(linear, 0 0, 0 100%, from(rgba(0, 0, 0, 0.0)), color-stop(0.05, rgba(0, 0, 0, 0.05)), color-stop(0.2, rgba(0, 0, 0, 0.32)), color-stop(0.29, rgba(0, 0, 0, 0.48)), color-stop(0.34, rgba(0, 0, 0, 0.56)), color-stop(0.4, rgba(0, 0, 0, 0.64)), color-stop(0.6, rgba(0, 0, 0, 0.80)), color-stop(0.81, rgba(0, 0, 0, 0.89)), to(rgba(0, 0, 0, 0.95)));
+	background: linear-gradient(rgba(0, 0, 0, 0.0) 0%, rgba(0, 0, 0, 0.05) 5%, rgba(0, 0, 0, 0.32) 20%, rgba(0, 0, 0, 0.48) 29%, rgba(0, 0, 0, 0.56) 34%, rgba(0, 0, 0, 0.64) 40%, rgba(0, 0, 0, 0.80) 60%, rgba(0, 0, 0, 0.89) 81%, rgba(0, 0, 0, 0.95) 100%);
+}
+
+#snippet-player-controls > .wrap {
+	padding: 135px 93px 14px 93px !important;
+}
+
+#snippet-player-controls > .wrap > .time {
+	top: 155px !important;
+}

@@ -1,21 +1,55 @@
 /* size is exactly 1280x720 */
-body, p, div, span, h1, h2, h3, h4, h5, ul, li, html, body { margin: 0;	padding: 0; }
-ul { list-style: none; }
-ul li { float: left;}
-a { border: 0;	outline: none !important; text-decoration: none; color: #FFF; }
-body { font-family: arial; font-size: 18px; color: #000; width: 1280px; height: 720px;	
-		 overflow: hidden;	background: transparent; }
+body, p, div, span, h1, h2, h3, h4, h5, ul, li, html, body {
+	margin: 0;
+	padding: 0;
+}
+
+ul {
+	list-style: none;
+}
+
+ul li {
+	float: left;
+}
+
+a {
+	border: 0;
+	outline: none !important;
+	text-decoration: none;
+	color: #FFF;
+}
+
+body {
+	font-family: arial;
+	font-size: 18px;
+	color: #000;
+	width: 1280px;
+	height: 720px;
+	overflow: hidden;
+	background: transparent;
+}
 
 /* main view */
-#viewport {	position: absolute; top: 0; left: 0; z-index: 1; margin: 0; padding: 0;
-				width: 1280px;	height: 720px;	overflow: hidden;	background: transparent; }
+#viewport {
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 1;
+	margin: 0;
+	padding: 0;
+	width: 1280px;
+	height: 720px;
+	overflow: hidden;
+	background: transparent;
+}
 
 /* global objects */
-.focusable { cursor: pointer; }
+.focusable {
+	cursor: pointer;
+}
 
 /* notification object */
-#notifications
-{
+#notifications {
 	position: absolute;
 	z-index: 99;
 	top: 0;
@@ -23,8 +57,7 @@ body { font-family: arial; font-size: 18px; color: #000; width: 1280px; height: 
 	right: 0;
 }
 
-#notifications .msg
-{
+#notifications .msg {
 	padding: 20px;
 	color: #fff;
 	text-align: left;
@@ -34,8 +67,7 @@ body { font-family: arial; font-size: 18px; color: #000; width: 1280px; height: 
 }
 
 /* throbber object */
-.throbber
-{
+.throbber {
 	position: absolute;
 	z-index: 98;
 	top: 360px;
@@ -107,10 +139,10 @@ body { font-family: arial; font-size: 18px; color: #000; width: 1280px; height: 
 #scene-test .input-cover .input {
 	background: white;
 	font-family: Arial;
+	height: 100px;
 	line-height: 100px;
 	font-size: 40px;
 	padding: 0 10px;
 	width: 322px;
 	overflow: hidden;
-	white-space: nowrap;
 }

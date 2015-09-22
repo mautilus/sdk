@@ -93,6 +93,15 @@ Main = (function(global) {
 			else if (navigator.userAgent.indexOf('Maple') >= 0) {
 				return ['samsung', '2013'];
 			}
+			else if (navigator.userAgent.indexOf('SmartTV+2014; Maple2012') >= 0) {
+				return ['samsung', '2014'];
+			}
+			else if (navigator.userAgent.indexOf('SmartTV+2015; Maple2012') >= 0) {
+				return ['samsung', '2015'];
+			}
+			else if (navigator.userAgent.indexOf('Tizen') >= 0) {
+				return ['tizen', '2015'];
+			}
 			else if (navigator.userAgent.indexOf('LG NetCast.TV-2011') >= 0) {
 				return ['lg', '2011'];
 			}

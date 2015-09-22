@@ -78,7 +78,7 @@ Input = (function () {
 		* Create input.
 		*/
 		create: function ($parent, css) {
-			this.$el = $("<div class='input' style='position:relative;'><span class='text' style='position: relative; left: 0px;'></span></div>");
+			this.$el = $("<div class='input' style='position:relative;'><span class='text' style='position: relative; left: 0px; white-space: nowrap;'></span></div>");
 			this.$text = this.$el.find(".text");
 			this.$cursor = $("<div class='cursor' style='position: absolute; left:0; top:0;display:absolute;'></div>");
 			this.cursorBlinking = null;
@@ -156,10 +156,16 @@ Input = (function () {
 		* Set text, which user can see on the screen.
 		*/
 		setText: function (text, isPlaceholder) {
-			if (this.passwordMode) {
+			if (this.passwordMode && !isPlaceholder) {
 				this.$text.html(text.replace(new RegExp(".", "gm"), "*"));
-			} else
-				this.$text.html(text.replace(new RegExp(" ", "gm"), "&nbsp;"));
+			} else {
+				text = text.replace(new RegExp("&", "gm"), "&amp;");
+				text = text.replace(new RegExp(" ", "gm"), "&nbsp;");
+				text = text.replace(new RegExp("<", "gm"), "&lt;");
+				text = text.replace(new RegExp(">", "gm"), "&gt;");
+				
+				this.$text.html(text);
+			}
 
 			if (this.$text.html().length < 1 && this.placeHolder) {
 				this.setPlaceholder(true);
@@ -200,7 +206,7 @@ Input = (function () {
 				// insert inside
 
 				var left = this.valueArray.splice(0, this.cursorPos), right = this.valueArray,
-					 leftS = this.value.substr(0, this.cursorPos), rightS = this.value.substr(this.cursorPos, this.value.length - this.cursorPos);
+					leftS = this.value.substr(0, this.cursorPos), rightS = this.value.substr(this.cursorPos, this.value.length - this.cursorPos);
 
 				this.valueArray = left.concat([{ char: xchar, width: this.getTextDimensions(xchar).width}], right);
 				this.value = leftS + xchar + rightS;
@@ -208,6 +214,7 @@ Input = (function () {
 				this.cursorPos++;
 				this.cursor(this.cursorPos);
 			}
+			this.trigger('inserted', this.getValue());
 		},
 		/**
 		* Cursor functionality inside the input.
@@ -236,8 +243,10 @@ Input = (function () {
 			var textHeight = this.$text.height() > 0 ? this.$text.height() : this.getTextDimensions("T").height, inputHeight = this.$el.height();
 			if (inputHeight < 1) inputHeight = textHeight;
 			var mt = (Math.floor((inputHeight - textHeight) / 2) + parseInt(this.$el.css('padding-top'), 10)), scope = this;
+			
 			this.$cursor.css("height", textHeight + "px");
 			this.$cursor.css("width", newWidth + "px");
+			
 			this.$cursor.css("top", mt + "px");
 			this.$cursor.css("border", "1px solid " + (this.borderColor ? this.borderColor : "black"));
 			this.$cursor.css("border-width", "0px 1px 0px 0px");
@@ -252,11 +261,13 @@ Input = (function () {
 
 			// empty
 			if (this.$text.width() == 0) {
-				this.$el.css("height", this.getTextDimensions("T").height + "px");
+//				this.$el.css("height", this.getTextDimensions("T").height + "px"); // PP
+				if(!this.$el.height()) {this.$el.css('height', (this.getTextDimensions('T').height + 2) + 'px');}
 				this.$cursor.css("top", ((this.$el.height() - textHeight) / 2 + parseInt(this.$el.css('padding-top'), 10)) + "px");
 			}
 			else {
-				this.$el.css("height", "auto");
+				//this.$el.css("height", "auto"); // PP
+				if(!this.$el.height()) {this.$el.css("height", "auto");} // PP
 			}
 			// move text
 			if (newWidth > parentWidth) {

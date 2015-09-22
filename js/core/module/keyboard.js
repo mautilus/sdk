@@ -36,7 +36,7 @@ Keyboard = (function (Events) {
 		init: function (config) {
 			this.configure(config);
 			this.create();
-			this.layouts = { // v - values; s - size; t - type (K key, F function key, S space, N numeric key); w - change width in %;
+			this.layouts = { // v - values; s - size; t - type (K key, F function key, S space, N numeric key); sec - secundary button; w - change width in %;
 				"SPECIAL": {
 					layout: [
 						[
@@ -267,6 +267,12 @@ Keyboard = (function (Events) {
 
 			this.capsLock = false;
 			this.specialState = false;
+			this.accentsState = false;
+
+			// variables for repeat pressing on keys to write the accents
+			this.accentsTime = 0;
+			this.accentsTimeRepeat = 1000; // time in miliseconds
+			this.accentsKey = false;
 
 			// only one layout
 			if (this.config.oneLayout) {
@@ -315,6 +321,9 @@ Keyboard = (function (Events) {
 
 				this.navigate(direction);
 			}
+			else if(this.isForbiddenKey(keyCode)) {
+				// do nothing
+			} 
 			else if (Control.isNumeric(keyCode)) {
 				event.stopPropagation();
 				event.preventDefault();
@@ -331,15 +340,47 @@ Keyboard = (function (Events) {
 				this.focusByInput(value);
 			}
 		},
+
+		/**
+		 * Check forbidden keys for onKeyDown
+		 */
+		isForbiddenKey: function(keyCode) {
+			var isForbiddenKey = false;
+			if (Device.isSAMSUNG) {
+				var forbiddenKeys = [Control.key.PLAY, Control.key.PAUSE, Control.key.STOP, Control.key.FF, Control.key.RW, 
+									Control.key.PUP, Control.key.PDOWN, Control.key.CHLIST, Control.key.TOOLS];
+				isForbiddenKey = forbiddenKeys.indexOf(keyCode) >= 0 ? true : false;
+			}
+
+			return isForbiddenKey;
+		},
+
 		/**
 		 * Enter action for keys, this function also uses mouse click.
 		*/
 		onEnter: function ($el) {			
 			var posx = parseInt(Focus.focused.attr("data-posx"), 10), posy = parseInt(Focus.focused.attr("data-posy"), 10),
-				 selElem = this.specialState ? this.layouts["SPECIAL"].layout[posy][posx] : this.layouts[this.lang].layout[posy][posx];
+				 selElem = this.specialState ? this.layouts["SPECIAL"].layout[posy][posx] : this.accentsState ? this.layouts["ACENTOS"].layout[posy][posx] : this.layouts[this.lang].layout[posy][posx];
 
 			if (selElem.t == "K") {
-				this.insertValue(selElem.v, "LETTER");
+				// normal letter assign
+				var value = '';
+				var date = new Date;
+				var time = date.getTime();
+
+				// test if the key was pressed again in the selected time
+				if (selElem.sec && this.accentsKey == selElem.v && ((time - this.accentsTime) < this.accentsTimeRepeat)) {
+					this.input.backspace();
+					value = selElem.sec;
+				} else if (selElem.sec && this.accentsKey == selElem.sec && ((time - this.accentsTime) < this.accentsTimeRepeat)) {
+					this.input.backspace();
+					value = selElem.v;
+				} else {
+					value = selElem.v;
+				}
+				this.accentsKey = value;
+				this.accentsTime = time;
+				this.insertValue(value, "LETTER");
 			}
 			else if (selElem.t == "N") {
 				this.insertValue(selElem.v, "NUMERIC");
@@ -431,7 +472,7 @@ Keyboard = (function (Events) {
 			return false;
 		},
 		/**
-		 * This function is called from navigate. It focues new key.
+		 * This function is called from navigate. It focuse new key.
 		*/
 		move: function (dirX, dirY, axis) {
 			// current x
@@ -451,7 +492,7 @@ Keyboard = (function (Events) {
 			Focus.to(this.$el.find(".key[data-posx='" + this.position.x + "'][data-posy='" + this.position.y + "']"));
 		},
 		/**
-		 * Move between lines, assing new index to visible keys.
+		 * Move between lines, assign new index to visible keys.
 		*/
 		assingIndToArray: function (axis, currentX) {
 			var layout = this.specialState ? this.layouts["SPECIAL"].layout : this.layouts[this.lang].layout, newCurrentX = 0, newSize = 0;
@@ -582,6 +623,7 @@ Keyboard = (function (Events) {
 		*/
 		exit: function () {
 			this.specialState = false;
+			this.accentsState = false;
 			this.capsLock = false;
 			this.shift = false;
 			this.input.blur();
@@ -591,7 +633,7 @@ Keyboard = (function (Events) {
 			document.body.onselectstart = function () { return true; };
 		},
 		/**
-		 * Becuase of different of each line, createKeys() need to count each width of the line.
+		 * Because of different of each line, createKeys() need to count each width of the line.
 		*/
 		getLineSize: function(line) {
 			if (!line || line.length == 0) return 1; // 0 divide zero
@@ -625,6 +667,12 @@ Keyboard = (function (Events) {
 					$keyContent = $('<span class="content" />');
 					$keyContent.html(layout[i][j].v);
 					$key.append($keyContent);
+
+					if (layout[i][j].sec) {
+						$keySecContent = $('<span class="seccontent" style="position: relative; top: -40px; right: -25px; color: #6c6e6e" />');
+						$keySecContent.html(layout[i][j].sec);
+						$key.append($keySecContent);
+					}
 
 					if (!layout[i][j].s) layout[i][j].s = 1;
 					$key.attr("data-width", layout[i][j].s);

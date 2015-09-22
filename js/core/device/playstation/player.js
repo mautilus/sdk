@@ -266,6 +266,3 @@ Device_Playstation_Player = (function (Events) {
     return Device_Playstation_Player;
 
 })(Events);
-
-
-        

@@ -155,7 +155,7 @@ Player = (function(Events) {
 			/**
 			 * @property {Boolean} 
 			 */
-			this.isTimeshiftedLiveStream = false;			
+			this.isTimeshiftedLiveStream = false;
 			/**
 			 * @property {Number} duration Media duration (ms)
 			 */
@@ -188,6 +188,14 @@ Player = (function(Events) {
 			 * @property {Number} height Player height
 			 */
 			this.height = this.config.height;
+			/**
+			 * @property {Number} top Player top position
+			 */
+			this.top = this.config.top;
+			/**
+			 * @property {Number} left Player left position
+			 */
+			this.left = this.config.left;
 			/**
 			 * @property {String} customData DRM custom data
 			 */
