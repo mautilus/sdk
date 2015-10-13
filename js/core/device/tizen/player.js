@@ -169,8 +169,6 @@ Device_Tizen_Player = (function(Events) {
 	
 					this.PLAYER.prepareAsync(function() {
             Player.PLAYER.setDisplayRect(scope.left * scope.uhdMultiplier, scope.top * scope.uhdMultiplier, scope.width * scope.uhdMultiplier, scope.height * scope.uhdMultiplier);
-					  Player.PLAYER.setDisplayMethod("PLAYER_DISPLAY_MODE_FULL_SCREEN");
-            Player.PLAYER.setTimeoutForBuffering(2000);
             if (attrs && attrs.position) {
 						  Player.PLAYER.seekTo(attrs.position, function() {scope.trigger('seekSuccess');}, function() {scope.trigger('seekError');});
 					  }
@@ -293,7 +291,7 @@ Device_Tizen_Player = (function(Events) {
 			var deviceId = null;
 	
 			try {
-				//deviceId = webapis.drminfo.getEsn('WIDEVINE');
+				deviceId = webapis.drminfo.getEsn('WIDEVINE');
 			} catch (e) {
 				return false;
 			}
