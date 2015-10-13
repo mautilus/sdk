@@ -179,7 +179,7 @@ Device_Tizen_Player = (function(Events) {
 				} else {
 					try {
 						if (attrs && attrs.position) {
-							this.PLAYER.seekTo(attrs.position, function() {scope.trigger('seekSuccess');}, function() {scope.trigger('seek');});
+							this.PLAYER.seekTo(attrs.position, function() {scope.trigger('seekSuccess');}, function() {scope.trigger('seekError');});
 						}
 						this.PLAYER.play();
 					} catch(e){
