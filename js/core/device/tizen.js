@@ -116,7 +116,6 @@ Device_Tizen = (function(Events) {
 		for (var i = 0; i < supportedKeys.length; i++) {
 			keyCode[supportedKeys[i].name] = supportedKeys[i].code;
 		}
-		
 		this.tvKey = {
 			"KEY_LEFT" : 37,
 			"KEY_RIGHT" : 39,
@@ -171,10 +170,10 @@ Device_Tizen = (function(Events) {
 				setTimeout(onLoad, 50);
 			}
 		};
-		
-		if(!this.inited) {
+
+		if (!this.inited) {
 			this.inited = true;
-			
+
 			/*
 			 * Multitasking visibilitychange event
 			 * - first event is trigger visibilitychange!! / return false == stop propagation hideApp/resumeApp
@@ -303,7 +302,6 @@ Device_Tizen = (function(Events) {
 	 * @inheritdoc Device#getDate
 	 */
 	getDate: function() {
-		
 //		var date;
 //
 //		try {

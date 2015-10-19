@@ -161,7 +161,7 @@ Developer = (function() {
 				if (scope.canAccessError) {
 					var stack = new Error().stack, allFiles = (stack ? stack.match(new RegExp("[_a-zA-Z0-9]*.js[^)]*", "g")) : []),
 						file = "";
-					if (allFiles.length >= 1 && typeof(allFiles[1]) !== "undefined") {
+					if (allFiles && allFiles.length >= 1 && typeof(allFiles[1]) !== "undefined") {
 						// only file + line number
 						file = allFiles[1].replace(new RegExp("(.*[/])([^:]+):([^:]+)(.*)", "g"), "$2 $3"); // first is console, second is a file
 						// remove part after ?
@@ -763,7 +763,7 @@ background: green;\
 			} else {
 				s.innerText = cssText;   // old style - not supported by Firefox
 			}
-			
+
 			document.head.appendChild(s);
 		}
 	});

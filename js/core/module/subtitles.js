@@ -104,6 +104,7 @@ Subtitles = (function(Events) {
 				}
 			}, this);
 		},
+
 		/**
 		 * Set class config hash
 		 * 
@@ -112,14 +113,16 @@ Subtitles = (function(Events) {
 		configure: function(config) {
 			this.config = $.extend(true, this.config || {}, config);
 		},
+
 		/**
 		 * @private
 		 */
 		tick: function() {
 			if (this.playing) {
-			this.setTime(this.time + 100);
+				this.setTime(this.time + 100);
 			}
 		},
+
 		/**
 		 * @private
 		 */
@@ -127,6 +130,7 @@ Subtitles = (function(Events) {
 			this.time = time;
 			this.render();
 		},
+
 		/**
 		 * Set TTML xml subtitles
 		 * 
@@ -348,6 +352,83 @@ Subtitles = (function(Events) {
 			scope.styles = $.extend(true, this.styles, styles);
 			scope.subs = $.extend(true, this.subs, subs);
 		},
+
+		/**
+		 * Set SRT subtitles
+		 * 
+		 * example: https://www.npmjs.com/package/subtitles-parser
+		 * example: https://raw.githubusercontent.com/bazh/subtitles-parser/master/index.js
+		 * license: MIT
+		 * 
+		 * @param {String} subtitles
+		 */
+		setSRT: function(srt) {
+			/**
+			 * Time to miliseconds
+			 * 
+			 * @param {String} time value
+			 * @return {Number} miliseconds
+			 */
+			var timeMs = function(val) {
+				var regex = /(\d+):(\d{2}):(\d{2}),(\d{3})/;
+		        var parts = regex.exec(val);
+
+		        if (parts === null) {
+		            return 0;
+		        }
+
+		        for (var i = 1; i < 5; i++) {
+		            parts[i] = parseInt(parts[i], 10);
+		            if (isNaN(parts[i])) parts[i] = 0;
+		        }
+
+		        // hours + minutes + seconds + ms
+		        return parts[1] * 3600000 + parts[2] * 60000 + parts[3] * 1000 + parts[4];
+		    };
+
+		    /**
+		     * From Srt parser
+		     * 
+		     * @param {String} srt data
+		     * @oaram {Boolean} ms true = use miliseconds
+		     * @return {Object} items [{{String} id,
+		     * 							{String} startTime,
+		     * 							{String} endTime,
+		     * 							{String} text }]
+		     * 
+		     */
+		    var fromSrt = function(data, ms) {
+		    	var useMs = ms ? true : false;
+
+		        data = data.replace(/\r/g, '');
+		        var regex = /(\d+)\n(\d{2}:\d{2}:\d{2},\d{3}) --> (\d{2}:\d{2}:\d{2},\d{3})/g;
+		        data = data.split(regex);
+		        data.shift();
+
+		        var items = [];
+		        for (var i = 0; i < data.length; i += 4) {
+		            items.push({
+		                id: data[i].trim(), // {String}
+		                startTime: useMs ? timeMs(data[i + 1].trim()) : data[i + 1].trim(), // {String}
+		                endTime: useMs ? timeMs(data[i + 2].trim()) : data[i + 2].trim(), // {String}
+		                text: data[i + 3].trim() // {String}
+		            });
+		        }
+
+		        return items;
+		    };
+
+		    // RUN
+		    this.subs = {};
+		    if(srt) {
+		    	var items = fromSrt(srt, true);
+		    	for(var i=0; i<items.length; i++) {
+		    		this.subs[items[i].startTime] = items[i];
+		    	}
+		    }
+
+		},
+
 		/**
 		 * Start playback in given format
 		 * 
@@ -359,6 +440,7 @@ Subtitles = (function(Events) {
 
 			this.playing = true;
 			this.setTime(0);
+			this.subsFormat = format;
 
 			if (this.interval) {
 				clearInterval(this.interval);
@@ -366,15 +448,15 @@ Subtitles = (function(Events) {
 
 			if (format === 'ttml' && data) {
 				this.setTTML(data);
-			}
-			else if (format === "srt" && data) { /* for srt are data url (http:/... movie.srt) */
-				// todo
+			} else if (format === "srt" && data) { /* for srt are data url (http:/... movie.srt) */
+				this.setSRT(data);
 			}
 
 			this.interval = setInterval(function() {
 				scope.tick();
 			}, 100);
 		},
+
 		/**
 		 * Stop playback and clear data
 		 */
@@ -393,6 +475,7 @@ Subtitles = (function(Events) {
 				clearInterval(this.interval);
 			}
 		},
+
 		/**
 		 * @private
 		 */
@@ -406,6 +489,7 @@ Subtitles = (function(Events) {
 				top: Player.top
 			}).show();
 		},
+
 		/**
 		 * @private
 		 */
@@ -414,6 +498,7 @@ Subtitles = (function(Events) {
 
 			this.$el.hide();
 		},
+
 		/**
 		 * @private
 		 */
@@ -444,6 +529,7 @@ Subtitles = (function(Events) {
 
 			return style;
 		},
+
 		/**
 		 * @private
 		 */
@@ -454,6 +540,7 @@ Subtitles = (function(Events) {
 			}
 			return (times.sort().reverse())[0];
 		},
+
 		/**
 		 * @private
 		 */
@@ -469,6 +556,7 @@ Subtitles = (function(Events) {
 
 			return this.style2css(o);
 		},
+
 		/**
 		 * @private
 		 */
@@ -528,6 +616,7 @@ Subtitles = (function(Events) {
 
 			return $wrap;
 		},
+
 		/**
 		 * @private
 		 */
@@ -538,51 +627,77 @@ Subtitles = (function(Events) {
 			return;
 			}
 
-			for (var i in this.subs) {
-				if (this.time >= parseInt(i, 10) && this.getMaxEndTime(this.subs[i]) >= this.time) {
-					if (this.lastRenderedTime !== i) {
-						this.lastRenderedTime = i;
-
-						if (this.subs[i]) {
-							for (var j in this.subs[i]) {
-								$wrap = this.region_els[this.subs[i][j].region];
-
-								if (!$wrap) {
-									$wrap = this.renderRegion(this.subs[i][j].region);
+			if(this.subsFormat == 'ttml') {
+				for (var i in this.subs) {
+					if (this.time >= parseInt(i, 10) && this.getMaxEndTime(this.subs[i]) >= this.time) {
+						if (this.lastRenderedTime !== i) {
+							this.lastRenderedTime = i;
+	
+							if (this.subs[i]) {
+								for (var j in this.subs[i]) {
+									$wrap = this.region_els[this.subs[i][j].region];
+	
+									if (!$wrap) {
+										$wrap = this.renderRegion(this.subs[i][j].region);
+									}
+	
+									if (!$wrap) {
+										break;
+									}
+	
+									$wrap.empty();
+									$el = $('<div />');
+									$el.html(this.subs[i][j].lines.join('<br />'));
+	
+									$el.css({
+										display: 'inline-block',
+										padding: '5px 10px'
+									});
+	
+									$el.css(this.getStyles((this.subs[i][j].style && this.styles[this.subs[i][j].style]) ? this.styles[this.subs[i][j].style].css : {}, this.subs[i][j].css));
+	
+									$wrap.append($el);
 								}
-
-								if (!$wrap) {
-									break;
-								}
-
-								$wrap.empty();
-								$el = $('<div />');
-								$el.html(this.subs[i][j].lines.join('<br />'));
-
-								$el.css({
-									display: 'inline-block',
-									padding: '5px 10px'
-								});
-
-								$el.css(this.getStyles((this.subs[i][j].style && this.styles[this.subs[i][j].style]) ? this.styles[this.subs[i][j].style].css : {}, this.subs[i][j].css));
-
-								$wrap.append($el);
 							}
 						}
-					}
-
-					return;
-				}
-			}
-
-			if (this.lastRenderedTime !== false) {
-				this.lastRenderedTime = false;
-
-				for (var i in this.region_els) {
-					if (this.region_els.hasOwnProperty(i)) {
-					this.region_els[i].empty();
+	
+						return;
 					}
 				}
+
+				if (this.lastRenderedTime !== false) {
+					this.lastRenderedTime = false;
+	
+					for (var i in this.region_els) {
+						if (this.region_els.hasOwnProperty(i)) {
+						this.region_els[i].empty();
+						}
+					}
+				}
+			} else if(this.subsFormat == 'srt') {
+				/*
+				 subs[i] = {
+				 	id
+		          	startTime
+		          	endTime
+		          	text
+		         }
+		         */
+				for (var i in this.subs) {
+	            	if (this.time >= i && this.subs[i].endTime >= this.time) {
+	                    if (this.lastRenderedTime !== i) {
+	                        this.lastRenderedTime = i;
+	                        if (this.subs[i]) {
+	                            this.$el.html(this.subs[i].text);
+	                            console.log('subtitles: ' + this.subs[i].text);
+	                        }
+	                    } else if(this.subs[i].endTime < this.time + 100) {
+	                    	this.$el.empty();
+	                    }
+	                    
+	                    return;
+	                }
+	            }
 			}
 		}
 	});

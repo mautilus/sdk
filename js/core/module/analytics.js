@@ -27,61 +27,62 @@
  */
 Analytics = (function(Events) {
 	var Analytics = {
-			/**
-			 * @property {Object} config General config hash
-			 */
-			config: null,
-			/**
-			 * @property {Boolean} General information if app is tracking as website or as application (this flag can enable measurement some other parameters)
-			 */
-			application: true,
-			/**
-			 * @property {string} requestType default type of request GET|POST
-			 */
-			requestType: 'POST',
-			/**
-			 * @property {String} URL absolute path to the analytics 
-			 */
-			URL: '',
-			/**
-			 * @property {String} no SSL URL absolute path to the analytics 
-			 */
-			URLnoSSL: 'http://www.google-analytics.com/collect',
-			/**
-			 * @property {String} SSL URL absolute path to the analytics 
-			 */
-			URLSSL: 'https://ssl.google-analytics.com/collect',
-			/**
-			 * @property {Number} How long is cookie available (s)
-			 */
-			YEARS_2: 63115200,
-			/**
-			 * @property {Object} Required values for all hits
-			 */
-      params: {
-        v: '1',             // The protocol version. The value should be 1.
-        tid: '',            // The ID that distinguishes to which Google Analytics property to send data.
-        cid: '',            // An ID unique to a particular user.
-        t: '',              // The type of interaction collected for a particular user. ('pageview'|'screenview'|'event'|'transaction'|'item'|'social'|'exception'|'timing')
-//        ua: '',             // OPTIONAL The User Agent of the browser. Note that Google has libraries to identify real user agents. Hand crafting your own agent could break at any time.
-//        ds: '',             // OPTIONAL Indicates the data source of the hit.
-        sr: '1280x720',     // OPTIONAL Specifies the screen resolution.
-      },
-      
-      appParams: {
-        an: '',             // OPTIONAL Specifies the application name.
-        aid: '',            // OPTIONAL Application identifier..
-        av: '',             // OPTIONAL Specifies the application version.
-        aiid: '',           // OPTIONAL Application installer identifier.
-      }
+		/**
+		 * @property {Object} config General config hash
+		 */
+		config: null,
+		/**
+		 * @property {Boolean} General information if app is tracking as website or as application (this flag can enable measurement some other parameters)
+		 */
+		application: true,
+		/**
+		 * @property {string} requestType default type of request GET|POST
+		 */
+		requestType: 'POST',
+		/**
+		 * @property {String} URL absolute path to the analytics 
+		 */
+		URL: '',
+		/**
+		 * @property {String} no SSL URL absolute path to the analytics 
+		 */
+		URLnoSSL: 'http://www.google-analytics.com/collect',
+		/**
+		 * @property {String} SSL URL absolute path to the analytics 
+		 */
+		URLSSL: 'https://ssl.google-analytics.com/collect',
+		/**
+		 * @property {Number} How long is cookie available (s)
+		 */
+		YEARS_2: 63115200,
+		/**
+		 * @property {Object} Required values for all hits
+		 */
+		
+		params: {
+			v: '1',             // The protocol version. The value should be 1.
+			tid: '',            // The ID that distinguishes to which Google Analytics property to send data.
+			cid: '',            // An ID unique to a particular user.
+			t: '',              // The type of interaction collected for a particular user. ('pageview'|'screenview'|'event'|'transaction'|'item'|'social'|'exception'|'timing')
+		//        ua: '',             // OPTIONAL The User Agent of the browser. Note that Google has libraries to identify real user agents. Hand crafting your own agent could break at any time.
+		//        ds: '',             // OPTIONAL Indicates the data source of the hit.
+		sr: '1280x720',     // OPTIONAL Specifies the screen resolution.
+		},
+		  
+		appParams: {
+			an: '',             // OPTIONAL Specifies the application name.
+			aid: '',            // OPTIONAL Application identifier..
+			av: '',             // OPTIONAL Specifies the application version.
+			aiid: '',           // OPTIONAL Application installer identifier.
+		}
 	};
 
 	$.extend(true, Analytics, Events, {
 		init: function(config) {
 			this.configure(config);
-      this.on('timeout', function(){
-        //console.log('request timeout');
-      }, this);
+			this.on('timeout', function(){
+			//console.log('request timeout');
+			}, this);
 		},
 		/**
 		 * Set class config hash
@@ -89,52 +90,52 @@ Analytics = (function(Events) {
 		 * @param {Object} config Hash of parameters
 		 */
 		configure: function(config) {
-      this.requestTimeout = CONFIG.ajax.timeout;
+			this.requestTimeout = CONFIG.ajax.timeout;
 			this.config = $.extend(true, this.config || {}, config);
-      if(this.config.ssl){
-        this.URL = this.URLSSL;
-      }
-      else{
-        this.URL = this.URLnoSSL;
-      }
-      if(typeof this.config.application == 'boolean'){
-        this.application = this.config.application;
-      }
-      if(typeof this.config.params){
-        this.params = $.extend(true, this.params || {}, this.config.params);
-      }
+			if(this.config.ssl){
+				this.URL = this.URLSSL;
+			}
+			else{
+				this.URL = this.URLnoSSL;
+			}
+			if(typeof this.config.application == 'boolean'){
+				this.application = this.config.application;
+			}
+			if(typeof this.config.params){
+				this.params = $.extend(true, this.params || {}, this.config.params);
+			}
 
-      if(this.application){
-        this.appParams.an = this.config.applicationName || '';
-        this.appParams.aid = this.config.applicationId || '';
-        this.appParams.av = this.config.applicationVersion || '';
-        this.appParams.aiid = this.config.applicationInstallId || '';
-      }
-      this.setUUID();
+			if(this.application){
+				this.appParams.an = this.config.applicationName || '';
+				this.appParams.aid = this.config.applicationId || '';
+				this.appParams.av = this.config.applicationVersion || '';
+				this.appParams.aiid = this.config.applicationInstallId || '';
+			}
+			this.setUUID();
 
-      this.params.tid = this.config.ACCOUNT_CODE;
-      this.params.cid = this.UUID;
-      //this.params.ua = navigator.userAgent;
+			this.params.tid = this.config.ACCOUNT_CODE;
+			this.params.cid = this.UUID;
+			//this.params.ua = navigator.userAgent;
 		},
-    
+		
 		/**
 		 * Set and returns current UUID it should be valid for 2 years
 		 *
 		 *  @returns {string} UUID
 		 **/
-    setUUID: function(){
-      // UUID should be valid for the 2 years
-      this.UUID = Storage.get('device_uuid');
-      if(!this.UUID){
-        this.UUID = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-          var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
-          return v.toString(16);
-        });
-      }
-      Storage.set('device_uuid' , this.UUID, this.YEARS_2);
-      
-      return this.UUID;
-    },
+		setUUID: function(){
+			// UUID should be valid for the 2 years
+			this.UUID = Storage.get('device_uuid');
+			if(!this.UUID){
+				this.UUID = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+					var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+					return v.toString(16);
+				});
+			}
+			Storage.set('device_uuid' , this.UUID, this.YEARS_2);
+		  
+			return this.UUID;
+		},
 		/**
 		 * Track page view
 		 * @private
@@ -145,16 +146,16 @@ Analytics = (function(Events) {
 			if(!this.config.ACCOUNT_CODE){
 				return;
 			}
-      var params = {};
-      $.extend(true, params, this.params, description || {}, {'t':'pageview', 'dp':site});
-      
-      this.collect(this.URL, params, this.requestType, function(resp) {
-        if(resp){
-          var img = new Image();
-          img.src = resp;
-        }
-      }, this);
-
+			
+			var params = {};
+			$.extend(true, params, this.params, description || {}, {'t':'pageview', 'dp':site});
+		  
+			this.collect(this.URL, params, this.requestType, function(resp) {
+				if(resp){
+					var img = new Image();
+					img.src = resp;
+				}
+			}, this);
 		},
 
 		/**
@@ -167,16 +168,17 @@ Analytics = (function(Events) {
 			if(!this.config.ACCOUNT_CODE){
 				return;
 			}
-      var params = {};
-      $.extend(true, params, this.params, this.application ? this.appParams : {}, description || {}, {'t':'screenview', 'cd':site});
-      
-      this.collect(this.URL, params, this.requestType, function(resp) {
-        if(resp){
-          var img = new Image();
-          img.src = resp;
-        }
-      }, this);
-
+			
+			var params = {};
+			$.extend(true, params, this.params, this.application ? this.appParams : {}, description || {}, {'t':'screenview', 'cd':site});
+			
+			this.collect(this.URL, params, this.requestType, function(resp) {
+				if(resp){
+					var img = new Image();
+					img.src = resp;
+				}
+			}, this);
+			
 		},
 
 		/**
@@ -192,29 +194,29 @@ Analytics = (function(Events) {
 			if(!this.config.ACCOUNT_CODE){
 				return;
 			}
-      if(typeof label == 'object'){
-        var d = description; 
-        description = label;
-        label = value;
-        value = d;
-      }
-      
-      var params = {};
-      $.extend(true, params, this.params, this.application ? this.appParams : {}, description || {}, {'t':'event', 'ec':category, 'ea':action});
-      
-      if(label){
-        params.el = label;
-      }
-      if(value){
-        params.ev = value;
-      }
-      
-      this.collect(this.URL, params, this.requestType, function(resp) {
-        if(resp){
-          var img = new Image();
-          img.src = resp;
-        }
-      }, this);
+			if(typeof label == 'object'){
+				var d = description; 
+				description = label;
+				label = value;
+				value = d;
+			}
+		
+			var params = {};
+			$.extend(true, params, this.params, this.application ? this.appParams : {}, description || {}, {'t':'event', 'ec':category, 'ea':action});
+		
+			if(label){
+				params.el = label;
+			}
+			if(value){
+				params.ev = value;
+			}
+			
+			this.collect(this.URL, params, this.requestType, function(resp) {
+				if(resp){
+					var img = new Image();
+					img.src = resp;
+				}
+			}, this);
 		},
 
 		/**
@@ -227,58 +229,60 @@ Analytics = (function(Events) {
 			if(!this.config.ACCOUNT_CODE){
 				return;
 			}
-      var params = {};
-      $.extend(true, params, this.params, this.application ? this.appParams : {}, description || {}, {'t':'exception', 'exf':'1', 'exd':exception});
-      
-      this.collect(this.URL, params, this.requestType, function(resp) {
-        if(resp){
-          var img = new Image();
-          img.src = resp;
-        }
-      }, this);
-
+			
+			var params = {};
+			$.extend(true, params, this.params, this.application ? this.appParams : {}, description || {}, {'t':'exception', 'exf':'1', 'exd':exception});
+			
+			this.collect(this.URL, params, this.requestType, function(resp) {
+				if(resp){
+					var img = new Image();
+					img.src = resp;
+				}
+			}, this);
+			
 		},
  
-  	collect: function(url, data, requestType, callback, cbscope) {
-      if(typeof requestType == 'function'){
-        cbscope = callback;
-        callback = requestType;
-        requestType = this.requestType;
-      }
-  		var scope = this;
-  		var dataArr = [];
-  
-  		for (var i in data) {
-  			if (data.hasOwnProperty(i)) {
-  				if (typeof data[i] == 'object' || (data[i] instanceof Array)) {
-  					for (var j in data[i]) {
-  						dataArr.push(i + '=' + encodeURIComponent(data[i][j]));
-  					}
-  
-  				} else {
-  					dataArr.push(i + '=' + encodeURIComponent(data[i]));
-  				}
-  			}
-  		}
-      
-      var cb = function(resp, status, xhr){
-  				if (callback) {
-  					callback.call(cbscope || scope, resp || null, status, xhr, url);
-  				}
-      };
-      var cbfail = function(resp, status, xhr){
-    			if (callback) {
-    				callback.call(cbscope || scope, false, xhr.status, xhr, url);
-    			}
-      };
-
+		collect: function(url, data, requestType, callback, cbscope) {
+			if(typeof requestType == 'function'){
+				cbscope = callback;
+				callback = requestType;
+				requestType = this.requestType;
+			}
+			var scope = this;
+			var dataArr = [];
+			
+			for (var i in data) {
+				if (data.hasOwnProperty(i)) {
+					if (typeof data[i] == 'object' || (data[i] instanceof Array)) {
+						for (var j in data[i]) {
+							dataArr.push(i + '=' + encodeURIComponent(data[i][j]));
+						}
+						
+					} else {
+						dataArr.push(i + '=' + encodeURIComponent(data[i]));
+					}
+				}
+			}
+			
+			var cb = function(resp, status, xhr){
+				if (callback) {
+					callback.call(cbscope || scope, resp || null, status, xhr, url);
+				}
+			};
+			var cbfail = function(resp, status, xhr){
+				if (callback) {
+					callback.call(cbscope || scope, false, xhr.status, xhr, url);
+				}
+			};
+			
 			Ajax.request(url, {
 				method: requestType, 
 				data: dataArr.join('&'),
-        processData: false,
-        timeout: scope.requestTimeout}
+				processData: false,
+				timeout: scope.requestTimeout}
 			).done(cb).fail(cbfail);
-  	}
+		}
+		
 	});
 
 	// Initialize this class when Main is ready

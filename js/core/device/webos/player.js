@@ -51,6 +51,11 @@ Device_WebOS_Player = (function(Events, Deferrable) {
 
 			this.el.addEventListener('playing', function() {
 				scope.state(scope.STATE_PLAYING);
+				
+				if(scope._seekOnPlay){
+					scope.el.currentTime = scope._seekOnPlay / 1000;
+					scope._seekOnPlay = 0;
+				}
 			});
 
 			this.el.addEventListener('pause', function() {
@@ -120,6 +125,7 @@ Device_WebOS_Player = (function(Events, Deferrable) {
 			
 			if (cmd === 'play') {
 				if (attrs && attrs.url) {
+					this._seekOnPlay = 0; // clear
 					if (attrs.url.match(/\/manifest/i)) {
 						// PlayReady DRM
 						url = attrs.url;
@@ -153,12 +159,16 @@ Device_WebOS_Player = (function(Events, Deferrable) {
 							sendDrmMessage(this.clientId, {url: url});
 						}
 						
-					} else if (attrs && attrs.url && this.el.src !== this.url) {
+					} else {
 						// NO DRM
 						this._play(attrs.url);
 					}
 				} else {
 					this.el.play();
+				}
+				
+				if (attrs && attrs.position) {
+					this._seekOnPlay = attrs.position;
 				}
 				
 				return true;
@@ -248,14 +258,14 @@ Device_WebOS_Player = (function(Events, Deferrable) {
 						"appId": scope.appId
 					},
 					onSuccess: function (result) {
-						console.log("DRM Client is loaded successfully.");
+						console.log("[Device_WebOS_Player] loadDrmClient successful. clientId: " + result.clientId);
 						scope.clientId = result.clientId;
 						scope.isDrmClientLoaded = true;
 						promise.resolve(result);
 					},
 					onFailure: function (result) {
-						console.error("[" + result.errorCode + "] " + result.errorText);
-						promise.reject('Plaer.loadDrmClient onFailure: ' + '[' + result.errorCode + '] ' + result.errorText);	// Do something for error handling
+						console.error("[Device_WebOS_Player] loadDrmClient failed. [" + result.errorCode + "] " + result.errorText);
+						promise.reject('Player.loadDrmClient onFailure: ' + '[' + result.errorCode + '] ' + result.errorText);	// Do something for error handling
 					}
 				});
 			}, this);
@@ -271,17 +281,16 @@ Device_WebOS_Player = (function(Events, Deferrable) {
 		unloadDrmClient: function() {
 			var scope = this;
 			return this.when(function(promise) {
-				if(isDrmClientLoaded) {
+				if(scope.isDrmClientLoaded) {
 					var request = webOS.service.request("luna://com.webos.service.drm", {
 						method:"unload",
 						parameters: { "clientId": scope.clientId },
 						onSuccess: function (result) {
-							isDrmClientLoaded = false;
-							console.log("DRM Client is unloaded successfully.");
+							scope.isDrmClientLoaded = false;
 							promise.resolve(result);
 						},
 						onFailure: function (result) {
-							console.error("[" + result.errorCode + "] " + result.errorText);
+							console.error("[Device_WebOS_Player] unloadDrmClient failed. [" + result.errorCode + "] " + result.errorText);
 							// Do something for error handling
 							promise.reject('Player.unloadDrmClient onFailure: ' + '[' + result.errorCode + '] ' + result.errorText);
 						}
@@ -308,13 +317,8 @@ Device_WebOS_Player = (function(Events, Deferrable) {
 				var msg = '';
 				
 				if(this.drmType == 'playready') {
-					/*
-					*********************************************************
-					* PLAYREADY
-					*********************************************************
-					*/
-					msgType = 'application/vnd.ms-playready.initiator+xml';		// Message type of DRM system
-					drmSystemId = 'urn:dvb:casystemid:19219';					// Unique ID of DRM system
+					msgType = 'application/vnd.ms-playready.initiator+xml';     // Message type of DRM system
+					drmSystemId = 'urn:dvb:casystemid:19219';                   // Unique ID of DRM system
 					
 					// Message for playready
 //					msg = "<?xml version=\"1.0\" encoding=\"utf-8\"?> \
@@ -347,11 +351,6 @@ Device_WebOS_Player = (function(Events, Deferrable) {
 					'</PlayReadyInitiator>';
 					
 				} else if(this.drmType == 'widevine') {
-					/*
-					*********************************************************
-					* WIDEVINE		!!! NEDOKONCENO - ROZPRACOVANO !!!
-					*********************************************************
-					*/
 					msgType = 'application/widevine+xml';       // Message type for widevine 'xml' 
 					drmSystemId = 'urn:dvb:casystemid:19156';   // Unique ID of DRM system
 					
@@ -359,14 +358,14 @@ Device_WebOS_Player = (function(Events, Deferrable) {
 					msg = '<?xml version="1.0" encoding="utf-8"?>'+
 						'<WidevineCredentialsInfo xmlns="http://www.smarttv-alliance.org/DRM/widevine/2012/protocols/">'+
 						'<ContentURL>'+this.url+'</ContentURL>'+
-						'<DeviceID>'+this.clientId+'</DeviceID>'+
+						'<DeviceID></DeviceID>'+
 						'<StreamID></StreamID>'+
 						'<ClientIP></ClientIP>'+
 						'<DRMServerURL>'+this.config.DRMconfig.DRM_URL+'</DRMServerURL>'+
 						'<DRMAckServerURL></DRMAckServerURL>'+
-						'<DRMHeartBeatURL></DRMHeartBeatURL>'+
-						'<DRMHeartBeatPeriod></DRMHeartBeatPeriod>'+
-						'<UserData>'+this.customData+'</UserData>'+
+						'<DRMHeartBeatURL>'+this.config.DRMconfig.HEARTBEAT_URL+'</DRMHeartBeatURL>'+
+						'<DRMHeartBeatPeriod>'+this.config.DRMconfig.HEARTBEAT_PERIOD+'</DRMHeartBeatPeriod>'+
+						'<UserData>'+this.config.DRMconfig.USER_DATA+'</UserData>'+
 						'<Portal>'+this.config.DRMconfig.PORTAL+'</Portal>'+
 						'<StoreFront></StoreFront>'+
 						'<BandwidthCheckURL></BandwidthCheckURL>'+
@@ -383,13 +382,12 @@ Device_WebOS_Player = (function(Events, Deferrable) {
 						"drmSystemId": drmSystemId
 					},
 					onSuccess: function (result) {
-						// !!! DRM API does not return the msgId, resultCode, resultMsg for Widevine type !!
-						msgId = (scope.drmType == 'playready')? result.msgId : '';
-						var resultCode = (scope.drmType == 'playready')? result.resultCode : '';
-						var resultMsg = (scope.drmType == 'playready')? result.resultMgs : '';
 						
-						
-						if(scope.drmType == 'playready') {
+						if(scope.drmType === 'playready') {
+							//console.log("sendDrmMessage Success: Message ID: " + msgId);
+							var msgId = result.msgId;                    // only for PlayReady 
+							var resultCode = result.resultCode || '';    // only for PlayReady 
+							
 							if (resultCode == 0){
 								promise.resolve(result);
 							} else {
@@ -397,14 +395,15 @@ Device_WebOS_Player = (function(Events, Deferrable) {
 								// Do Handling DRM message error
 								promise.reject('Player.sendDrmMessage onSuccess: ' + '[' + resultCode + '] ' + 'DRM message error');
 							}
-						} else {
+						} else if (scope.drmType === 'widevine') {
 							promise.resolve(result);
 						}
 						
 					},
 					onFailure: function (result) {
-						scope.subscribeLicensingError(clientId, msgId);
-						console.error("[" + result.errorCode + "] " + result.errorText);
+						if(scope.drmType === 'playready') {
+							scope.subscribeLicensingError(clientId, msgId);
+						}
 						// Do something for error handling
 						promise.reject('Player.sendDrmMessage onFailure: ' + '[' + result.errorCode + '] ' + result.errorText);
 					}
@@ -438,8 +437,6 @@ Device_WebOS_Player = (function(Events, Deferrable) {
 							console.log("Invalid license");
 							// Do something for error handling
 						}
-						//console.log("DRM System ID: " + result.drmSystemId);
-						//console.log("License Server URL: " + result.rightIssueUrl);
 					}
 				},
 				onFailure: function (result) {
@@ -457,8 +454,6 @@ Device_WebOS_Player = (function(Events, Deferrable) {
 		 * @param {Object} options
 		 */
 		_play: function(url, options) {
-			var scope = this;
-			
 			this.el.innerHTML = '';
 			
 			if(!options) {
@@ -476,9 +471,9 @@ Device_WebOS_Player = (function(Events, Deferrable) {
 				//source.setAttribute('type', 'application/vnd.ms-playready.initiator+xml;mediaOption=' + mediaOption);
 			} else if(String(url).match(/\.wvm/)) {
 				source.setAttribute('type', 'video/mp4;mediaOption=' + mediaOption);
-			} else if(String(url).match(/\.mp4/)){
+			} else if(String(url).match(/\.mp4/)) {
 				source.setAttribute('type', 'video/mp4;mediaOption=' + mediaOption);
-			} else if(String(url).match(/\.m3u8/)){
+			} else if(String(url).match(/\.m3u8/)) {
 				source.setAttribute('type', 'application/vnd.apple.mpegurl;mediaOption=' + mediaOption);
 			}
 			

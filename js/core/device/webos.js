@@ -34,7 +34,7 @@ Device_Webos = (function(Events) {
 		    	
 		    	// override default modules
 			    this.override();
-		    	0
+
 		    	// init return
 			    this.initReturnEvent();
 			    
@@ -50,7 +50,7 @@ Device_Webos = (function(Events) {
 			    	scope.trigger('webOSRelaunch');
 			    }, true);
 			    
-			    document.addEventListener ('visibilityChange', function() {
+			    document.addEventListener('visibilityChange', function() {
 			    	scope.trigger('visibilityChange');
 			    }, true);
 			    
@@ -93,11 +93,11 @@ Device_Webos = (function(Events) {
 					Control.onKeyDown({
 						keyCode: Control.key.RETURN,
 						preventDefault: function() {}
-					});					
+					});
 				}
 			};
 			
-		    window.addEventListener("popstate", scope.returnEvent);
+			window.addEventListener("popstate", scope.returnEvent);
 		},
 		
 		/**
@@ -164,7 +164,7 @@ Device_Webos = (function(Events) {
 				history.go(-(history.length-1));
 				setTimeout(function() {
 					window.addEventListener("popstate", scope.returnEvent);
-				}, 500);
+				}, 50);
 			}
 			
 			console.log('CLEAR-HISTORY length: ' + history.length);
@@ -184,7 +184,7 @@ Device_Webos = (function(Events) {
 				history.go(1);
 				setTimeout(function() {
 					window.addEventListener("popstate", scope.returnEvent);
-				}, 500);
+				}, 50);
 			}
 			
 			console.log('PUSH-HISTORY length: ' + history.length);
@@ -214,7 +214,7 @@ Device_Webos = (function(Events) {
 			return;
 
 			this.clearHistory();
-		    window.open('', '_self').close();			
+			window.open('', '_self').close();
 		},
 		
 		/**

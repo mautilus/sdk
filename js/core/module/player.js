@@ -470,7 +470,7 @@ Player = (function(Events) {
 			this.trigger('url', this.url);
 		},
 		/**
-		 * Setu custom data for widevine/playready DRM
+		 * Set custom data for widevine/playready DRM
 		 *
 		 * @param {String} customData
 		 */

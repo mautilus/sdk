@@ -21,7 +21,7 @@
  */
 
 Main = (function(global) {
-    var Main = {
+	var Main = {
 		init: function() {
 			var scope = this;
 
@@ -37,15 +37,15 @@ Main = (function(global) {
 			this.stack = [];
 
 			if (typeof jQuery === 'undefined') {
-			throw new Error('jQuery is not loaded');
+				throw new Error('jQuery is not loaded');
 			}
 
 			jQuery(document).ready(function() {
-			scope.onLoad();
+				scope.onLoad();
 			});
 
 			jQuery(window).unload(function() {
-			scope.onUnload();
+				scope.onUnload();
 			});
 		},
 		/**
@@ -59,7 +59,7 @@ Main = (function(global) {
 			this.stack.push(['ready', callback, scope]);
 
 			if (this.isReady) {
-			this.onReady();
+				this.onReady();
 			}
 
 			return this;
@@ -71,7 +71,7 @@ Main = (function(global) {
 		 * @param {Function} callback
 		 * @param {Object} scope
 		 */
-		unload: function(callback, scope){
+		unload: function(callback, scope) {
 			this.stack.push(['unload', callback, scope]);
 			return this;
 		},
@@ -81,6 +81,7 @@ Main = (function(global) {
 		 * @returns {Array}
 		 */
 		getDevice: function() {
+
 			if (navigator.userAgent.indexOf('Maple 5') >= 0) {
 				return ['samsung', '2010'];
 			}
@@ -123,23 +124,29 @@ Main = (function(global) {
 			else if (navigator.userAgent.indexOf('DuneHD\/') >= 0) {
 				return ['dunehd', ''];
 			}
-			else if (navigator.userAgent.indexOf('SmartTvA\/') >= 0) {
-				return ['alliance', 'generic'];
-			}
-			else if (navigator.userAgent.indexOf('ToshibaTP\/') >= 0) {
-				return ['alliance', 'toshiba'];
-			}
 			else if (navigator.userAgent.indexOf('Viera\/1\.') >= 0) {
 				return ['viera', '2012'];
 			}
 			else if (navigator.userAgent.indexOf('Viera\/3\.') >= 0) {
 				return ['viera', '2013'];
 			}
-			else if (navigator.userAgent.match(/playstation/gi)) {
-				return ['playstation', ''];
+			else if (navigator.userAgent.indexOf('SmartTvA\/') >= 0) {
+				return ['alliance', 'generic'];
+			}
+			else if (navigator.userAgent.indexOf('ToshibaTP\/') >= 0) {
+				return ['alliance', 'toshiba'];
+			}
+			else if (navigator.userAgent.match(/playstation 3/gi)) {
+				return ['playstation', '3'];
+			}
+			else if (navigator.userAgent.match(/playstation 4/gi)) {
+				return ['playstation', '4'];
 			}
 			else if (navigator.userAgent.indexOf('Web0S') >= 0) {
 				return ['webos', ''];
+			}
+			else if (navigator.userAgent.indexOf('Crosswalk') >= 0) {
+				return ['android', ''];
 			}
 
 			return ['default', ''];
@@ -165,7 +172,7 @@ Main = (function(global) {
 		 */
 		onReady: function() {
 			this.isReady = true;
-			
+
 			if (this.stack) {
 				for (var i in this.stack) {
 					if (this.stack.hasOwnProperty(i) && this.stack[i] && this.stack[i][0] === 'ready' && typeof this.stack[i][1] === 'function') {
@@ -194,10 +201,10 @@ Main = (function(global) {
 				}
 			}
 		}
-    };
+	};
 
-    Main.init();
+	Main.init();
 
-    return Main;
+	return Main;
 
 })(this);

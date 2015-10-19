@@ -15,7 +15,7 @@ Applications based on Mautilus Smart TV SDK™ share the same source code across
 [http://smarttv.mautilus.com/SDK](http://smarttv.mautilus.com/SDK)
 
 ### 3. Architecture
-![Architecture](./img/Mautilus_SmartTV_SDK_Schema.png?raw=true)
+![Architecture](https://photos-1.dropbox.com/t/2/AABnj7V7h-8jIhbuj5sw1LsZ5WOPcN0qsEbF-ofP8lzFyg/12/289058125/png/32x32/1/_/1/2/Mautilus_SmartTV_SDK_Schema.png/EKyan5cCGNtVIAIoAg/4_ZY6dJxEeiotZYPeV_BLlrVeBab4LUPMWPLF2RdkEI?size=1600x1200&size_mode=2)
 
 ### 4. Examples
 
@@ -27,26 +27,26 @@ Version: 2.0.188
 
 Release notes 2.0.188:
 
--	Tizen support added
--	Widevine support in webOS Player added
--	PlayReady support in Tizen player added
--	Small improvements in developer console
--	Keyboard handling improvements
--	Keyboard support secondary button for special characters
--	Partial HbbTV support
--	Bug-fixing
--	RSS reader example optimized and new PlayerKeyboardInfo example added
+- Tizen support added
+- Widevine support in webOS Player added
+- PlayReady support in Tizen player added
+- Small improvements in developer console
+- Keyboard handling improvements
+- Keyboard support secondary button for special characters
+- Partial HbbTV support
+- Bug-fixing
+- RSS reader example optimized and new PlayerKeyboardInfo example added
 
 Currently supported platforms:
                             
--	Samsung SmartTV/Orsay (2012, 2013, 2014, 2015)
--	Samsung Tizen (2015)
--	LG NetCast 3.x+ (2012, 2013, 2014, 2015)
--	LG webOS 1.x, 2.x (2014, 2015)
--	Philips NetTV 4.x+ (2013, 2014, 2015)
--	Sony BRAVIA (2012, 2013, 2014, 2015)
--	Panasonic VIERA (2012, 2013, 2014)
--	VESTEL (GoGEN, Hyundai)
+- Samsung SmartTV/Orsay (2012, 2013, 2014, 2015)
+- Samsung Tizen (2015)
+- LG NetCast 3.x+ (2012, 2013, 2014, 2015)
+- LG webOS 1.x, 2.x (2014, 2015)
+- Philips NetTV 4.x+ (2013, 2014, 2015)
+- Sony BRAVIA (2012, 2013, 2014, 2015)
+- Panasonic VIERA (2012, 2013, 2014)
+- VESTEL (GoGEN, Hyundai)
 - DuneHD
 
 ### 6. Roadmap
@@ -58,7 +58,7 @@ For Q4/2015 is planned for public release:
 - Adding of the Hisense TV support
 - Enhancement of the HbbTV support
 - Android TV (WebView) support
--	Panasonic FireFox OS
+- Panasonic FireFox OS
 
 ### 7. References
 

@@ -214,7 +214,7 @@ Input = (function () {
 				this.cursorPos++;
 				this.cursor(this.cursorPos);
 			}
-			this.trigger('inserted', this.getValue());
+			this.trigger('inserted', this.getValue(), xchar);
 		},
 		/**
 		* Cursor functionality inside the input.
@@ -351,9 +351,10 @@ Input = (function () {
 				if (this.cursorPos < 0) this.cursorPos = 0;
 				this.cursor(this.cursorPos);
 			}
+			this.trigger('backspace', this.value, this.cursorPos);
 		},
 		/**
-		* Remove all text from input. 
+		* Remove all text from input.
 		*/
 		clearAllText: function () {
 			this.cursorPos = 0;
@@ -361,6 +362,7 @@ Input = (function () {
 			this.valueArray = [];
 			this.setText("");
 			this.cursor();
+			this.trigger('clear-all-text');
 		},
 		/**
 		* This functions is the same like standart input blur, which is removes cursor.
