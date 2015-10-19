@@ -31,7 +31,8 @@ Device_Tizen_Player = (function(Events) {
 			this.$el = $(this.el);
 			this.isMute = false;
 			this.uhdMultiplier = (webapis.productinfo.isUdPanelSupported()) ? 1.5 : 1;   // ratio 1.5 for UHD models, 1.0 for normal model (used in .setDisplayRect())
-	
+			this.$el.css({left : Math.round(this.left), top : Math.round(this.top), width: Math.round(this.width), height: Math.round(this.height)});
+			
 			this.PLAYER = Device.PLAYER;
 	
 			this.PLAYER.setListener({
@@ -166,14 +167,15 @@ Device_Tizen_Player = (function(Events) {
 						}
 					}
 	
-					this.PLAYER.prepare();
-					this.PLAYER.setDisplayRect(this.left * this.uhdMultiplier, this.top * this.uhdMultiplier, this.width * this.uhdMultiplier, this.height * this.uhdMultiplier);
-					if (attrs && attrs.position) {
-						this.PLAYER.seekTo(attrs.position, function() {scope.trigger('seekSuccess');}, function() {scope.trigger('seekError');});
-					}
-					this.PLAYER.play();
-					// STATE_BUFFERING
-					this.state(this.STATE_BUFFERING);
+					this.PLAYER.prepareAsync(function() {
+            Player.PLAYER.setDisplayRect(scope.left * scope.uhdMultiplier, scope.top * scope.uhdMultiplier, scope.width * scope.uhdMultiplier, scope.height * scope.uhdMultiplier);
+            if (attrs && attrs.position) {
+						  Player.PLAYER.seekTo(attrs.position, function() {scope.trigger('seekSuccess');}, function() {scope.trigger('seekError');});
+					  }
+					  Player.PLAYER.play();
+					  // STATE_PLAYING
+					  Player.state(this.STATE_PLAYING);
+          });
 				} else {
 					try {
 						if (attrs && attrs.position) {
@@ -223,13 +225,11 @@ Device_Tizen_Player = (function(Events) {
 				} catch(e) {
 					console.warn(e);
 				}
-				this.$el.css({left : Math.round(this.left), top : Math.round(this.top), width: Math.round(this.width), height: Math.round(this.height)});
-			
+				
 			} else if (cmd === 'hide') {
 				// stop clears the screen
 				this.PLAYER.stop();
 				this.PLAYER.setDisplayRect(0, 0, 0, 0);
-				this.$el.css({left:0, top:0, width: 0, height: 0});
 				if (typeof Device.screensaver == 'function') {
 					Device.screensaver();
 				}
