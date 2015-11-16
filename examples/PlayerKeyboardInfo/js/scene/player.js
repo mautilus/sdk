@@ -20,17 +20,23 @@ Scene_Player = (function(Scene) {
 
 			this.playerControls = new Snippet_PlayerControls(this);
 
-			// get video path
-			var videoPath = './';
-			if (Device.isSAMSUNG) {
-				videoPath = '/mtd_down/widgets/user/' + curWidget.id + '/';
-			}
-			if (Device.isTIZEN) {
-				var packageInfo = tizen.package.getPackageInfo(null);
-				videoPath = '/opt/usr/apps/' + packageInfo.id + '/res/wgt/';
+			// video path
+			var videoPath = '';
+
+			// is it URL or local file?
+			if (!CONFIG.video.match(/^https?:\/\//gi)) {
+				// video path for included media files
+				videoPath = './';
+				if (Device.isSAMSUNG) {
+					videoPath = '/mtd_down/widgets/user/' + curWidget.id + '/';
+				}
+				if (Device.isTIZEN) {
+					var packageInfo = tizen.package.getPackageInfo(null);
+					videoPath = '/opt/usr/apps/' + packageInfo.id + '/res/wgt/';
+				}
 			}
 
-			this.video = (Device.isSAMSUNG || Device.isTIZEN)? videoPath + CONFIG.video : './' + CONFIG.video;
+			this.video = videoPath + CONFIG.video;
 
 			// mouse position
 			this.mousePageX = 0;
