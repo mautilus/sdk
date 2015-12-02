@@ -102,32 +102,73 @@ function secondsToMinutes(seconds) {
 
 /* Modify objects */
 
-/*
- * This function removes all white spaces after / behind the string
- * 
- * @returns {String};
- */
-String.prototype.trim = function () { return this.replace(/^\s+|\s+$/g, ''); };
+//checks if it isn't function implemented yet.
+if (!String.prototype.trim) {
+	/*
+	 * This function removes all white spaces after / behind the string
+	 * 
+	 * @returns {String};
+	 */
+	String.prototype.trim = function () {
+		return this.replace(/^\s+|\s+$/g, '');
+	};
+}
 
-/*
- * This function replace all occurrence of string inside the string.
- * 
- * @param {String} a string which the function is looking for
- * @param {String} b string for replace
- * @returns {String};
- */
-String.prototype.replaceAll = function (a, b) {
-	if (!a || !b) return this;
-	return this.replace(new RegExp(a, 'gm'), b);
-};
+//checks if it isn't function implemented yet.
+if (!String.prototype.replaceAll) {
+	/*
+	 * This function replace all occurrence of string inside the string.
+	 * 
+	 * @param {String} a string which the function is looking for
+	 * @param {String} b string for replace
+	 * @returns {String};
+	 */
+	String.prototype.replaceAll = function (a, b) {
+		if (!a || !b) return this;
+		return this.replace(new RegExp(a, 'gm'), b);
+	};
+}
 
-/*
- * This function returns flag, if the string contains substring
- * 
- * @param {String} a substring
- * @returns {Boolean};
- */
-String.prototype.contains = function (a) {
-	if (this.indexOf(a) >= 0) return true;
-	else return false;
-};
+//checks if it isn't function implemented yet.
+if (!String.prototype.contains) {
+	/*
+	 * This function returns flag, if the string contains substring
+	 * 
+	 * @param {String} a substring
+	 * @returns {Boolean};
+	 */
+	String.prototype.contains = function (a) {
+		if (this.indexOf(a) >= 0) return true;
+		else return false;
+	};
+}
+
+// checks if it isn't function implemented yet.
+if (!String.prototype.format) {
+	/*
+	 * Replaces each format item in a specified string with the text equivalent of a corresponding object's value. Works like String.Format in C#
+	 * @returns {String}
+	 */
+	String.prototype.format = function () {
+		var args = arguments;
+		return this.replace(/{(\d+)}/g, function (match, number) {
+			return typeof args[number] != 'undefined'
+				? args[number]
+				: match
+			;
+		});
+	};
+}
+
+//checks if it isn't function implemented yet.
+if (!String.prototype.ucfirst) {
+	/*
+	 * Convert string to the string with first letter in uppercase. Example: first -> First
+	 * @returns {String}
+	 */
+	if (!String.prototype.ucfirst) {
+		String.prototype.ucfirst = function() {
+			return this.charAt(0).toUpperCase() + this.slice(1);
+		}
+	}
+}
