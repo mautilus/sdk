@@ -81,8 +81,13 @@ Main = (function(global) {
 		 * @returns {Array}
 		 */
 		getDevice: function() {
-
-			if (navigator.userAgent.indexOf('Maple 5') >= 0) {
+			if (CONFIG.HbbTV) {
+				var name = navigator.userAgent.match(/hbbtv\S*/i);   //e.g: HbbTV/1.2.1
+				var nameArr = name ? name[0].split("/") : [];
+				var version = nameArr.length > 1 ? nameArr[1] : "";
+				return ['hbbtv', version];
+			}
+			else if (navigator.userAgent.indexOf('Maple 5') >= 0) {
 				return ['samsung', '2010'];
 			}
 			else if (navigator.userAgent.indexOf('Maple 6') >= 0) {
