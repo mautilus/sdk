@@ -73,11 +73,20 @@ Device_Tizen = (function(Events) {
 			});
 
 			self.setKeys();
-
+			/*
+			 ********************************************************
+			 * Tizen KeyCode Table
+			 * 
+			 * http://www.samsungdforum.com/tizenguide/tizen3551/index.html#Key-Code-Table
+			 * http://www.samsungdforum.com/tizenguide/?Foldername=tizen3551&Filename=index.html
+			 ********************************************************
+			 */
+			// UNREGISTER_KEY
 			tizen.tvinputdevice.unregisterKey("VolumeDown");
 			tizen.tvinputdevice.unregisterKey("VolumeUp");
 			tizen.tvinputdevice.unregisterKey("VolumeMute");
-
+			
+			// REGISTER_KEY
 			tizen.tvinputdevice.registerKey("0");
 			tizen.tvinputdevice.registerKey("1");
 			tizen.tvinputdevice.registerKey("2");
@@ -99,11 +108,12 @@ Device_Tizen = (function(Events) {
 			tizen.tvinputdevice.registerKey("MediaFastForward");
 			tizen.tvinputdevice.registerKey("MediaRecord");
 			tizen.tvinputdevice.registerKey("MediaPlayPause");
-//			tizen.tvinputdevice.registerKey("Exit");
 			tizen.tvinputdevice.registerKey("ChannelList");
 			tizen.tvinputdevice.registerKey("ChannelUp");
 			tizen.tvinputdevice.registerKey("ChannelDown");
 			tizen.tvinputdevice.registerKey("PreviousChannel");
+			tizen.tvinputdevice.registerKey("Info");
+			// tizen.tvinputdevice.registerKey("Exit");
 
 			self.screensaver();
 

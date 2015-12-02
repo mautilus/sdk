@@ -1,7 +1,7 @@
 CONFIG = {
 	locale: 'EN',
-	versionSDK: '2.0.171 [01.03.2015]',	// SDK version  (format: X.Y.SDK_SVN_Revision_number)
-	version: '1.0.1 [16.11.2015]',		// application version - put your own
+	versionSDK: '2.0.220 [02.12.2015]',	// SDK version  (format: X.Y.SDK_SVN_Revision_number)
+	version: '1.0.2 [17.8.2015]',		// application version - put your own
 	developer: {
 		debug: false,
 		active: false,
