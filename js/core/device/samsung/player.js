@@ -35,13 +35,14 @@ Device_Samsung_Player = (function(Events) {
 
 			this.el.OnEvent = this.onEvent;
 			this.el.Open('Player', '0001', 'InitPlayer');
+
 		},
 
 		/**
 		 * @inheritdoc Player#deinitNative
 		 */
 		deinitNative: function() {
-			this.el.Execute("Stop");
+			this.el.Execute('Stop');
 			this.el.Close();
 		},
 
@@ -53,14 +54,14 @@ Device_Samsung_Player = (function(Events) {
 
 			if (cmd === 'play') {
 				if (attrs && attrs.url) {
-					this.el.Execute("Stop");
+					this.el.Execute('Stop');
 
 					url = this.prepareUrl(this.url);
 					console.network('PLAYER', url);
 
-					this.el.Execute("InitPlayer", url);
+					this.el.Execute('InitPlayer', url);
 					//init
-					//console.log("INIT working variable");
+					//console.log('INIT working variable');
 					this._lastSeekBy = 0;     // milisec
 					this._accSeekTime = 0;    // milisec
 					this._realLastSeekBy = 0; // milisec
@@ -68,28 +69,28 @@ Device_Samsung_Player = (function(Events) {
 
 					if (this.customData) {
 						// set DRM custom data
-						this.el.Execute("SetPlayerProperty", "3", this.customData, this.customData.length);
+						this.el.Execute('SetPlayerProperty', '3', this.customData, this.customData.length);
 					}
 				}
 
 				if (attrs && attrs.position) {
 					// StartPlayback takes position in seconds
-					this.el.Execute("StartPlayback", parseFloat(attrs.position, 10) / 1000);
+					this.el.Execute('StartPlayback', parseFloat(attrs.position, 10) / 1000);
 
 				} else {
-					this.el.Execute("StartPlayback", 0);
+					this.el.Execute('StartPlayback', 0);
 				}
 
 				this.state(this.STATE_PLAYING);
 				return true;
 
 			} else if (cmd === 'pause') {
-				this.el.Execute("Pause");
+				this.el.Execute('Pause');
 				this.state(this.STATE_PAUSED);
 				return true;
 
 			} else if (cmd === 'stop') {
-				return this.el.Execute("Stop");
+				return this.el.Execute('Stop');
 
 			} else if (cmd === 'seek') {
 				var position = Math.round((attrs.position - this.currentTime) / 1000);
@@ -97,19 +98,19 @@ Device_Samsung_Player = (function(Events) {
 				if (attrs.position === 0) {
 					position = Math.round(this.currentTime / 1000);
 					this._lastSeekBy = (position * -1);
-					this.el.Execute("JumpBackward", position);
+					this.el.Execute('JumpBackward', position);
 
 				} else if (position >= 0) {
-					this.el.Execute("JumpForward", position);
+					this.el.Execute('JumpForward', position);
 
 				} else {
-					this.el.Execute("JumpBackward", position * -1);
+					this.el.Execute('JumpBackward', position * -1);
 				}
 
 				return true;
 
 			} else if (cmd === 'playbackSpeed') {
-				return this.el.Execute("SetPlaybackSpeed", attrs.speed);
+				return this.el.Execute('SetPlaybackSpeed', attrs.speed);
 
 			} else if (cmd === 'show') {
 				this.width = attrs.width || this.width;
@@ -123,7 +124,7 @@ Device_Samsung_Player = (function(Events) {
 
 			} else if (cmd === 'hide') {
 				// stop clears the screen
-				this.el.Execute("Stop");
+				this.el.Execute('Stop');
 
 				this.$el.css('visibility', 'hidden');
 
@@ -151,17 +152,17 @@ Device_Samsung_Player = (function(Events) {
 				this.el.Execute('SetDisplayArea', Math.round(this.left / 1.333), Math.round(this.top / 1.333), Math.round(this.width / 1.333), Math.round(this.height / 1.333));
 
 			} else if (cmd === 'currentBitrate') {
-				return this.el.Execute("GetCurrentBitrates");
+				return this.el.Execute('GetCurrentBitrates');
 
 			} else if (cmd === 'audioTrack') {
 				if (!this.duration) {
 					this.one('durationchange', function() {
-						this.el.Execute("SetStreamID", 1, attrs.index || 0);
+						this.el.Execute('SetStreamID', 1, attrs.index || 0);
 					}, this);
 
 					return;
 				}
-				return this.el.Execute("SetStreamID", 1, attrs.index || 0);
+				return this.el.Execute('SetStreamID', 1, attrs.index || 0);
 
 			} else if (cmd === 'mute') {
 				// @todo: implement mute native API, http://www.samsungdforum.com/Guide/ref00014/sef_plugin_audio.html
@@ -224,7 +225,7 @@ Device_Samsung_Player = (function(Events) {
 			var deviceId = null;
 
 			try {
-				deviceId = Device.EXTERNALWIDGET.GetESN("WIDEVINE");
+				deviceId = Device.EXTERNALWIDGET.GetESN('WIDEVINE');
 
 			} catch (e) {
 				return false;
@@ -270,7 +271,7 @@ Device_Samsung_Player = (function(Events) {
 						this._lastSeekBy = 0;                                          // clear lastSeek					
 					}
 				}
-				// console.warn("SAM currTime: " + toTimee(time) + ", duration: " + this.duration + "(ms), isTimeShift: " + this.isTimeshiftedLiveStream + ", lastSeekBy: " + this._lastSeekBy + ", realLastSeekBy: " + this._realLastSeekBy + ", accSeekTime: " + this._accSeekTime);		
+				// console.warn('SAM currTime: ' + toTimee(time) + ', duration: ' + this.duration + '(ms), isTimeShift: ' + this.isTimeshiftedLiveStream + ', lastSeekBy: ' + this._lastSeekBy + ', realLastSeekBy: ' + this._realLastSeekBy + ', accSeekTime: ' + this._accSeekTime);		
 
 				this._lastTime = time;                      // save currTime
 				var corrTime = this.duration + this._accSeekTime;  // correct currTime
@@ -383,13 +384,13 @@ Device_Samsung_Player = (function(Events) {
 				Player.OnStreamInfoReady();
 
 				try {
-					console.info("Player Info >>>\n"
-							+ " URL: " + Player.prepareUrl(Player.url) + "\n"
-							+ " Duration: " + Player.el.Execute('GetDuration') + "\n"
-							+ " Resolution: " + Player.el.Execute('GetVideoResolution') + "\n"
-							+ " Bitrates: " + Player.el.Execute('GetAvailableBitrates') + "\n"
-							+ " Audio tracks: " + Player.el.Execute('GetTotalNumOfStreamID', 1) + "\n"
-							+ " Subtitle tracks: " + Player.el.Execute('GetTotalNumOfStreamID', 5)
+					console.info('Player Info >>>' + "\n"
+							+ ' URL: ' + Player.prepareUrl(Player.url) + "\n"
+							+ ' Duration: ' + Player.el.Execute('GetDuration') + "\n"
+							+ ' Resolution: ' + Player.el.Execute('GetVideoResolution') + "\n"
+							+ ' Bitrates: ' + Player.el.Execute('GetAvailableBitrates') + "\n"
+							+ ' Audio tracks: ' + Player.el.Execute('GetTotalNumOfStreamID', 1) + "\n"
+							+ ' Subtitle tracks: ' + Player.el.Execute('GetTotalNumOfStreamID', 5)
 					);
 
 				} catch (e) {

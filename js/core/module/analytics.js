@@ -58,22 +58,27 @@ Analytics = (function(Events) {
 		/**
 		 * @property {Object} Required values for all hits
 		 */
-		
+
 		params: {
-			v: '1',             // The protocol version. The value should be 1.
-			tid: '',            // The ID that distinguishes to which Google Analytics property to send data.
-			cid: '',            // An ID unique to a particular user.
-			t: '',              // The type of interaction collected for a particular user. ('pageview'|'screenview'|'event'|'transaction'|'item'|'social'|'exception'|'timing')
-		//        ua: '',             // OPTIONAL The User Agent of the browser. Note that Google has libraries to identify real user agents. Hand crafting your own agent could break at any time.
-		//        ds: '',             // OPTIONAL Indicates the data source of the hit.
-		sr: '1280x720',     // OPTIONAL Specifies the screen resolution.
+			v: '1',			// The protocol version. The value should be 1.
+			tid: '',		// The ID that distinguishes to which Google Analytics property to send data.
+			cid: '',		// An ID unique to a particular user.
+			t: '',			// The type of interaction collected for a particular user. ('pageview'|'screenview'|'event'|'transaction'|'item'|'social'|'exception'|'timing')
+			// ua: '',		// OPTIONAL The User Agent of the browser. Note that Google has libraries to identify real user agents. Hand crafting your own agent could break at any time.
+			// ds: '',		// OPTIONAL Indicates the data source of the hit.
+			sr: '1280x720',	// OPTIONAL Specifies the screen resolution.
+			cd1: '',		// OPTIONAL Custom variable 1
+			cd2: '',		// OPTIONAL Custom variable 2
+			cd3: '',		// OPTIONAL Custom variable 3
+			cd4: '',		// OPTIONAL Custom variable 4
+			cd5: '',		// OPTIONAL Custom variable 5
 		},
-		  
+
 		appParams: {
-			an: '',             // OPTIONAL Specifies the application name.
-			aid: '',            // OPTIONAL Application identifier..
-			av: '',             // OPTIONAL Specifies the application version.
-			aiid: '',           // OPTIONAL Application installer identifier.
+			an: '',			// OPTIONAL Specifies the application name.
+			aid: '',		// OPTIONAL Application identifier..
+			av: '',			// OPTIONAL Specifies the application version.
+			aiid: '',		// OPTIONAL Application installer identifier.
 		}
 	};
 
@@ -117,7 +122,7 @@ Analytics = (function(Events) {
 			this.params.cid = this.UUID;
 			//this.params.ua = navigator.userAgent;
 		},
-		
+
 		/**
 		 * Set and returns current UUID it should be valid for 2 years
 		 *
@@ -133,9 +138,10 @@ Analytics = (function(Events) {
 				});
 			}
 			Storage.set('device_uuid' , this.UUID, this.YEARS_2);
-		  
+
 			return this.UUID;
 		},
+
 		/**
 		 * Track page view
 		 * @private
@@ -146,10 +152,10 @@ Analytics = (function(Events) {
 			if(!this.config.ACCOUNT_CODE){
 				return;
 			}
-			
+
 			var params = {};
-			$.extend(true, params, this.params, description || {}, {'t':'pageview', 'dp':site});
-		  
+			$.extend(true, params, this.params, description || {}, {'t': 'pageview', 'dp': site});
+
 			this.collect(this.URL, params, this.requestType, function(resp) {
 				if(resp){
 					var img = new Image();
@@ -168,17 +174,17 @@ Analytics = (function(Events) {
 			if(!this.config.ACCOUNT_CODE){
 				return;
 			}
-			
+
 			var params = {};
-			$.extend(true, params, this.params, this.application ? this.appParams : {}, description || {}, {'t':'screenview', 'cd':site});
-			
+			$.extend(true, params, this.params, this.application ? this.appParams : {}, description || {}, {'t': 'screenview', 'cd': site});
+
 			this.collect(this.URL, params, this.requestType, function(resp) {
 				if(resp){
 					var img = new Image();
 					img.src = resp;
 				}
 			}, this);
-			
+
 		},
 
 		/**
@@ -200,17 +206,17 @@ Analytics = (function(Events) {
 				label = value;
 				value = d;
 			}
-		
+
 			var params = {};
-			$.extend(true, params, this.params, this.application ? this.appParams : {}, description || {}, {'t':'event', 'ec':category, 'ea':action});
-		
+			$.extend(true, params, this.params, this.application ? this.appParams : {}, description || {}, {'t': 'event', 'ec': category, 'ea': action});
+
 			if(label){
 				params.el = label;
 			}
 			if(value){
 				params.ev = value;
 			}
-			
+
 			this.collect(this.URL, params, this.requestType, function(resp) {
 				if(resp){
 					var img = new Image();
@@ -229,20 +235,21 @@ Analytics = (function(Events) {
 			if(!this.config.ACCOUNT_CODE){
 				return;
 			}
-			
+
 			var params = {};
-			$.extend(true, params, this.params, this.application ? this.appParams : {}, description || {}, {'t':'exception', 'exf':'1', 'exd':exception});
-			
+			$.extend(true, params, this.params, this.application ? this.appParams : {}, description || {}, {'t': 'exception', 'exf': '1', 'exd': exception});
+
 			this.collect(this.URL, params, this.requestType, function(resp) {
 				if(resp){
 					var img = new Image();
 					img.src = resp;
 				}
 			}, this);
-			
+
 		},
- 
+
 		collect: function(url, data, requestType, callback, cbscope) {
+
 			if(typeof requestType == 'function'){
 				cbscope = callback;
 				callback = requestType;
@@ -250,20 +257,20 @@ Analytics = (function(Events) {
 			}
 			var scope = this;
 			var dataArr = [];
-			
+
 			for (var i in data) {
 				if (data.hasOwnProperty(i)) {
 					if (typeof data[i] == 'object' || (data[i] instanceof Array)) {
 						for (var j in data[i]) {
 							dataArr.push(i + '=' + encodeURIComponent(data[i][j]));
 						}
-						
+
 					} else {
 						dataArr.push(i + '=' + encodeURIComponent(data[i]));
 					}
 				}
 			}
-			
+
 			var cb = function(resp, status, xhr){
 				if (callback) {
 					callback.call(cbscope || scope, resp || null, status, xhr, url);
@@ -276,13 +283,13 @@ Analytics = (function(Events) {
 			};
 			
 			Ajax.request(url, {
-				method: requestType, 
+				method: requestType,
 				data: dataArr.join('&'),
 				processData: false,
 				timeout: scope.requestTimeout}
 			).done(cb).fail(cbfail);
 		}
-		
+
 	});
 
 	// Initialize this class when Main is ready
