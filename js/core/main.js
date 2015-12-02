@@ -146,7 +146,7 @@ Main = (function(global) {
 				return ['webos', ''];
 			}
 			else if (navigator.userAgent.indexOf('Crosswalk') >= 0) {
-				return ['android', ''];
+				return ['android', ((Android && Android.getManufacturer) ? Android.getManufacturer() : '')];
 			}
 
 			return ['default', ''];
