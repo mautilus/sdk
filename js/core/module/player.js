@@ -206,6 +206,9 @@ Player = (function(Events) {
 			if (this.config.muted) {
 				this.mute();
 			}
+
+			// TODO
+			setTimeout(function() { Player.trigger('init'); }, 0);
 		},
 		/**
 		 * De-init player
@@ -417,11 +420,14 @@ Player = (function(Events) {
 		 * Reset all states and properties
 		 */
 		reset: function() {
+
 			this.url = null;
 			this.duration = 0;
 			this.currentTime = 0;
 			this.currentState = this.STATE_IDLE;
 			this.speed = 1;
+			this.width = this.config.width;
+			this.height = this.config.height;
 
 			this.trigger('reset');
 		},

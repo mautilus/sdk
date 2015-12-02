@@ -135,12 +135,20 @@ Device_Samsung_Player = (function(Events) {
 				var h = Math.round((this.width / attrs.width) * attrs.height);
 				// widescreen
 				if (h <= 720) {
-					this.el.Execute('SetDisplayArea', 0, Math.round(((this.height - h) / 2) / 1.333), 960, Math.round(h / 1.333));
+					this.left = 0;
+					this.top = Math.round((this.height - h) / 2);
+					this.width= 1280;
+					this.height = h;
 				// not widescreen
 				} else {
 					var w = Math.round((this.height / attrs.height) * attrs.width);
-					this.el.Execute('SetDisplayArea', Math.round(((this.width - w) / 2) / 1.333), 0, Math.round(w / 1.333), 540);
+					this.left = Math.round((this.width - w) / 2);
+					this.top = 0;
+					this.width= w;
+					this.height = 720;
 				}
+
+				this.el.Execute('SetDisplayArea', Math.round(this.left / 1.333), Math.round(this.top / 1.333), Math.round(this.width / 1.333), Math.round(this.height / 1.333));
 
 			} else if (cmd === 'currentBitrate') {
 				return this.el.Execute("GetCurrentBitrates");

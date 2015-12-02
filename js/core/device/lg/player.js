@@ -67,6 +67,9 @@ Device_Lg_Player = (function(Events) {
 			};
 
 			this.drm = drm || null;
+
+			Player.trigger('init');
+
 		},
 
 		/**
@@ -126,6 +129,8 @@ Device_Lg_Player = (function(Events) {
 					} else if (this.customData && Device.DRMAGENT) {
 						console.log("LG DRM");
 
+						this.createPlayer();
+
 						var msgType = "application/vnd.ms-playready.initiator+xml",
 							scope = this;
 						DRMSystemID = "urn:dvb:casystemid:19219",
@@ -152,7 +157,10 @@ Device_Lg_Player = (function(Events) {
 						console.log("SEND DRM " + msgType + this.customData + DRMSystemID);
 						Device.DRMAGENT.sendDRMMessage(msgType, msg, DRMSystemID);
 						return;
-					} else this.PLAYER.data = url;
+					} else {
+						this.createPlayer();
+						this.PLAYER.data = url;
+					}
 				}
 
 				this.PLAYER.play(1);
