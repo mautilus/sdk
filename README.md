@@ -1,4 +1,4 @@
-﻿Mautilus Smart TV SDK™
+Mautilus Smart TV SDK™
 ===========
 
 ### 1. Introduction
@@ -23,57 +23,64 @@ The SDK is delivered with two examples, which are showing use of the virtual key
 
 ### 5. Current version
 
-Version: 2.0.188  
+Version: 2.0.220  
+
+Release notes 2.0.220:
+
+-	Support for Panasonic Firefox devices (2015 models) added 
+-	Support for Arris (KreaTV) added
+-	Support for MPEG-DASH on Samsung Orsay models enhanced
+-	Support for HbbTV 1.1.1 and 1.2.1 enhanced
 
 Release notes 2.0.188:
 
-- Tizen support added
-- Widevine support in webOS Player added
-- PlayReady support in Tizen player added
-- Small improvements in developer console
-- Keyboard handling improvements
-- Keyboard support secondary button for special characters
-- Partial HbbTV support
-- Bug-fixing
-- RSS reader example optimized and new PlayerKeyboardInfo example added
+-	Tizen support added
+-	Widevine support in webOS Player added
+-	PlayReady support in Tizen player added
+-	Small improvements in developer console
+-	Keyboard handling improvements
+-	Keyboard support secondary button for special characters
+-	Partial HbbTV support
+-	Bug-fixing
+-	RSS reader example optimized and new PlayerKeyboardInfo example added
 
 Currently supported platforms:
                             
-- Samsung SmartTV/Orsay (2012, 2013, 2014, 2015)
-- Samsung Tizen (2015)
-- LG NetCast 3.x+ (2012, 2013, 2014, 2015)
-- LG webOS 1.x, 2.x (2014, 2015)
-- Philips NetTV 4.x+ (2013, 2014, 2015)
-- Sony BRAVIA (2012, 2013, 2014, 2015)
-- Panasonic VIERA (2012, 2013, 2014)
-- VESTEL (GoGEN, Hyundai)
-- DuneHD
+-	Samsung SmartTV/Orsay (2012, 2013, 2014, 2015)
+-	Samsung Tizen (2015)
+-	LG NetCast 3.x+ (2012, 2013, 2014, 2015)
+-	LG webOS 1.x, 2.x (2014, 2015)
+-	Philips NetTV 4.x+ (2013, 2014, 2015)
+-	Sony BRAVIA (2012, 2013, 2014, 2015)
+-	Panasonic VIERA (2012, 2013, 2014)
+-	Panasonic Firefox (2015)
+-	VESTEL (GoGEN, Hyundai)
+-	DuneHD
+-	Arris (KreaTV) 
+-   HbbTV 1.1.1 and 1.2.1
 
 ### 6. Roadmap
 
-For Q4/2015 is planned for public release:
+For Q1/2016 is planned for public release:
 
-- Enhancement of SONY PlayStation 3/4 drivers 
-- Adding of the Arris (KreaTV) set-top box support
-- Adding of the Hisense TV support
-- Enhancement of the HbbTV support
-- Android TV (WebView) support
-- Panasonic FireFox OS
+-	Enhancement of SONY PlayStation 3/4 drivers 
+-	Adding of the Hisense TV support
+-	Android TV (WebView) support
 
 ### 7. References
 
-- VOYO (CEE countries)
-- icflix (MENA)
-- ShowMax (South Africa)
-- Filmin (Spain)
-- Virtual Radio OE3 (Austria)
-- ChannelLive (USA)
-- Stream.cz (Czech Republic, Slovakia)
-- HBO.GO (Europe)
-- Telefonica O2TV (Czech Republic)
-- DittoTV (India)
-- Mobily (Saudi Arabia)
-- and many more ...
+-	VOYO (CEE countries)
+-	icflix (MENA)
+-	ShowMax (South Africa)
+-	Filmin (Spain)
+-	Virtual Radio OE3 (Austria)
+-	ChannelLive (USA)
+-	Stream.cz (Czech Republic, Slovakia)
+-	HBO.GO (Europe)
+-	Telefonica O2TV (Czech Republic)
+-	DittoTV (India)
+-	Mobily (Saudi Arabia)
+-	and many more ...
 
 ### 8. License
 
