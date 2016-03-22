@@ -32,7 +32,7 @@ Device_Tizen_Player = (function(Events) {
 			this.isMute = false;
 			this.uhdMultiplier = (webapis.productinfo.isUdPanelSupported()) ? 1.5 : 1;   // ratio 1.5 for UHD models, 1.0 for normal model (used in .setDisplayRect())
 
-			this.$el.css({left : Math.round(this.left), top : Math.round(this.top), width: Math.round(this.width), height: Math.round(this.height)});
+			this.$el.css({position: "absolute", left : Math.round(this.left), top : Math.round(this.top), width: Math.round(this.width), height: Math.round(this.height)});
 
 			this.PLAYER = Device.PLAYER;
 	
