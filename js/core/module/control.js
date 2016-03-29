@@ -1,4 +1,4 @@
-/*
+/**
  ********************************************************
  * Copyright (c) 2013 Mautilus s.r.o. (Czech Republic)
  * All rights reserved.
@@ -32,9 +32,9 @@ Control = (function(Events) {
 		 * Key map, contains key:value pairs for key codes, e.g. {LEFT:37,...}
 		 */
 		key: {}
-		};
+	};
 
-		$.extend(true, Control, Events, {
+	$.extend(true, Control, Events, {
 		/**
 		 * @event beforekey
 		 * Will be called before a `key` event
@@ -134,7 +134,7 @@ Control = (function(Events) {
 			if(this.isExternNumeric(keycode)) {
 				return true;
 			}
-			
+
 			return false;
 		},	
 		/**
@@ -174,7 +174,7 @@ Control = (function(Events) {
 				|| keycode === this.key.RETURN) {
 				return true;
 			}
-			
+
 			return false;
 		},
 		isMedia: function(keycode) {
@@ -185,7 +185,7 @@ Control = (function(Events) {
 				|| keycode === this.key.RW) {
 				return true;
 			}
-			
+
 			return false;
 		},
 		/**
@@ -216,7 +216,7 @@ Control = (function(Events) {
 			}else if(keycode === this.key.ZERO || keycode === this.key.NUMERIC_ZERO){
 				return '0';
 			}
-			
+
 			return null;
 		},
 		/**
@@ -224,7 +224,7 @@ Control = (function(Events) {
 		 * 
 		 * @private
 		 */
-		onKeyDown: function(ev) {
+		onKeyDown: function(ev,rc) {
 			var keyCode;
 
 			if (typeof ev === 'object') {
@@ -238,7 +238,7 @@ Control = (function(Events) {
 				ev.preventDefault();
 			}
 
-			if (this.trigger('beforekey', keyCode, ev) === false) {
+			if (this.trigger('beforekey', keyCode, ev, rc) === false) {
 				return;
 			}
 

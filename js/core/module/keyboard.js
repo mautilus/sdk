@@ -300,7 +300,12 @@ Keyboard = (function (Events) {
 		onKeyDown: function ($el, event) {
 			if (!this.$el.is(":visible")) return;
 
-			var keyCode = event.keyCode;
+			var keyCode;
+			if (typeof event === 'object') {
+				keyCode = event.keyCode;
+			} else {
+				keyCode = event;
+			}
 
 			if (keyCode == Control.key.RETURN) {
 				this.exit();
@@ -310,7 +315,9 @@ Keyboard = (function (Events) {
 				return this.onEnter($el);
 			}
 			else if (keyCode == 32) { // spacebar todo
-				event.preventDefault();
+				if (typeof event === 'object') {
+					event.preventDefault();
+				}
 				this.insertValue(" ", "SPACE");
 			}
 			else if (Control.isNavigational(keyCode)) {
@@ -325,15 +332,19 @@ Keyboard = (function (Events) {
 				// do nothing
 			} 
 			else if (Control.isNumeric(keyCode)) {
-				event.stopPropagation();
-				event.preventDefault();
+				if (typeof event === 'object') {
+					event.stopPropagation();
+					event.preventDefault();
+				}
 				var value = Control.getTextValue(keyCode);
 				this.insertValue(value, "NUMERIC");
 				this.focusByInput(value);
 			}
 			else if (keyCode >= 65 && keyCode <= 90) {
-				event.stopPropagation();
-				event.preventDefault();
+				if (typeof event === 'object') {
+					event.stopPropagation();
+					event.preventDefault();
+				}
 				var value = String.fromCharCode(keyCode);
 				value = value.toLowerCase();
 				this.insertValue(value, "LETTER");
