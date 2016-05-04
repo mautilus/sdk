@@ -1,14 +1,18 @@
 /*
-********************************************************
-* Copyright (c) 2013 Mautilus s.r.o. (Czech Republic)
-* All rights reserved.
-*
-* You may obtain a copy of the License at LICENSE.txt
-********************************************************
-*/
+ *******************************************************************************
+ * Copyright (c) 2013 Mautilus, s.r.o. (Czech Republic)
+ * All rights reserved
+ *  
+ * Questions and comments should be directed https://github.com/mautilus/sdk/issues
+ *
+ * You may obtain a copy of the License at LICENSE.txt
+ *******************************************************************************
+ */
 
 /**
  * Input class
+ * Own input implementation. This class does not use standart input tag, because of problems on some platforms. 
+ * This Input is fully under our control  
  * 
  * @author Mautilus s.r.o.
  * @class Input
@@ -22,12 +26,43 @@ Input = (function () {
 	};
 
 	$.extend(true, Input.prototype, Events, {
-		/**
+	   /**
+		* @event rtlChanged
+		* Triggered when rtl attribute is changed
+		* @param {Boolean} isRTL 
+		*/
+
+	   /**
+		* @event inserted
+		* Triggered when character is inserted
+		* @param {String} whole text in the input 
+		* @param {String} currenlty inserted character 
+		*/
+        
+	   /**
+		* @event backspace
+		* Triggered when character is removed
+		* @param {String} value Text in the input
+		* @param {Number} cursorPos Cursor position 
+		*/
+
+	   /**
+		* @event clear-all-text
+		* Triggered when text in the input is removed
+		*/
+
+	   /**
 		* This value holds each signs in the input.
 		*/
 		valueArray: [], // {char: '', width: 0} 
-		/**
+	   /**
 		* Input which is called after the input is created.
+        * @param {String} style CSS style which should be used in Input
+        * @param {Object} options properties which can be set in input
+        *                 `options.maxLength` maximum length of input 
+        *                 `options.cursorBorderColor` cursor color 
+        *                 `options.placeHolder` placeholder 
+        *                 `options.placeHolderFontSize` placeholder fontsize 
 		*/
 		init: function (style, options) {
 
@@ -54,12 +89,17 @@ Input = (function () {
 					this.setArabic(true);
 			}, this);
 		},
-		/**
+	   /**
 		* Set password mode.
 		*/
 		setPasswordMode: function () {
 			this.passwordMode = true;
 		},
+	   /**
+		* Set arabic mode.
+        * @param {Boolean} dontSet if is not defined or false then arabic class is added to the input and RTL flag is true
+        * @fires rtlChanged
+		*/
 		setArabic: function (dontSet) {
 			if (this.$el != undefined && !dontSet) {
 				this.$el.css('direction', 'rtl');
@@ -74,8 +114,10 @@ Input = (function () {
 
 			this.trigger('rtlChanged', this.isRTL);
 		},
-		/**
+	   /**
 		* Create input.
+        * @param {Object} $parent parent element where input be created
+        * @param {Object} css object with defined css which be set to the input
 		*/
 		create: function ($parent, css) {
 			this.$el = $("<div class='input' style='position:relative;'><span class='text' style='position: relative; left: 0px; white-space: nowrap;'></span></div>");
@@ -103,6 +145,8 @@ Input = (function () {
 		},
 		/**
 		* Get dimensions from input text.
+        * @param {String} text string which be measured (width and height) 
+        * @returns {Object} object with computed width and height of the `text` parameter
 		*/
 		getTextDimensions: function (text) {
 			if (!text || text.length == 0) return 0;
@@ -111,14 +155,16 @@ Input = (function () {
 			this.$inputHelp.html(text);
 			return { width: this.$inputHelp.width(), height: this.$inputHelp.height() };
 		},
-		/**
+	   /**
 		* Remove help input.
 		*/
 		destroy: function () {
 			this.$inputHelp.remove();
 		},
-		/**
+	   /**
 		* Set value to the input. The text is stored inside the variable.
+        * @param {String} text Text which be stored
+        * @param {Boolean} focus Flag if input should be focused
 		*/
 		setValue: function (text, focus) {
 			if (!text) text = "";
@@ -141,6 +187,11 @@ Input = (function () {
 			if (focus)
 				this.cursor();
 		},
+	   /**
+		* Set placeholder text to the input. 
+        * @param {Boolean} set flag if placeholder be set or not
+        * @private
+        */
 		setPlaceholder: function (set) {
 			if (set) {
 				this.$el.css('color', 'grey');
@@ -154,6 +205,9 @@ Input = (function () {
 		},
 		/**
 		* Set text, which user can see on the screen.
+        * @param {String} text Text which be seen in the input
+        * @param {Boolean} isPlaceholder Flag if input has placeholder
+        * @private
 		*/
 		setText: function (text, isPlaceholder) {
 			if (this.passwordMode && !isPlaceholder) {
@@ -175,6 +229,7 @@ Input = (function () {
 		},
 		/**
 		* set max count of characters
+        * @param {Number} length How many characters can be inserted in the input
 		**/
 		setMaxLength: function (length) {
 			if (!length)
@@ -184,12 +239,15 @@ Input = (function () {
 		},
 		/**
 		* Get current input value.
+        * @returns {String} what is currently in the input 
 		*/
 		getValue: function () {
 			return this.value;
 		},
 		/**
 		* Insert new char to the input.
+        * @param {String} xchar Characted which should be inserted
+        * @fires inserted
 		*/
 		insert: function (xchar) {
 			var len = this.valueArray.length;
@@ -218,6 +276,8 @@ Input = (function () {
 		},
 		/**
 		* Cursor functionality inside the input.
+        * @private
+        * @param {Number} position Position of cursor in the text
 		*/
 		cursor: function (position) {
 			var width = 1, len = this.valueArray.length, newWidth = 0, parentWidth = this.$el.width(), diff = 0;
@@ -292,8 +352,8 @@ Input = (function () {
 			this.cursorPos = -1;
 			this.$cursor.hide();
 		},
-		/**
-		* Cleart cursor timeout.
+	   /**
+		* Clear cursor timeout.
 		*/
 		clearCursor: function () {
 			if (this.cursorBlinking) {
@@ -303,6 +363,8 @@ Input = (function () {
 		},
 		/**
 		* Public function for keyboard for moving with the cursor.
+        * @param {Number} direction 1 for moving right or -1 for moving left or some other number
+        * @param {String} special String with special caret moving (`start` or `end`)
 		*/
 		moveCaret: function (direction, special) { // public function for keyboard
 			// special
@@ -315,6 +377,8 @@ Input = (function () {
 		},
 		/**
 		* Support function for moveCaret.
+        * @param {Number} direction 1 for moving right or -1 for moving left or some other number
+        * @private
 		*/
 		move: function (direction) {
 			if (this.cursorPos == -1) this.cursor();
@@ -355,6 +419,7 @@ Input = (function () {
 		},
 		/**
 		* Remove all text from input.
+        * @fires clear-all-text
 		*/
 		clearAllText: function () {
 			this.cursorPos = 0;

@@ -1,10 +1,12 @@
 /*
- ********************************************************
- * Copyright (c) 2013 Mautilus s.r.o. (Czech Republic)
- * All rights reserved.
+ *******************************************************************************
+ * Copyright (c) 2013 Mautilus, s.r.o. (Czech Republic)
+ * All rights reserved
+ *  
+ * Questions and comments should be directed https://github.com/mautilus/sdk/issues
  *
  * You may obtain a copy of the License at LICENSE.txt
- ********************************************************
+ *******************************************************************************
  */
 
 /**
@@ -24,9 +26,14 @@ Model = (function(Events, Deferrable) {
 	};
 
 	$.extend(true, Model.prototype, Events, Deferrable, {
+        /**
+         * @property {Object} attributes attributes related to model 
+         */
+
 		/**
-		 * Construct object
+		 * Construct Model object.
 		 * 
+         * @param {Object} [attributes] attributes which be set in model
 		 * @constructor
 		 */
 		construct: function(attributes) {
@@ -34,7 +41,7 @@ Model = (function(Events, Deferrable) {
 			this.set(attributes);
 		},
 		/**
-		 * Destruct object
+		 * Destruct object and remove model attributes 
 		 * 
 		 * @private
 		 */
@@ -85,7 +92,7 @@ Model = (function(Events, Deferrable) {
 			return this.attributes[attribute];
 		},
 		/**
-		 * Check if specified attribute is set and not empty (non-null non-undefined)
+		 * Check if specified attribute is set and not empty (non-null or non-undefined)
 		 * 
 		 * @param {String} attribute
 		 * @returns {Boolean}
@@ -95,6 +102,8 @@ Model = (function(Events, Deferrable) {
 		},
 		/**
 		 * Removes all attributes
+         * 
+         * @fires clear
 		 */
 		clear: function(){
 			this.attributes = {};
@@ -106,7 +115,7 @@ Model = (function(Events, Deferrable) {
 		 * 
 		 * @param {Object} attributes Hash of attributes
 		 * @param {Boolean} [typeSensitive=false] TRUE for type sensitive comparition
-		 * @returns {Boolean}
+		 * @returns {Boolean} TRUE if match FALSE if not match
 		 */
 		match: function(attributes, typeSensitive){
 			for(var i in attributes){

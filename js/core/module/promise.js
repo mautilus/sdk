@@ -1,14 +1,17 @@
 /*
- ********************************************************
- * Copyright (c) 2013 Mautilus s.r.o. (Czech Republic)
- * All rights reserved.
+ *******************************************************************************
+ * Copyright (c) 2013 Mautilus, s.r.o. (Czech Republic)
+ * All rights reserved
+ *  
+ * Questions and comments should be directed https://github.com/mautilus/sdk/issues
  *
  * You may obtain a copy of the License at LICENSE.txt
- ********************************************************
+ *******************************************************************************
  */
 
 /**
- * Promise implementation
+ * The Promise class is used for deferred and asynchronous computations. 
+ * This class represents an not yet completed operation, but this operation be completed in the future.
  * 
  * @author Mautilus s.r.o.
  * @class Promise
@@ -17,11 +20,7 @@
 Promise = (function() {
 
 	var Promise = function() {
-		/**
-		 * @property {Number} state
-		 * State of promise STATE_PENDING | STATE_RESOLVED | STATE_REJECTED
-		 */
-
+        // defined states of promises
 		this.STATE_PENDING = 1001;
 		this.STATE_RESOLVED = 1002;
 		this.STATE_REJECTED = 1003;
@@ -31,12 +30,25 @@ Promise = (function() {
 
 	$.extend(true, Promise.prototype, {
 		/**
+         * Creates a new Promise instance and set initial values to the properties.
 		 * @constructor
 		 */
 		construct: function() {
-			this.state = this.STATE_PENDING;
-			this.stack = [];
-			this.args = [];
+            /**
+             * @property {Number} state=STATE_PENDING
+             * State of promise STATE_PENDING | STATE_RESOLVED | STATE_REJECTED
+             */
+            this.state = this.STATE_PENDING;
+            /**
+             * @property {Array} stack=[]
+             * Stack of current callbacks with specific flag (´done´ | ´fail´ | ´then´)
+             */
+            this.stack = [];
+            /**
+             * @property {Array} args=[]
+             * Arguments of current callback calling
+             */
+            this.args = [];
 		},
 		/**
 		 * Add callback that will be called when promise is resolved or rejected, it's boolean status is passed as a first argument
@@ -83,11 +95,11 @@ Promise = (function() {
 			this.callStack(arguments);
 		},
 		/**
+         * Save all callbacks to stack with specific flag (´done´ | ´fail´ | ´then´) and callbacks are called only when Promise is not pending 
 		 * @private
+         * @chainable
 		 */
 		pushCallback: function(type, args) {
-			var promise, fn;
-
 			args = Array.prototype.slice.call(args);
 			args.unshift(type);
 			this.stack.push(args);
@@ -99,6 +111,7 @@ Promise = (function() {
 			return this;
 		},
 		/**
+         * Calling required callback according state (´done´ | ´fail´) and ´then´ callbacks are called if they are defined
 		 * @private
 		 */
 		callStack: function(args) {

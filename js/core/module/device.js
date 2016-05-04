@@ -1,10 +1,12 @@
 /*
- ********************************************************
- * Copyright (c) 2013 Mautilus s.r.o. (Czech Republic)
- * All rights reserved.
+ *******************************************************************************
+ * Copyright (c) 2013 Mautilus, s.r.o. (Czech Republic)
+ * All rights reserved
+ *  
+ * Questions and comments should be directed https://github.com/mautilus/sdk/issues
  *
  * You may obtain a copy of the License at LICENSE.txt
- ********************************************************
+ *******************************************************************************
  */
 
 /**
@@ -19,6 +21,7 @@ Device = (function(Events) {
     var Device = {
     	// states for all devices
 		isDEFAULT: false,
+        isANDROID: false,
 		isLG: false,
 		isSAMSUNG: false,
 		isTIZEN: false,
@@ -103,7 +106,7 @@ Device = (function(Events) {
 		 * Returns device name and model code
 		 * 
 		 * @param {Boolean} stripSpaces TRUE for strip empty chars
-		 * @returns {String}
+		 * @returns {String} name of device
 		 */
 		getDeviceName: function(stripSpaces) {
 			return 'default3';

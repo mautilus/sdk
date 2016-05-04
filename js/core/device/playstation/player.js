@@ -1,11 +1,13 @@
 /*
-********************************************************
-* Copyright (c) 2013 Mautilus s.r.o. (Czech Republic)
-* All rights reserved.
-*
-* You may obtain a copy of the License at LICENSE.txt
-********************************************************
-*/
+ *******************************************************************************
+ * Copyright (c) 2013 Mautilus, s.r.o. (Czech Republic)
+ * All rights reserved
+ *  
+ * Questions and comments should be directed https://github.com/mautilus/sdk/issues
+ *
+ * You may obtain a copy of the License at LICENSE.txt
+ *******************************************************************************
+ */
 
 /**
 * Playstation Player class
@@ -14,8 +16,6 @@
 * @class Device_Playstation_Player
 * @extends Player
 */
-
-
 
 Device_Playstation_Player = (function (Events) {
     var Device_Playstation_Player = {
@@ -37,17 +37,29 @@ Device_Playstation_Player = (function (Events) {
             }, 500);
 
         },
+        /**
+         * Internal player timer
+         * 
+         * @private
+         */
         tick: function () {
             var scope = this;
             if (this.currentState == this.STATE_PLAYING) {
                 if (this._seekOnPlay) {
                     console.log('setting playback time ', this._seekOnPlay);
-                    this.command({ command: "setPlayTime", playTime: this._seekOnPlay });
+                    this.nativeCommand({ command: "setPlayTime", playTime: this._seekOnPlay });
                     this._seekOnPlay = null;
                 }
-            this.command({ command: "getPlaybackTime" });
+            this.nativeCommand({ command: "getPlaybackTime" });
             }
         },
+        
+        /**
+         * Handler for current player time
+         * 
+         * @param {Number} time Current player time 
+         * @private
+         */
         OnCurrentPlayTime: function (time) {
 
             this.onTimeUpdate(parseInt(time, 10) * 1000);
@@ -60,10 +72,14 @@ Device_Playstation_Player = (function (Events) {
                 this.onEnd();
             }
         },
-
+        /**
+         * Handler for change duration
+         * 
+         * @param {Number} duration
+         * @private
+         * @fires durationchange
+         */
         onDurationChange: function (duration) {
-
-
             this.duration = Math.round(duration);
             this.trigger('durationchange', this.duration);
         },
@@ -73,7 +89,12 @@ Device_Playstation_Player = (function (Events) {
         deinitNative: function () {
 
         },
-
+		/**
+         * Adding Playstation execute command from stack
+         * 
+         * @param {Object} json Command which should be executed
+		 * @private
+		 */
         executeCommand: function (json) {
             var data = {};
             
@@ -96,17 +117,21 @@ Device_Playstation_Player = (function (Events) {
                 }
             }
         },
-        /**
-        * @private
-        */
-        command: function (json, callback) {
-            json = JSON.stringify(json);
-            window.external.user(json);
 
+		/**
+         * Adding Playstation native command to stack
+         * 
+         * @param {Object} json Command in JSON format
+         * @param {Function} callback Callback function with defined functionality
+         * @param {Boolean} remove Flag if command be removed or not after executing
+		 * @private
+		 */
+		nativeCommand: function(json, callback, remove) {
+			window.external.user(JSON.stringify(json));
             if (callback) {
-                this.callbacks.push({ command: json.command, callback: callback });
+    			this.callbacks.push({ command: json.command, callback: callback, remove: remove });
             }
-        },
+		},
         /**
         * @inheritdoc Player#native
         */
@@ -121,15 +146,15 @@ Device_Playstation_Player = (function (Events) {
                     if (this.customData)
                         loadData.customData = this.customData;
 
-                    this.command(loadData);
+                    this.nativeCommand(loadData);
 
-                    this.command({ command: "play" });
-                    //this.command('{"command":"contentAvailable"}');
+                    this.nativeCommand({ command: "play" });
+                    //this.nativeCommand('{"command":"contentAvailable"}');
 
                     this.state(this.STATE_BUFFERING);
 
                 } else {
-                    this.command({ command: "play" });
+                    this.nativeCommand({ command: "play" });
                 }
                 //console.log('pos ', attrs.position);
                 if (attrs.position) {
@@ -139,19 +164,19 @@ Device_Playstation_Player = (function (Events) {
                 }
 
             } else if (cmd === 'pause') {
-                this.command({ command: "pause" });
+                this.nativeCommand({ command: "pause" });
                 this.state(this.STATE_PAUSED);
 
                 return;
 
             } else if (cmd === 'stop') {
-                this.command({ command: "stop" });
+                this.nativeCommand({ command: "stop" });
             } else if (cmd === 'seek') {
                 if (this.currentState === this.STATE_BUFFERING) {
                     this._seekOnPlay = attrs.position;
                 } else {
                     var position = parseInt(attrs.position / 1000);
-                    this.command({ command: "setPlayTime", playTime: position });
+                    this.nativeCommand({ command: "setPlayTime", playTime: position });
                 }
 
                 return true;
@@ -181,7 +206,7 @@ Device_Playstation_Player = (function (Events) {
                 }
 
                 //not supported from february 2013
-                //this.command('{"command": "setPlaybackSpeed", "speed":' + speed + '}');
+                //this.nativeCommand('{"command": "setPlaybackSpeed", "speed":' + speed + '}');
 
             } else if (cmd === 'show') {
                 this.width = attrs.width || this.width;
@@ -200,7 +225,7 @@ Device_Playstation_Player = (function (Events) {
                 var rbx = parseFloat(((this.left + this.width) / 1280 * 2 - 1).toFixed(2));
                 var rby = parseFloat(((this.top + this.height) / (-720) * 2 + 1).toFixed(2));
 
-                this.command({ command: "setVideoPortalSize", ltx: ltx, lty: lty, rbx: rbx, rby: rby });
+                this.nativeCommand({ command: "setVideoPortalSize", ltx: ltx, lty: lty, rbx: rbx, rby: rby });
 
             } else if (cmd === 'hide') {
 
@@ -211,18 +236,23 @@ Device_Playstation_Player = (function (Events) {
             } else if (cmd === 'audioTrack') {
                 //this.API.setAudioTrack(attrs.index || 0);
                 if (attrs.language) {
-                    // this.command('{"command": "setAudioTrack", "audioTrack": "' + attrs.language + '"}');
-                    this.command({ command: "setAudioTrack", audioTrack: attrs.language });
+                    // this.nativeCommand('{"command": "setAudioTrack", "audioTrack": "' + attrs.language + '"}');
+                    this.nativeCommand({ command: "setAudioTrack", audioTrack: attrs.language });
 
                 }
             }
         },
+        /**
+         * Handling ready event
+         * @private
+         */
         onReady: function () {
             console.log('ready');
         },
         /**
-        * @private
-        */
+         * Handling changes in player state
+         * @private
+         */
         onState: function (state) {
             state = state.toLowerCase();
             console.log(state);
@@ -244,10 +274,18 @@ Device_Playstation_Player = (function (Events) {
                     break;
             }
         },
+        /**
+         * Get unique ESN code. It is used for DRM verification.
+         * 
+         * @private
+         */
         getESN: function () {
-            return Device.getUID() + '|60';
+            return Device.getUID();
         },
-        //function accessing responses from playstation sdk
+        /**
+         * Function accessing responses from playstation sdk
+         * @param {Object} json JSON object which be executed
+         */
         accessfunction: function (json) {
             if (json) {
                 if (json.playerState) {

@@ -18,12 +18,20 @@ Applications based on Mautilus Smart TV SDK™ share the same source code across
 ![Architecture](./img/Mautilus_SmartTV_SDK_Schema.png?raw=true)
 
 ### 4. Examples
-
-The SDK is delivered with two examples, which are showing use of the virtual keyboard, player and network communication. They are located in the `examples` subfolder. Bothe examples include packages, which could be immediatelly installed on Samsung and LG televisions.
+                        
+The SDK is delivered with two examples, which are showing use of the virtual keyboard, player and network communication. They are located in the `examples` subfolder. Both examples include packages, which could be immediatelly installed on Samsung and LG televisions.
 
 ### 5. Current version
 
-Version: 2.0.220  
+Version: 2.0.230 
+
+Release notes 2.0.230:
+
+-	Instant On feature on Tizen 
+-	Improved help generation
+-	New example (3PlayersDemo)
+-	Added support for LG NetCast Simple SmartTV 2016
+-	Added support for LG webOS 3.x (2016) (not fully tested)
 
 Release notes 2.0.220:
 
@@ -54,25 +62,30 @@ Currently supported platforms:
 -	Sony BRAVIA (2012, 2013, 2014, 2015)
 -	Panasonic VIERA (2012, 2013, 2014)
 -	Panasonic Firefox (2015)
--	VESTEL (GoGEN, Hyundai)
+-	VESTEL
 -	DuneHD
--	Arris (KreaTV) 
--   HbbTV 1.1.1 and 1.2.1
+-	Arris/KreaTV (limited support) 
+- HbbTV 1.1.1 and 1.2.1
 
 ### 6. Roadmap
 
-For Q1/2016 is planned for public release:
+For public release is planned:
 
 -	Enhancement of SONY PlayStation 3/4 drivers 
 -	Adding of the Hisense TV support
 -	Android TV (WebView) support
+- New examples (grid, Instant On)
+-	LG WebOS 3.0 2016 support
+-	Samsung Tizen 2016 support
+-	Limited VAST support
+-	Finalize documentation
 
 ### 7. References
-
+            
 -	VOYO (CEE countries)
 -	icflix (MENA)
 -	ShowMax (South Africa)
--	Filmin (Spain)
+-	FILMIN (Spain)
 -	Virtual Radio OE3 (Austria)
 -	ChannelLive (USA)
 -	Stream.cz (Czech Republic, Slovakia)
@@ -80,6 +93,10 @@ For Q1/2016 is planned for public release:
 -	Telefonica O2TV (Czech Republic)
 -	DittoTV (India)
 -	Mobily (Saudi Arabia)
+- Markíza HbbTV (Slovakia) [link](http://www.broadbandtvnews.com/2016/05/02/first-hbbtv-app-for-tv-markiza/)
+- HbbTV advertisements - Hyundai, Vodafone (Czech Republic) [link](http://www.broadbandtvnews.com/2016/01/27/key-hbbtv-ad-test-in-czech-republic/)
+- Frekvence 1 / Lagardère (Czech Republic, Slovakia)
+- Smart TV/HbbTV white-label [link](http://www.iptv-news.com/2016/04/delivering-ott-and-hbbtv-front-end-applications-reliably-and-quickly/)
 -	and many more ...
 
 ### 8. License

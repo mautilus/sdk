@@ -1,14 +1,20 @@
-/**
- ********************************************************
- * Copyright (c) 2013 Mautilus s.r.o. (Czech Republic)
- * All rights reserved.
+/*
+ *******************************************************************************
+ * Copyright (c) 2013 Mautilus, s.r.o. (Czech Republic)
+ * All rights reserved
+ *  
+ * Questions and comments should be directed https://github.com/mautilus/sdk/issues
  *
  * You may obtain a copy of the License at LICENSE.txt
- ********************************************************
+ *******************************************************************************
+ */
+
+/*
+ * TODO REVISION: handling backbutton on Webos - http://developer.lge.com/community/forums/RetrieveForumContent.dev?detailContsId=FC23084309
  */
 
 /**
- * WebOS device, overrides Device
+ * Webos device, overrides Device
  * 
  * @author Mautilus s.r.o.
  * @class Device_Webos
@@ -74,13 +80,13 @@ Device_Webos = (function(Events) {
 		 */
 		override: function () {
 			// extend default player
-		    if (typeof Device_WebOS_Player !== 'undefined' && Player) {
-		    	Player = $.extend(true, Player, Device_WebOS_Player);
+		    if (typeof Device_Webos_Player !== 'undefined' && Player) {
+		    	Player = $.extend(true, Player, Device_Webos_Player);
 		    }
 		},
 		
 		/**
-		 * Init Return event for WebOS
+		 * Init Return event for Webos
 		 * 
 		 * @private
 		 */
@@ -88,6 +94,11 @@ Device_Webos = (function(Events) {
 			var scope = this;
 			
 			this.returnEvent = function() {
+				console.log('popstate, state: ' + history.state);
+				if(history.state !== null) {
+					return;  // detected the Popstate event launched by the Push-history action. We can ignore it
+				}
+				
 				if(!scope.eexit) {
 					scope.pushHistory();
 					Control.onKeyDown({
@@ -196,7 +207,7 @@ Device_Webos = (function(Events) {
 		},
 		
 		/**
-		 * @inheritdoc SDK_Device#exit
+		 * @inheritdoc Device#exit
 		 * Not TESTED - may not correct for QA
 		 */
 		exit: function(dvb) {

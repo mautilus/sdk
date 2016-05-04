@@ -1,10 +1,12 @@
 /*
- ********************************************************
- * Copyright (c) 2013 Mautilus s.r.o. (Czech Republic)
- * All rights reserved.
+ *******************************************************************************
+ * Copyright (c) 2013 Mautilus, s.r.o. (Czech Republic)
+ * All rights reserved
+ *  
+ * Questions and comments should be directed https://github.com/mautilus/sdk/issues
  *
  * You may obtain a copy of the License at LICENSE.txt
- ********************************************************
+ *******************************************************************************
  */
 
 /**
@@ -50,6 +52,10 @@ Control = (function(Events) {
 		 * @param {Event} event
 		 */
 
+		/**
+		 * Init Control object
+		 * @param {Object} [config={}] Control configuration
+		 */
 		init: function(config) {
 			var scope = this;
 
@@ -177,6 +183,12 @@ Control = (function(Events) {
 			
 			return false;
 		},
+		/**
+		 * Test if given keycode is media keys (Play, Pause, FF, etc.)
+		 * 
+		 * @param {Number} keycode
+		 * @returns {Boolean}
+		 */
 		isMedia: function(keycode) {
 			if (keycode === this.key.PLAY
 				|| keycode === this.key.PAUSE
@@ -221,7 +233,8 @@ Control = (function(Events) {
 		},
 		/**
 		 * Handles keyDown events
-		 * 
+         * 
+		 * @param {Object} $el Target element, jQuery collection
 		 * @private
 		 */
 		onKeyDown: function(ev) {

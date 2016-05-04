@@ -1,10 +1,12 @@
 /*
- ********************************************************
- * Copyright (c) 2013 Mautilus s.r.o. (Czech Republic)
- * All rights reserved.
+ *******************************************************************************
+ * Copyright (c) 2013 Mautilus, s.r.o. (Czech Republic)
+ * All rights reserved
+ *  
+ * Questions and comments should be directed https://github.com/mautilus/sdk/issues
  *
  * You may obtain a copy of the License at LICENSE.txt
- ********************************************************
+ *******************************************************************************
  */
 
 /**
@@ -16,7 +18,7 @@
  * @mixins Events
  */
 
-Player = (function(Events) {
+Player = (function(Events, Deferrable) {
 	var Player = {
 		STATE_IDLE: -1,
 		STATE_PENDING: -1, // alias for STATE_IDLE
@@ -51,7 +53,7 @@ Player = (function(Events) {
 		}
 	};
 
-	$.extend(true, Player, Events, {
+	$.extend(true, Player, Events, Deferrable, {
 		/**
 		 * @event durationchange
 		 * When duration is changed
@@ -145,6 +147,10 @@ Player = (function(Events) {
 		 * Seek ended
 		 */
 
+        /**
+         * Init Player object
+         * @param {Object} [config={}] Player configuration
+         */
 		init: function(config) {
 			this.configure(config);
 
@@ -200,6 +206,10 @@ Player = (function(Events) {
 			 * @property {String} customData DRM custom data
 			 */
 			this.customData = null;
+			/**
+			 * @property {String} DRM type custom data
+			 */
+			this.drmType = '';
 
 			this.initNative();
 
@@ -360,6 +370,9 @@ Player = (function(Events) {
 			}
 		},
 		/**
+         * Function is binded on duration change event
+         * @param {Number} duration Content duration
+         * @fires durationchange
 		 * @private
 		 */
 		onDurationChange: function(duration) {
@@ -369,6 +382,9 @@ Player = (function(Events) {
 			console.info("Player Info >>>\n" + " URL: " + this.url + "\n" + " Duration: " + this.duration);
 		},
 		/**
+         * Function is binded on time update event
+         * @param {Number} time Current time
+         * @fires timeupdate
 		 * @private
 		 */
 		onTimeUpdate: function(time) {
@@ -380,6 +396,8 @@ Player = (function(Events) {
 			}
 		},
 		/**
+         * Function is binded on end event
+         * @fires end
 		 * @private
 		 */
 		onEnd: function() {
@@ -393,15 +411,31 @@ Player = (function(Events) {
 			}
 		},
 		/**
+         * Function is binded on error event
+         * @param {Number} code Error code
+         * @param {String} msg Message
+         * @param {String} [details] Error details
+         * @fires error
 		 * @private
 		 */
 		onError: function(code, msg, details) {
 			this.trigger('error', code, msg, details);
 		},
 		/**
+	     * Triggered when DRM custom data are set
+	     * 
+	     * @param {String} customData DRM custom data
+	     * @template
+	     */
+	    onCustomData: function(customData) {
+
+	    },
+		/**
 		 * Set/Get current state
 		 *
 		 * @param {Number} state
+         * @returns current state
+         * @fires statechange
 		 */
 		state: function(state) {
 			if (typeof state !== 'undefined') {
@@ -418,6 +452,7 @@ Player = (function(Events) {
 		},
 		/**
 		 * Reset all states and properties
+         * @fires reset
 		 */
 		reset: function() {
 
@@ -428,16 +463,19 @@ Player = (function(Events) {
 			this.speed = 1;
 			this.width = this.config.width;
 			this.height = this.config.height;
+			this.drmType = '';
+			this.customData = null;
 
 			this.trigger('reset');
 		},
 		/**
 		 * Show player and set it's position
 		 *
-		 * @param {Number} [width]
-		 * @param {Number} [height]
-		 * @param {Number} [left]
-		 * @param {Number} [top]
+		 * @param {Number} [width] Width of player
+		 * @param {Number} [height] Height of player
+		 * @param {Number} [left] Position from the left side
+		 * @param {Number} [top] Position from the top side
+         * @fires show
 		 */
 		show: function(width, height, left, top) {
 			this.native('show', {
@@ -453,6 +491,7 @@ Player = (function(Events) {
 		},
 		/**
 		 * Hide player
+         * @fires hide
 		 */
 		hide: function() {
 			this.native('hide');
@@ -468,6 +507,7 @@ Player = (function(Events) {
 		 * Set media URL
 		 *
 		 * @param {String} url
+         * @fires url
 		 */
 		setURL: function(url) {
 			this.reset();
@@ -478,17 +518,29 @@ Player = (function(Events) {
 		/**
 		 * Set custom data for widevine/playready DRM
 		 *
-		 * @param {String} customData
+		 * @param {String} customData Custom data related with DRM content
 		 */
 		setCustomData: function(customData) {
 			this.customData = customData || null;
+			this.trigger('customData', this.customData);
+		},
+		/**
+		 * Set DRM typ 'widevine'/'playready'
+		 *
+		 * @param {String} drmType
+		 */
+		setDrmType: function(drmType) {
+			this.drmType = drmType;
+			this.trigger('drmType', this.drmType);
 		},
 		/**
 		 * Start playback
 		 *
-		 * @param {String} [url]
+		 * @param {String} [url] Url what should be played
 		 * @param {Number} [position] Seek position (ms)
-		 * @param {Boolean} [looping]
+		 * @param {Boolean} [looping] If content should play again in the loop
+         * @param {Boolean} [isTimeshiftedLiveStream] If content is time shifted (only for live streams)
+         * @fires play
 		 */
 		play: function(url, position, looping, isTimeshiftedLiveStream) {
 			if (!position && typeof url === 'number') {
@@ -525,6 +577,7 @@ Player = (function(Events) {
 		},
 		/**
 		 * Pause playback
+         * @fires pause
 		 */
 		pause: function() {
 			if (this.speed !== 1) {
@@ -536,6 +589,7 @@ Player = (function(Events) {
 		},
 		/**
 		 * Stop playback and reset player
+         * @fires stop
 		 */
 		stop: function() {
 			this.native('stop');
@@ -547,6 +601,7 @@ Player = (function(Events) {
 		 * Seek playback
 		 *
 		 * @param {Number} position Time position (ms)
+         * @fires seek
 		 */
 		seek: function(position) {
 			if (String(position).match(/\%/)) {
@@ -570,7 +625,7 @@ Player = (function(Events) {
 			this.startSeek();
 			this.trigger('seek', position);
 		},
-		/*
+		/**
 		 * This function is called every time, when the player executes seek method.
 		 * Seek method fires: forward, rewind and seek inside the movie.
 		 * When the start seek is called, this method trigger seek-start and then it
@@ -579,6 +634,8 @@ Player = (function(Events) {
 		 * movie does not play, this interval is cleared and seek-end is triggered.
 		 *
 		 * This functionality you can use for setting throbber progress inside video player.
+         * @private 
+         * @fires seek-end
 		 */
 		startSeek: function() {
 			var scope = this,
@@ -602,6 +659,11 @@ Player = (function(Events) {
 				}
 			}, 1000);
 		},
+        /**
+         * If seeking is finished then this is called
+         * @private 
+         * 
+         */
 		clearSeekInterval: function() {
 			// clear interval
 			if (this.triggerHandle) {
@@ -645,6 +707,7 @@ Player = (function(Events) {
 		 * Set playback speed
 		 *
 		 * @param {Number} speed
+         * @fires playbackspeed
 		 */
 		playbackSpeed: function(speed) {
 			speed = speed >> 0;
@@ -696,8 +759,18 @@ Player = (function(Events) {
 					return "STATE = undefined";
 			}
 		},
+		/**
+	     * Get unique ESN code. It is used for DRM verification.
+	     * Default code!!!
+	     * 
+		 * @private
+		 */
+		getESN: function() {
+			return(0123456789);
+		},
 		/*
 		 * Mute audio
+         * @fires mute
 		 */
 		mute: function() {
 			this.native('mute');
@@ -705,11 +778,18 @@ Player = (function(Events) {
 		},
 		/*
 		 * Un-mute audio
+         * @fires unmute
 		 */
 		unmute: function() {
 			this.native('unmute');
 			this.trigger('unmute');
 		},
+		/*
+		 * Volume content (Not yet fully supported)
+         * 
+         * @param {Number} direction + volume up or - volume down
+         * @param {Number} percent Hom much be volume changed
+		 */
 		volume: function (direction, percent) {
 			this.native('volume', { percent: percent, direction: direction });
 		},
@@ -727,4 +807,4 @@ Player = (function(Events) {
 
 	return Player;
 
-})(Events);
+})(Events, Deferrable);

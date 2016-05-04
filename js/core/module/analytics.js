@@ -1,10 +1,12 @@
-/**
- ********************************************************
- * Copyright (c) 2013 Mautilus s.r.o. (Czech Republic)
- * All rights reserved.
+/*
+ *******************************************************************************
+ * Copyright (c) 2013 Mautilus, s.r.o. (Czech Republic)
+ * All rights reserved
+ *  
+ * Questions and comments should be directed https://github.com/mautilus/sdk/issues
  *
  * You may obtain a copy of the License at LICENSE.txt
- ********************************************************
+ *******************************************************************************
  */
 
 /**
@@ -32,7 +34,7 @@ Analytics = (function(Events) {
 		 */
 		config: null,
 		/**
-		 * @property {Boolean} General information if app is tracking as website or as application (this flag can enable measurement some other parameters)
+		 * @property {Boolean} application General information if app is tracking as website or as application (this flag can enable measurement some other parameters)
 		 */
 		application: true,
 		/**
@@ -44,21 +46,20 @@ Analytics = (function(Events) {
 		 */
 		URL: '',
 		/**
-		 * @property {String} no SSL URL absolute path to the analytics 
+		 * @property {String} URLnoSSL absolute path to the analytics 
 		 */
 		URLnoSSL: 'http://www.google-analytics.com/collect',
 		/**
-		 * @property {String} SSL URL absolute path to the analytics 
+		 * @property {String} URLSSL absolute path to the analytics 
 		 */
 		URLSSL: 'https://ssl.google-analytics.com/collect',
 		/**
-		 * @property {Number} How long is cookie available (s)
+		 * @property {Number} YEARS_2 How long is cookie available (s) currenty 2 years
 		 */
 		YEARS_2: 63115200,
 		/**
-		 * @property {Object} Required values for all hits
+		 * @property {Object} params Required values for all hits
 		 */
-
 		params: {
 			v: '1',			// The protocol version. The value should be 1.
 			tid: '',		// The ID that distinguishes to which Google Analytics property to send data.
@@ -73,16 +74,22 @@ Analytics = (function(Events) {
 			cd4: '',		// OPTIONAL Custom variable 4
 			cd5: '',		// OPTIONAL Custom variable 5
 		},
-
+		/**
+		 * @property {Object} appParams Required values for all hits if analytics are in application mode
+		 */
 		appParams: {
 			an: '',			// OPTIONAL Specifies the application name.
-			aid: '',		// OPTIONAL Application identifier..
+			aid: '',		// OPTIONAL Application identifier.
 			av: '',			// OPTIONAL Specifies the application version.
 			aiid: '',		// OPTIONAL Application installer identifier.
 		}
 	};
 
 	$.extend(true, Analytics, Events, {
+		/**
+		 * Init Analytics object
+		 * @param {Object} [config={}] Analytics configuration
+		 */
 		init: function(config) {
 			this.configure(config);
 			this.on('timeout', function(){
@@ -144,9 +151,8 @@ Analytics = (function(Events) {
 
 		/**
 		 * Track page view
-		 * @private
 		 * @param {String} site - required
-		 * @param {String} description - optional
+		 * @param {String} [description]
 		 */
 		trackPageview: function (site, description) {
 			if(!this.config.ACCOUNT_CODE){
@@ -166,9 +172,8 @@ Analytics = (function(Events) {
 
 		/**
 		 * Track page view
-		 * @private
 		 * @param {String} site - required
-		 * @param {String} description - optional
+		 * @param {String} [description]
 		 */
 		trackScreenview: function (site, description) {
 			if(!this.config.ACCOUNT_CODE){
@@ -189,12 +194,11 @@ Analytics = (function(Events) {
 
 		/**
 		 * Track events
-		 * @private
-		 * @param {String} category - required
-		 * @param {String} action - required
-		 * @param {String} label - optional
-		 * @param {String} value - optional
-		 * @param {Object} value - optional overwrite some query params
+		 * @param {String} category
+		 * @param {String} action
+		 * @param {String} [label]
+		 * @param {String} [value]
+		 * @param {Object} [description] - json object overwrites some query params
 		 */
 		trackEvent: function (category, action, label, value, description) {
 			if(!this.config.ACCOUNT_CODE){
@@ -227,9 +231,8 @@ Analytics = (function(Events) {
 
 		/**
 		 * Track page view
-		 * @private
-		 * @param {String} exception - required which exception occurs
-		 * @param {String} description - optional
+		 * @param {String} exception required which exception occurs
+		 * @param {String} [description]
 		 */
 		trackException: function (exception, description) {
 			if(!this.config.ACCOUNT_CODE){
@@ -248,6 +251,15 @@ Analytics = (function(Events) {
 
 		},
 
+		/**
+		 * send tracking information to the server
+         * @private
+		 * @param {String} url
+		 * @param {Object} data 
+		 * @param {String} requestType GET or POST
+		 * @param {Function} [callback] callback function
+		 * @param {Object} [cbscope]
+		 */
 		collect: function(url, data, requestType, callback, cbscope) {
 
 			if(typeof requestType == 'function'){

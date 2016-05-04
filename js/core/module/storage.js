@@ -1,10 +1,12 @@
-/**
- ********************************************************
- * Copyright (c) 2013 Mautilus s.r.o. (Czech Republic)
- * All rights reserved.
+/*
+ *******************************************************************************
+ * Copyright (c) 2013 Mautilus, s.r.o. (Czech Republic)
+ * All rights reserved
+ *  
+ * Questions and comments should be directed https://github.com/mautilus/sdk/issues
  *
  * You may obtain a copy of the License at LICENSE.txt
- ********************************************************
+ *******************************************************************************
  */
 
 /**
@@ -25,6 +27,10 @@ Storage = (function(Events) {
     };
 
     $.extend(true, Storage, Events, {
+	/**
+	 * Init Storage object
+	 * @param {Object} [config={}] Storage configuration
+     */
 	init: function(config) {
 	    this.configure(config);
 	},

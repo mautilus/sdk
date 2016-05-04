@@ -1,10 +1,12 @@
 /*
- ********************************************************
- * Copyright (c) 2013 Mautilus s.r.o. (Czech Republic)
- * All rights reserved.
+ *******************************************************************************
+ * Copyright (c) 2013 Mautilus, s.r.o. (Czech Republic)
+ * All rights reserved
+ *  
+ * Questions and comments should be directed https://github.com/mautilus/sdk/issues
  *
  * You may obtain a copy of the License at LICENSE.txt
- ********************************************************
+ *******************************************************************************
  */
 
 /**
@@ -47,7 +49,7 @@ Device_Lg = (function(Events) {
 			}
 		},
 		/**
-		 * Display Q.Menu
+		 * Display Q.Menu (LG Necast specific function)
 		 */
 		qmenu: function() {
 			window.NetCastLaunchQMENU();
@@ -198,8 +200,8 @@ Device_Lg = (function(Events) {
 		 * Load specific OBJECT
 		 * 
 		 * @private
-		 * @param {String} id
-		 * @param {String} clsid
+		 * @param {String} id Id of created object
+		 * @param {String} type Set type attribute
 		 */
 		loadObject: function(id, type) {
 			var objs = document.getElementsByTagName('object');

@@ -61,6 +61,8 @@ App = (function(Events, Deferrable) {
 			Router.go('welcome');
 		},
 		/**
+         * Network connection checker
+         * @fires network
 		 * @private
 		 */
 		checkNetworkConnection: function() {
@@ -71,6 +73,11 @@ App = (function(Events, Deferrable) {
 				}
 			}, this);
 		},
+        
+		/**
+         * Function renders throbber in the app
+		 * @param {Boolean} disable Set TRUE if Control and Mouse should be disabled
+		 */
 		throbber: function(disable) {
 			if (this.throbberIsShown)
 				return; // only one instance of throbber
@@ -94,6 +101,10 @@ App = (function(Events, Deferrable) {
 				$throbber.css("background-position", pos + 'px 0px');
 			}, 100);
 		},
+		/**
+         * Function removes throbber from the app
+		 * @param {Boolean} enable Set TRUE if Control and Mouse should be enabled
+		 */
 		throbberHide: function(enable) {
 			if (this.throbberIsShown) {
 				this.throbberIsShown = false;
@@ -106,6 +117,10 @@ App = (function(Events, Deferrable) {
 				}
 			}
 		},
+		/**
+         * Function renders small app notification. Notification be removed after 4 seconds 
+		 * @param {String} msg Message which should be rendered
+		 */
 		notification: function(msg) {
 			var $el = $('<div class="msg" />').html(msg);
 			$('#notifications').html($el);

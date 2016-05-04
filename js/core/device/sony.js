@@ -1,20 +1,17 @@
 /*
- ********************************************************
- * Copyright (c) 2013 Mautilus s.r.o. (Czech Republic)
- * All rights reserved.
+ *******************************************************************************
+ * Copyright (c) 2013 Mautilus, s.r.o. (Czech Republic)
+ * All rights reserved
+ *  
+ * Questions and comments should be directed https://github.com/mautilus/sdk/issues
  *
  * You may obtain a copy of the License at LICENSE.txt
- ********************************************************
+ *******************************************************************************
  */
 
 /**
- * Toshiba device, overrides Device. Holds initialisation and all basic stuff about this device.
+ * Sony device, overrides Device.
  *  
- * [Player](#!/api/Player) is extended by [Device_Sony_Player](#!/api/Device_Sony_Player).
- * 
- * [Device_Sony_Input](#!/api/Device_Sony_Input) and [Device_Sony_Keyboard](#!/api/Device_Sony_Keyboard) are commented out
- * 
- * 
  * @author Mautilus s.r.o.
  * @class Device_Sony
  * @extends Device
@@ -209,17 +206,6 @@ Device_Sony = (function(Events) {
 			if (typeof Device_Sony_Player !== 'undefined' && Player) {
 				Player = $.extend(true, Player, Device_Sony_Player);
 			}
-/*
-			// rewrite input
-			if (typeof Device_Sony_Input !== 'undefined' && Input) {
-				Input = Device_Sony_Input;
-			}
-
-			// rewrite keyboard
-			if (typeof Device_Sony_Keyboard !== 'undefined' && Keyboard) {
-				Keyboard = new Device_Sony_Keyboard;
-			}
-*/
 		},
 
 		/**

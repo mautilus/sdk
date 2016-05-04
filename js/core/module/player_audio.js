@@ -1,10 +1,12 @@
 /*
- ********************************************************
- * Copyright (c) 2013 Mautilus s.r.o. (Czech Republic)
- * All rights reserved.
+ *******************************************************************************
+ * Copyright (c) 2013 Mautilus, s.r.o. (Czech Republic)
+ * All rights reserved
+ *  
+ * Questions and comments should be directed https://github.com/mautilus/sdk/issues
  *
  * You may obtain a copy of the License at LICENSE.txt
- ********************************************************
+ *******************************************************************************
  */
 
 /**
@@ -96,7 +98,10 @@ Player_Audio = (function(Events) {
 		config: {
 			muted: false
 		},
-
+		/**
+		 * Init Player_audio object
+		 * @param {Object} [config={}] Player_audio configuration
+		 */
 		init: function(config) {
 			this.configure(config);
 
@@ -251,6 +256,9 @@ Player_Audio = (function(Events) {
 			}
 		},
 		/**
+         * Function is binded on duration change event
+         * @param {Number} duration Content duration
+         * @fires durationchange
 		 * @private
 		 */
 		onDurationChange: function(duration) {
@@ -267,6 +275,9 @@ Player_Audio = (function(Events) {
 			console.info("Audio Info >>>\n" + " URL: " + this.url + "\n" + " Duration: " + this.duration);
 		},
 		/**
+         * Function is binded on time update event
+         * @param {Number} time Current time
+         * @fires timeupdate
 		 * @private
 		 */
 		onTimeUpdate: function(time) {
@@ -278,6 +289,8 @@ Player_Audio = (function(Events) {
 			}
 		},
 		/**
+         * Function is binded on end event
+         * @fires end
 		 * @private
 		 */
 		onEnd: function() {
@@ -291,6 +304,11 @@ Player_Audio = (function(Events) {
 			}
 		},
 		/**
+         * Function is binded on error event
+         * @param {Number} code Error code
+         * @param {String} msg Message
+         * @param {String} [details] Error details
+         * @fires error
 		 * @private
 		 */
 		onError: function(code, msg, details) {
@@ -300,6 +318,8 @@ Player_Audio = (function(Events) {
 		 * Set/Get current state
 		 *
 		 * @param {Number} state
+         * @returns current state
+         * @fires statechange
 		 */
 		state: function(state) {
 			if (typeof state !== 'undefined') {
@@ -316,6 +336,7 @@ Player_Audio = (function(Events) {
 		},
 		/**
 		 * Reset all states and properties
+         * @fires reset
 		 */
 		reset: function() {
 			this.url = null;
@@ -330,6 +351,7 @@ Player_Audio = (function(Events) {
 		 * Set media URL
 		 *
 		 * @param {String} url
+         * @fires url
 		 */
 		setURL: function(url) {
 			this.reset();
@@ -340,9 +362,10 @@ Player_Audio = (function(Events) {
 		/**
 		 * Start playback
 		 *
-		 * @param {String} [url]
+		 * @param {String} [url] Url what should be played
 		 * @param {Number} [position] Seek position (ms)
-		 * @param {Boolean} [looping]
+		 * @param {Boolean} [looping] If content should play again in the loop
+         * @fires play
 		 */
 		play: function(url, position, looping) {
 			if (!position && typeof url === 'number') {
@@ -372,6 +395,7 @@ Player_Audio = (function(Events) {
 		},
 		/**
 		 * Pause playback
+         * @fires pause
 		 */
 		pause: function() {
 			this.native('pause');
@@ -379,6 +403,7 @@ Player_Audio = (function(Events) {
 		},
 		/**
 		 * Stop playback and reset player
+         * @fires stop
 		 */
 		stop: function() {
 			this.native('stop');
@@ -390,6 +415,7 @@ Player_Audio = (function(Events) {
 		 * Seek playback
 		 *
 		 * @param {Number} position Time position (ms)
+         * @fires seek
 		 */
 		seek: function(position) {
 			if (String(position).match(/\%/)) {
@@ -465,6 +491,7 @@ Player_Audio = (function(Events) {
 		},
 		/*
 		 * Mute audio
+         * @fires mute
 		 */
 		mute: function() {
 			this.native('mute');
@@ -472,6 +499,7 @@ Player_Audio = (function(Events) {
 		},
 		/*
 		 * Un-mute audio
+         * @fires unmute
 		 */
 		unmute: function() {
 			this.native('unmute');

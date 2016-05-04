@@ -2,7 +2,7 @@
  * Test scene
  * 
  * @author Mautilus s.r.o.
- * @class Scene_Welcome
+ * @class Scene_Test
  * @extends Scene
  */
 
@@ -13,29 +13,16 @@ Scene_Test = (function (Scene) {
 	};
 
 	$.extend(true, Scene_Test.prototype, Scene.prototype, {
-		init: function () {
+        /**
+         * @inheritdoc Scene#init
+         */
+        init: function () {
 			var input = new Input();
 			//input.setPasswordMode(); turn on / off password mode
 			input.create(this.$el.find(".input-cover"));
 			input.setValue("hodnota");
 			input.blur();
 			this.input = input;
-		},
-		activate: function () {
-			Focus.to(this.$el.find(".btnorig"));
-		},
-		onLangChange: function () {
-		},
-		onClick: function ($el, event) {
-			this.onEnter.apply(this, arguments);
-		},
-		onEnter: function ($el, event) {
-			if ($el.hasClass("btnorig")) Keyboard.show($("#originput"));
-			else if ($el.hasClass("btnmine")) Keyboard.show(this.input);
-		},
-		navigate: function (direction) {
-			if (direction == "left") Focus.to(this.getCircleFocusable(-1));
-			else if (direction == "right") Focus.to(this.getCircleFocusable(1));
 		},
 		/**
 		 * @inheritdoc Scene#create
@@ -47,7 +34,42 @@ Scene_Test = (function (Scene) {
 		 * @inheritdoc Scene#render
 		 */
 		render: function () {
+            console.log('render test scene');
 		},
+		/**
+		 * @inheritdoc Scene#activate
+		 */
+		activate: function () {
+			Focus.to(this.$el.find(".btnorig"));
+		},
+		/**
+		 * @inheritdoc Scene#onLangChange
+		 */
+		onLangChange: function () {
+		},
+		/**
+		 * @inheritdoc Scene#onClick
+		 */
+		onClick: function ($el, event) {
+			this.onEnter.apply(this, arguments);
+		},
+		/**
+		 * @inheritdoc Scene#onEnter
+		 */
+		onEnter: function ($el, event) {
+			if ($el.hasClass("btnorig")) Keyboard.show($("#originput"));
+			else if ($el.hasClass("btnmine")) Keyboard.show(this.input);
+		},
+		/**
+		 * @inheritdoc Scene#navigate
+		 */
+		navigate: function (direction) {
+			if (direction == "left") Focus.to(this.getCircleFocusable(-1));
+			else if (direction == "right") Focus.to(this.getCircleFocusable(1));
+		},
+		/**
+		 * @inheritdoc Scene#onReturn
+		 */
 		onReturn: function ($el) {
 			Router.goBack();
 		}

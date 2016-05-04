@@ -1,10 +1,12 @@
 /*
- ********************************************************
- * Copyright (c) 2013 Mautilus s.r.o. (Czech Republic)
- * All rights reserved.
+ *******************************************************************************
+ * Copyright (c) 2013 Mautilus, s.r.o. (Czech Republic)
+ * All rights reserved
+ *  
+ * Questions and comments should be directed https://github.com/mautilus/sdk/issues
  *
  * You may obtain a copy of the License at LICENSE.txt
- ********************************************************
+ *******************************************************************************
  */
 
 /**
@@ -24,9 +26,27 @@ Collection = (function(Events, Deferrable, Model) {
 	};
 
 	$.extend(true, Collection.prototype, Events, Deferrable, {
+        /**
+         * @property {Object} config Configuration of current collection
+         */
+        /**
+         * @property {Model} model Reference which Model object be used
+         */
+        /**
+         * @property {Array} models list of items (models) in the collection
+         */
+        /**
+         * @property {Number} length how many items is stored in this collection
+         */
+        /**
+         * @property {Object} sortBy according to this property list of items can be sorted 
+         */
+
 		/**
-		 * Construct object
+		 * Construct Collection object
 		 * 
+         * @param {Model} model reference to the Model which be used inside the collection
+         * @param {Object} [config] configuration of current collection
 		 * @constructor
 		 */
 		construct: function(models, config) {
@@ -49,7 +69,7 @@ Collection = (function(Events, Deferrable, Model) {
 			this.init();
 		},
 		/**
-		 * Destruct object
+		 * Destruct object. It means calling reseting and deinitializations
 		 * 
 		 * @private
 		 */
@@ -87,9 +107,10 @@ Collection = (function(Events, Deferrable, Model) {
 			return model;
 		},
 		/**
-		 * Removes all models and adds new specified models
-		 * 
-		 * @param {Array} [models]
+		 * Removes all models and adds new specified models. Use this function for filling of list of items (models) in collection
+         * 
+		 * @fires reset
+         * @param {Array} [models]
 		 */
 		reset: function(models) {
 			this.models = [];
@@ -128,7 +149,9 @@ Collection = (function(Events, Deferrable, Model) {
 		},
 		/**
 		 * Add new model to the end
-		 * 
+         * 
+         * @fires push
+         * @fires change
 		 * @param {Object} model Hash or Model or Array of models
 		 */
 		push: function(model) {
@@ -155,6 +178,8 @@ Collection = (function(Events, Deferrable, Model) {
 		/**
 		 * Add new model to the beginning 
 		 * 
+         * @fires unshift
+         * @fires change
 		 * @param {Object} model Hash or Model or Array of models
 		 */
 		unshift: function(model) {
@@ -181,6 +206,8 @@ Collection = (function(Events, Deferrable, Model) {
 		/**
 		 * Remove specified Model (or index) from the collection
 		 * 
+         * @fires remove
+         * @fires change
 		 * @param {Model/Number} model Index or Model instance
 		 * @returns {Boolean} TRUE on success
 		 */
@@ -257,6 +284,7 @@ Collection = (function(Events, Deferrable, Model) {
 			return models;
 		},
 		/**
+         * Return Array of Models that match specified attributes
 		 * Same as `where` but returns only the first found Model
 		 * 
 		 * @param {Object} where Hash of attributes

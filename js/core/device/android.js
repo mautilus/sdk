@@ -1,10 +1,12 @@
-/**
- ********************************************************
- * Copyright (c) 2013 Mautilus s.r.o. (Czech Republic)
- * All rights reserved.
+/*
+ *******************************************************************************
+ * Copyright (c) 2013 Mautilus, s.r.o. (Czech Republic)
+ * All rights reserved
+ *  
+ * Questions and comments should be directed https://github.com/mautilus/sdk/issues
  *
  * You may obtain a copy of the License at LICENSE.txt
- ********************************************************
+ *******************************************************************************
  */
 
 /**
@@ -64,7 +66,7 @@ Device_Android = (function(Events) {
 		},
 
 		/**
-		 * Init webOS Connection Manager
+		 * Init Android Connection Manager
 		 * 
 		 * @private
 		 */
@@ -106,7 +108,7 @@ Device_Android = (function(Events) {
 			this.eexit = false;
 
 			if (history.length <= 1) {
-				history.pushState({ 'position': history.length}, 'filmin');
+				history.pushState({ 'position': history.length}, CONFIG.appName);
 			} else {
 				history.go(1);
 			}
@@ -114,13 +116,17 @@ Device_Android = (function(Events) {
 			console.log('>>>>>> PUSH-HISTORY length: ' + history.length);
 		},
 
+		/**
+		 * Get current state from history
+         * @returns current state
+		 */
 		stateHistory: function() {
 			console.log('>>>>>> STATE-HISTORY length: ' + history.length);
 			return history.state;
 		},
 
 		/**
-		 * @inheritdoc SDK_Device#exit
+		 * @inheritdoc Device#exit
 		 * Not TESTED - may not correct for QA
 		 */
 		exit: function() {

@@ -1,10 +1,12 @@
 /*
- ********************************************************
- * Copyright (c) 2013 Mautilus s.r.o. (Czech Republic)
- * All rights reserved.
+ *******************************************************************************
+ * Copyright (c) 2013 Mautilus, s.r.o. (Czech Republic)
+ * All rights reserved
+ *  
+ * Questions and comments should be directed https://github.com/mautilus/sdk/issues
  *
  * You may obtain a copy of the License at LICENSE.txt
- ********************************************************
+ *******************************************************************************
  */
 
 /**
@@ -41,6 +43,9 @@ Playready = (function(Events, Deferrable) {
 			
 		},
 		/**
+         * Set playable streams
+         * 
+         * @param {Array} streams array of available streams
 		 * @private
 		 */
 		setStreams: function(streams){
@@ -49,9 +54,10 @@ Playready = (function(Events, Deferrable) {
 		/**
 		 * Get one stream by its type
 		 * 
-		 * @param {String} type
-		 * @param {String} [name]
-		 * @param {String} [language]
+		 * @param {String} type 
+		 * @param {String} [name] for better selection you can specify name of stream
+		 * @param {String} [language] for better selection you can specify language of stream
+         * @returns {Object} required stream or false
 		 */
 		getStream: function(type, name, language){
 			for(var i in this.streams){
@@ -66,6 +72,7 @@ Playready = (function(Events, Deferrable) {
 		 * Get array of streams by type, name or language
 		 * 
 		 * @param {String} type
+         * @returns {Array} streams with defined type
 		 */
 		getStreams: function(type){
 			var streams = [];
@@ -115,7 +122,10 @@ Playready = (function(Events, Deferrable) {
 			}
 		},
 		/**
+         * replaces inside the ttml subtitles
 		 * @private
+         * @param {String} ttml subtitle strings
+         * @returns {String} repaired ttml subtitle strings 
 		 */
 		fixTTML: function(ttml){
 			ttml = ttml
@@ -126,7 +136,7 @@ Playready = (function(Events, Deferrable) {
 			return ttml;
 		},
 		/**
-		 * Fetch manifest
+		 * Fetch manifest and fill-in available properties
 		 */
 		fetch: function(){
 			var base = String(this.manifest).replace(/\/manifest$/i, '/');

@@ -1,10 +1,12 @@
 /*
- ********************************************************
- * Copyright (c) 2013 Mautilus s.r.o. (Czech Republic)
- * All rights reserved.
+ *******************************************************************************
+ * Copyright (c) 2013 Mautilus, s.r.o. (Czech Republic)
+ * All rights reserved
+ *  
+ * Questions and comments should be directed https://github.com/mautilus/sdk/issues
  *
  * You may obtain a copy of the License at LICENSE.txt
- ********************************************************
+ *******************************************************************************
  */
 
 /**
@@ -174,6 +176,9 @@ Device_Samsung_Player = (function(Events) {
 		},
 
 		/**
+         * Appended flags related to type of content (HLS|Widewine|Playready|...)
+         * @param {String} url Url with playable content
+         * @returns prepared content URL
 		 * @private
 		 */
 		prepareUrl: function(url) {
@@ -195,6 +200,9 @@ Device_Samsung_Player = (function(Events) {
 		},
 
 		/**
+         * Added parameter for Widewine content url
+         * @param {Object} opts JSON with the widewine params
+         * @returns prepared content URL
 		 * @private
 		 */
 		prepareUrlWidevine: function(opts) {
@@ -219,6 +227,8 @@ Device_Samsung_Player = (function(Events) {
 		},
 
 		/**
+         * Get unique ESN code. It is used for DRM verification.
+         * 
 		 * @private
 		 */
 		getESN: function() {
@@ -233,29 +243,42 @@ Device_Samsung_Player = (function(Events) {
 
 			return deviceId;
 		},
-
+        /**
+         * Handler for change duration
+         * 
+         * @param {Number} duration
+         * @private
+         * @fires durationchange
+         */
 		onDurationChange: function(duration) {
 			this.duration = Math.round(duration);
 			this.trigger('durationchange', this.duration);
 		},
 
-		/**
-		 * @private
-		 */
+        /**
+         * Handler for start buffering
+         * 
+         * @private
+         */
 		OnBufferingStart: function() {
 			this.state(this.STATE_BUFFERING);
 		},
 
-		/**
-		 * @private
-		 */
+        /**
+         * Handler for end buffering
+         * 
+         * @private
+         */
 		OnBufferingComplete: function() {
 			this.state(this.prevState !== this.STATE_BUFFERING ? this.prevState : this.STATE_PLAYING);
 		},
 
-		/**
-		 * @private
-		 */
+        /**
+         * Handler for current player time
+         * 
+         * @param {Number} time Current player time 
+         * @private
+         */
 		OnCurrentPlayTime: function(time) {
 
 			if (this.isTimeshiftedLiveStream) {
@@ -289,37 +312,48 @@ Device_Samsung_Player = (function(Events) {
 			}
 		},
 
-		/**
-		 * @private
-		 */
+        /**
+         * Handler for Stream info. Called when information about stream are downloaded
+         * 
+         * @private
+         */
 		OnStreamInfoReady: function() {
 			this.onDurationChange(this.el.Execute('GetDuration'));
 		},
 
-		/**
-		 * @private
-		 */
+        /**
+         * Handler error (Stream not found)
+         * 
+         * @private
+         */
 		OnStreamNotFound: function() {
 			this.onError(1, 'not_found');
 		},
 
-		/**
-		 * @private
-		 */
+        /**
+         * Handler error (Network disconnted)
+         * 
+         * @private
+         */
 		OnNetworkDisconnected: function() {
 			this.onError(2, 'connection');
 		},
 
-		/**
-		 * @private
-		 */
+        /**
+         * Handler error (Connection to the stream failed)
+         * 
+         * @private
+         */
 		OnConnectionFailed: function() {
 			this.onError(2, 'connection');
 		},
 
-		/**
-		 * @private
-		 */
+        /**
+         * Handler error (Problem with stream rendering)
+         * 
+         * @param {Number} errorCode Error code
+         * @private
+         */
 		OnRenderError: function(errorCode) {
 			var msg = '';
 
@@ -336,18 +370,24 @@ Device_Samsung_Player = (function(Events) {
 			this.onError(3, 'render', msg);
 		},
 
-		/**
-		 * @private
-		 */
+        /**
+         * Handler error (Problem with DRM)
+         * 
+         * @param {Number} errorCode Error code
+         * @private
+         */
 		OnDRMError: function(errorCode) {
 			var msg = '';
 
 			this.onError(4, 'drm', msg);
 		},
 
-		/**
-		 * @private
-		 */
+        /**
+         * Handler for custom events
+         * 
+         * @param {Number} code Code represents some relevant event
+         * @private
+         */
 		OnCustomEvent: function(code) {
 			this.onError(code, 'custom');
 		},
@@ -360,9 +400,13 @@ Device_Samsung_Player = (function(Events) {
 			this.trigger('playbackstart');
 		},
 
-		/**
-		 * @private
-		 */
+        /**
+         * Handler for general events. It calls other funcions related to eventCode
+         * 
+         * @param {Number} eventCode Event code
+         * @param {Object} param Additional parameters related with this event
+         * @private
+         */
 		onEvent: function(eventCode, param) {
 			if (eventCode === 1 || eventCode === 2) {
 				// 2 = OnAuthenticationFailed

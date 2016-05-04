@@ -1,10 +1,12 @@
 /*
- ********************************************************
- * Copyright (c) 2013 Mautilus s.r.o. (Czech Republic)
- * All rights reserved.
+ *******************************************************************************
+ * Copyright (c) 2013 Mautilus, s.r.o. (Czech Republic)
+ * All rights reserved
+ *  
+ * Questions and comments should be directed https://github.com/mautilus/sdk/issues
  *
  * You may obtain a copy of the License at LICENSE.txt
- ********************************************************
+ *******************************************************************************
  */
 
 /**
@@ -12,7 +14,7 @@
  * 
  * @author Mautilus s.r.o.
  * @class Device_Toshiba_Keyboard
- * @singleton
+ * @extends Keyboard
  */
 
 Device_Toshiba_Keyboard = (function () {

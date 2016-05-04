@@ -1,11 +1,13 @@
 /*
-********************************************************
-* Copyright (c) 2013 Mautilus s.r.o. (Czech Republic)
-* All rights reserved.
-* 
-* You may obtain a copy of the License at LICENSE.txt
-********************************************************
-*/
+ *******************************************************************************
+ * Copyright (c) 2013 Mautilus, s.r.o. (Czech Republic)
+ * All rights reserved
+ *  
+ * Questions and comments should be directed https://github.com/mautilus/sdk/issues
+ *
+ * You may obtain a copy of the License at LICENSE.txt
+ *******************************************************************************
+ */
 
 /**
 * Dune HD device, overrides Device
@@ -57,11 +59,27 @@ Device_Playstation = (function(Events) {
 			//this.API.exitBrowser(this.API.EXIT_BROWSER_MODE_STANDBY);
 		},
 
+		/**
+         * Adding Playstation native command to stack
+         * 
+         * @param {Object} json Command in JSON format
+         * @param {Function} callback Callback function with defined functionality
+         * @param {Boolean} remove Flag if command be removed or not after executing
+		 * @private
+		 */
 		nativeCommand: function(json, callback, remove) {
 			window.external.user(JSON.stringify(json));
-			this.callbacks.push({ command: json.command, callback: callback, remove: remove });
+            if (callback) {
+    			this.callbacks.push({ command: json.command, callback: callback, remove: remove });
+            }
 		},
 
+		/**
+         * Execute command from stack
+         * 
+         * @param {Object} json Command in JSON format which be called
+		 * @private
+		 */
 		executeCommand: function(json) {
 			var data = {};
 
@@ -255,7 +273,7 @@ Device_Playstation = (function(Events) {
 		 * Load specific OBJECT
 		 * @private
 		 * @param {String} id
-		 * @param {String} clsid
+		 * @param {String} type
 		 */
 		loadObject: function(id, type) {
 			var objs = document.getElementsByTagName('object');
@@ -277,7 +295,10 @@ Device_Playstation = (function(Events) {
 
 			return obj;
 		},
-
+        /**
+         * Function accessing responses from playstation sdk
+         * @param {Object} json JSON object which be executed
+         */
 		accessfunction: function(json) {
 			if (json) {
 				this.executeCommand(json);

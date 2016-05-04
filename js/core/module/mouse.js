@@ -1,10 +1,12 @@
 /*
- ********************************************************
- * Copyright (c) 2013 Mautilus s.r.o. (Czech Republic)
- * All rights reserved.
+ *******************************************************************************
+ * Copyright (c) 2013 Mautilus, s.r.o. (Czech Republic)
+ * All rights reserved
+ *  
+ * Questions and comments should be directed https://github.com/mautilus/sdk/issues
  *
  * You may obtain a copy of the License at LICENSE.txt
- ********************************************************
+ *******************************************************************************
  */
 
 /**
@@ -40,6 +42,10 @@ Mouse = (function(Events) {
 		 * @param {Event} event
 		 */
 
+		/**
+		 * Init Mouse object
+		 * @param {Object} [config={}] Mouse configuration
+		 */
 		init: function(config) {
 			var scope = this;
 			this.enabled = true;
@@ -64,6 +70,7 @@ Mouse = (function(Events) {
 		/*
 		 * Enable mouse click event.
 		 * 
+         * @fires enable
 		 */
 		enable: function() {
 			this.enabled = true;
@@ -72,6 +79,7 @@ Mouse = (function(Events) {
 		/*
 		 * Disable mouse click event.
 		 * 
+         * @fires disable
 		 */
 		disable: function() {
 			this.enabled = false;
@@ -87,7 +95,10 @@ Mouse = (function(Events) {
 		},
 		/**
 		 * Handles click event
-		 * 
+         * 
+		 * @param {Object} target Target element, jQuery collection
+		 * @param {Event} event Mouse event
+         * @fires click
 		 * @private
 		 */
 		onClick: function(target, event) {
@@ -100,6 +111,10 @@ Mouse = (function(Events) {
 		/**
 		 * Handles scroll event
 		 * 
+		 * @param {Object} target Target element, jQuery collection
+		 * @param {Number} delat direction of scrolling
+		 * @param {Event} event Mouse event
+         * @fires scroll
 		 * @private
 		 */
 		onScroll: function(target, delta, event) {

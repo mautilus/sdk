@@ -1,10 +1,12 @@
 /*
- ********************************************************
- * Copyright (c) 2013 Mautilus s.r.o. (Czech Republic)
- * All rights reserved.
+ *******************************************************************************
+ * Copyright (c) 2013 Mautilus, s.r.o. (Czech Republic)
+ * All rights reserved
+ *  
+ * Questions and comments should be directed https://github.com/mautilus/sdk/issues
  *
  * You may obtain a copy of the License at LICENSE.txt
- ********************************************************
+ *******************************************************************************
  */
 
 /**
@@ -30,8 +32,8 @@ Keyboard = (function (Events) {
 			oneLayout: false // only one layout
 		},
 		/**
-		 * Init object
-		 * 
+		 * Init Keyboard object
+		 * @param {Object} [config={}] Keyboard configuration
 		 */
 		init: function (config) {
 			this.configure(config);
@@ -280,23 +282,25 @@ Keyboard = (function (Events) {
 			}
 		},
 		/**
-			 * Set class config hash
-			 * 
-			 * @param {Object} config Hash of parameters
-			 */
+	     * Set class config hash
+		 * 
+		 * @param {Object} config Hash of parameters
+		 */
 		configure: function (config) {
 			this.config = $.extend(true, this.config || {}, config);
 		},
 		/**
 		 * Bind events for mouse and keyboard.
-		*/
+		 */
 		initEvents: function () {
 			Control.on('key', this.onKeyDown, this);
 			Mouse.on('click', this.onClick, this);
 		},
 		/**
 		 * Handle keydown keyboard function.
-		*/
+		 * @param {Object} $el Target element, jQuery collection
+		 * @param {Event} event
+		 */
 		onKeyDown: function ($el, event) {
 			if (!this.$el.is(":visible")) return;
 
@@ -342,7 +346,9 @@ Keyboard = (function (Events) {
 		},
 
 		/**
-		 * Check forbidden keys for onKeyDown
+		 * Check forbidden keys for onKeyDown. Currently it is implemented only for Samsung (Orsay) models. 
+         * @param {Number} keyCode Key code which be checked if is forbidden or not
+         * @returns {Boolean} Flag if key is forbidden or not
 		 */
 		isForbiddenKey: function(keyCode) {
 			var isForbiddenKey = false;
@@ -355,8 +361,9 @@ Keyboard = (function (Events) {
 			return isForbiddenKey;
 		},
 
-		/**
-		 * Enter action for keys, this function also uses mouse click.
+	   /**
+		* Enter action for keys, this function also uses mouse click.
+        * @param {Object} $el Target element, on which element is used enter
 		*/
 		onEnter: function ($el) {			
 			var posx = parseInt(Focus.focused.attr("data-posx"), 10), posy = parseInt(Focus.focused.attr("data-posy"), 10),
@@ -458,8 +465,11 @@ Keyboard = (function (Events) {
 			}
 			return false;
 		},
-		/**
-		 * Navigate using cursor keys.
+	   /**
+		* Navigate using cursor keys.
+        * @param {Number} direction direction of moving
+        * @return {Boolean} Return FALSE to prevent event from bubeling
+        * @private
 		*/
 		navigate: function (direction) {
 			this.position.x = parseInt(Focus.focused.attr("data-posx"), 10);
@@ -471,8 +481,12 @@ Keyboard = (function (Events) {
 			else if (direction == "down") this.move(0, 1, "Y");
 			return false;
 		},
-		/**
-		 * This function is called from navigate. It focuse new key.
+	   /**
+		* This function is called from navigate. It focus new key.
+        * @param {Number} dirX X-axis direction of moving
+        * @param {Number} dirY Y-axis direction of moving
+        * @param {String} axis X or Y axis
+        * @private
 		*/
 		move: function (dirX, dirY, axis) {
 			// current x
@@ -491,8 +505,11 @@ Keyboard = (function (Events) {
 
 			Focus.to(this.$el.find(".key[data-posx='" + this.position.x + "'][data-posy='" + this.position.y + "']"));
 		},
-		/**
-		 * Move between lines, assign new index to visible keys.
+	   /**
+		* Move between lines, assign new index to visible keys.
+        * @param {String} axis X or Y axis
+        * @param {Number} currentX Current X items on the line
+        * @private
 		*/
 		assingIndToArray: function (axis, currentX) {
 			var layout = this.specialState ? this.layouts["SPECIAL"].layout : this.layouts[this.lang].layout, newCurrentX = 0, newSize = 0;
@@ -503,6 +520,7 @@ Keyboard = (function (Events) {
 				if (this.position.x < 0) this.position.x = len - 1;
 				if (this.position.x > len - 1) this.position.x = 0;
 			}
+            // for a column
 			else if (axis == "Y") {
 				var len = layout.length;
 				if (this.position.y < 0) this.position.y = len - 1;
@@ -524,8 +542,10 @@ Keyboard = (function (Events) {
 				if (this.position.x > lenX - 1) this.position.x = lenX - 1;
 			}
 		},
-		/**
-		 * Insert a new value to the input
+       /**
+	    * Insert a new value to the input
+        * @param {String} value Value which should be inserted. It can be modified (Caps/Shift etc.)
+        * @param {String} type Type of keyboard
 		*/
 		insertValue: function (value, type) {
 			if (this.mode != this.enums["NORESTRICTION"]) { // "NUMERIC" "LETTER" "SPACE"
@@ -548,8 +568,9 @@ Keyboard = (function (Events) {
 				this.input.insert(value);
 			}
 		},
-		/**
-		 * Switch between English and Arabic layout.
+	   /**
+		* Switch between English and Arabic layout or other available language.
+        * @param {String} lang Language identification. Which language be newly set.
 		*/
 		switchLayout: function (lang) {
 			if (this.lang != lang) {
@@ -562,49 +583,58 @@ Keyboard = (function (Events) {
 				Focus.to(this.$el.find(".key[data-id='LANGCHANGE']"));
 			}
 		},
-		/**
-		 * Press A and highlight this key on keyboard.
+	   /**
+		* Which button on keyboard be focused
+        * @param {String} Identification of button which be focused
+        * @private
 		*/
 		focusByInput: function (value) {
 			Focus.to(this.$el.find(".focusable[data-val='" + value.toUpperCase() + "']"));
 		},
 		/**
 		 * Mouse onclick handle.
-		*/
+		 * @param {Object} $el Target element, jQuery collection
+		 * @param {Event} event Mouse event
+		 */
 		onClick: function ($el, event) {
 			if (!this.$el.is(":visible")) return;
 			return this.onEnter($el);
 		},
-		/**
-		 * Create function, cover is created only for default and LG driver.
+	   /**
+		* Create function, cover is created only for default and LG driver.
 		*/
 		create: function () {
 			if (Device && !Device.isPHILIPS) { this.cover(); } // because Philips bugs
 			this.content();
 		},
-		/**
-		 * Set keyboard mode. Keyboard works in these modes: 
-		 * NORESTRICTION = this.enums["NORESTRICTION"] no restrictions
-		 * ONLYNUMBERS = this.enums["ONLYNUMBERS"] only numbers are working
+	   /**
+		* Set keyboard mode. Keyboard works in these modes: 
+		* NORESTRICTION = this.enums["NORESTRICTION"] no restrictions
+		* ONLYNUMBERS = this.enums["ONLYNUMBERS"] only numbers are working
+        * @param {String} mode String represents which keyboard mode be used
 		*/
 		setMode: function (mode) {
 			this.mode = this.enums[mode];
 		},
-		/**
-		 * Set keyboard position, only available modes are BOTTOM x TOP.
+	   /**
+		* Set keyboard position, only available modes are BOTTOM x TOP.
+        * @param {String} position String represents keyboard position (BOTTOM or TOP)
 		*/
 		setKeyboardPosition: function (position) { // position == BOTTOM x TOP
 			this.keyboardPosition = this.enums[position];
 		},
-		/**
-		 * Get available language. This is because default I18n locale does not have its own layout.
+	   /**
+		* Get available language. This is because default I18n locale does not have its own layout.¨
+        * @param {String} lang Keyboard language 
 		*/
 		getAvailableLang: function (lang) {
 			if (!this.layouts[lang]) return "EN"; // default
 			else return lang;
 		},
-		/**
-		 * Main function for show keyboard in the application.
+	   /**
+		* Main function for show keyboard in the application.
+        * @param {Object} Input object
+        * @param {String} [lang] Keyboard language 
 		*/
 		show: function (input, lang) {
 			if (!input) return;
@@ -632,8 +662,11 @@ Keyboard = (function (Events) {
 			this.trigger("exit");
 			document.body.onselectstart = function () { return true; };
 		},
-		/**
-		 * Because of different of each line, createKeys() need to count each width of the line.
+	   /**
+		* Because of different of each line, createKeys() need to count each width of the line.
+        * @param {Number} line Index of line
+        * @returns {Number} size Size of lines
+        * @private
 		*/
 		getLineSize: function(line) {
 			if (!line || line.length == 0) return 1; // 0 divide zero
@@ -646,8 +679,10 @@ Keyboard = (function (Events) {
 			}
 			return size;
 		},
-		/**
-		 * Create selected layout.
+	   /**
+		* Create selected layout.
+        * @param {String} layout Layout identification
+        * @private
 		*/
 		createKeys: function (layout) {
 			var $line = null, $key = null, $keyContent = null, signElemSize = 0;
@@ -692,7 +727,7 @@ Keyboard = (function (Events) {
 		},
 		/**
 		 * Only show element of keyboard.
-		*/
+		 */
 		showKeyboard: function () {
 			if (this.keyboardPosition == this.enums["BOTTOM"]) this.$el.attr("style", "top: 410px");
 			else if (this.keyboardPosition == this.enums["TOP"]) this.$el.attr("style", "top: 50px");
@@ -700,15 +735,15 @@ Keyboard = (function (Events) {
 			if(this.$cover) { this.$cover.show(); }
 			this.$el.show();
 		},
-		/**
-		 * Only hide element of keyboard.
+	   /**
+		* Only hide element of keyboard.
 		*/
 		hideKeyboard: function () {
 			if(this.$cover) { this.$cover.hide(); }
 			this.$el.hide();
 		},
-		/**
-		 * Create clickable cover under the keyboard.
+	   /**
+		* Create clickable cover under the keyboard.
 		*/
 		cover: function () {
 			var scope = this;
@@ -718,8 +753,8 @@ Keyboard = (function (Events) {
 			this.$cover.hide();
 			$("body").append(this.$cover);
 		},
-		/**
-		 * Create content which holds the keyboard itself.
+	   /**
+		* Create content which holds the keyboard itself.
 		*/
 		content: function () {
 			this.$el = $("<div class='keyboard-content' />");

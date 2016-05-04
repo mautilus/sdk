@@ -1,10 +1,12 @@
 /*
- ********************************************************
- * Copyright (c) 2013 Mautilus s.r.o. (Czech Republic)
- * All rights reserved.
+ *******************************************************************************
+ * Copyright (c) 2013 Mautilus, s.r.o. (Czech Republic)
+ * All rights reserved
+ *  
+ * Questions and comments should be directed https://github.com/mautilus/sdk/issues
  *
  * You may obtain a copy of the License at LICENSE.txt
- ********************************************************
+ *******************************************************************************
  */
 
 /**
@@ -39,6 +41,8 @@ Device_Dunehd_Player = (function(Events) {
 
 	},
 	/**
+     * Internal player timer
+     * 
 	 * @private
 	 */
 	tick: function() {
@@ -102,7 +106,10 @@ Device_Dunehd_Player = (function(Events) {
 	    }
 	},
 	/**
-	 * @inheritdoc Player#native
+     * Player state handling
+     * @param {Number} eventCode Code of actual player state
+     * 
+	 * @private
 	 */
         onEvent: function (eventCode) {
             this.actualState = eventCode;
@@ -129,6 +136,9 @@ Device_Dunehd_Player = (function(Events) {
                     break;
             }
         },
+	/**
+	 * @inheritdoc Player#native
+	 */
 	native: function(cmd, attrs) {
 	    var url;
 
@@ -262,10 +272,12 @@ Device_Dunehd_Player = (function(Events) {
 
 	},
 	/**
+     * Get unique ESN code. It is used for DRM verification.
+     * 
 	 * @private
 	 */
 	getESN: function() {
-	    return Device.getUID() + '|60';
+	    return Device.getUID();
         },
         isMuteEnabled: function () {
             if (this.API)

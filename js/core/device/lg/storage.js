@@ -1,11 +1,13 @@
 /*
-********************************************************
-* Copyright (c) 2013 Mautilus s.r.o. (Czech Republic)
-* All rights reserved.
-*
-* You may obtain a copy of the License at LICENSE.txt
-********************************************************
-*/
+ *******************************************************************************
+ * Copyright (c) 2013 Mautilus, s.r.o. (Czech Republic)
+ * All rights reserved
+ *  
+ * Questions and comments should be directed https://github.com/mautilus/sdk/issues
+ *
+ * You may obtain a copy of the License at LICENSE.txt
+ *******************************************************************************
+ */
 
 /**
 * LG File Storage class
@@ -21,6 +23,9 @@ Device_Lg_Storage = (function (Global) {
 	};
 
 	$.extend(true, Device_Lg_Storage, {
+		/**
+		* @inheritdoc Storage#init
+		*/
 		init: function (config) {
 			this.configure(config);
 		},

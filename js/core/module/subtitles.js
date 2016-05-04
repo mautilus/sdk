@@ -1,14 +1,17 @@
 /*
- ********************************************************
- * Copyright (c) 2013 Mautilus s.r.o. (Czech Republic)
- * All rights reserved.
+ *******************************************************************************
+ * Copyright (c) 2013 Mautilus, s.r.o. (Czech Republic)
+ * All rights reserved
+ *  
+ * Questions and comments should be directed https://github.com/mautilus/sdk/issues
  *
  * You may obtain a copy of the License at LICENSE.txt
- ********************************************************
+ *******************************************************************************
  */
 
 /**
  * Subtitles class
+ * Own implementation of subtitles independently of all platfroms
  * 
  * @author Mautilus s.r.o.
  * @class Subtitles
@@ -25,6 +28,10 @@ Subtitles = (function(Events) {
 	};
 
 	$.extend(true, Subtitles, Events, {
+		/**
+		 * Initialise Subtitles class
+		 * 
+		 */
 		init: function(config) {
 			this.configure(config);
 
@@ -44,7 +51,9 @@ Subtitles = (function(Events) {
 			this.subs = {};
 			this.region_els = {};
 			this.cellResolution = [32, 15];
-
+			/**
+			 * @property {Object} defaultStyle defined default style of subtitles
+			 */
 			this.defaultStyle = {
 				textAlign: 'center',
 				color: 'white',
@@ -115,6 +124,7 @@ Subtitles = (function(Events) {
 		},
 
 		/**
+         * Internal player timer
 		 * @private
 		 */
 		tick: function() {
@@ -124,6 +134,7 @@ Subtitles = (function(Events) {
 		},
 
 		/**
+         * Time updating inside this class and call rendering function
 		 * @private
 		 */
 		setTime: function(time) {
@@ -133,6 +144,8 @@ Subtitles = (function(Events) {
 
 		/**
 		 * Set TTML xml subtitles
+         * Parsing subtitles, start and end time, getting lines in each subtitle, get and prepare style of each subtitle
+         * and filling-in private attributes for rendering subtitles
 		 * 
 		 * @param {String} xml XML file
 		 * @param {Number} [timeOffset=0] Time offset in [ms]
@@ -390,7 +403,7 @@ Subtitles = (function(Events) {
 		     * From Srt parser
 		     * 
 		     * @param {String} srt data
-		     * @oaram {Boolean} ms true = use miliseconds
+		     * @param {Boolean} ms true = use miliseconds
 		     * @return {Object} items [{{String} id,
 		     * 							{String} startTime,
 		     * 							{String} endTime,
@@ -477,6 +490,7 @@ Subtitles = (function(Events) {
 		},
 
 		/**
+         * Update layout of subtitles related with player size
 		 * @private
 		 */
 		show: function() {
@@ -491,6 +505,7 @@ Subtitles = (function(Events) {
 		},
 
 		/**
+         * Hide subtitles
 		 * @private
 		 */
 		hide: function() {
@@ -531,6 +546,7 @@ Subtitles = (function(Events) {
 		},
 
 		/**
+         * Get time when subtitles should be hidden
 		 * @private
 		 */
 		getMaxEndTime: function(arr) {
@@ -542,7 +558,11 @@ Subtitles = (function(Events) {
 		},
 
 		/**
+         * Prepare CSS style for subtitle
 		 * @private
+         * @param {Object} css style from received subtitle file related with concrete subtitle string
+         * @param {Object} [cssOverride] css which shoud overwrite css properties
+         * @returns {Object} with css style 
 		 */
 		getStyles: function(css, cssOverride) {
 			var o = $.extend({}, this.defaultStyle);
@@ -558,7 +578,10 @@ Subtitles = (function(Events) {
 		},
 
 		/**
+         * Render region. It is required for subtitle rendering
 		 * @private
+         * @param {Object} regionId id which region be rendered
+         * @returns {Object} jQuery element (region)
 		 */
 		renderRegion: function(regionId) {
 			var $el, $wrap, cells2px, colWidth, rowHeight;
@@ -618,6 +641,7 @@ Subtitles = (function(Events) {
 		},
 
 		/**
+         * render subtitle related with current playing time
 		 * @private
 		 */
 		render: function() {

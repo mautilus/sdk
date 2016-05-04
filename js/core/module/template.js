@@ -1,10 +1,12 @@
 /*
- ********************************************************
- * Copyright (c) 2013 Mautilus s.r.o. (Czech Republic)
- * All rights reserved.
+ *******************************************************************************
+ * Copyright (c) 2013 Mautilus, s.r.o. (Czech Republic)
+ * All rights reserved
+ *  
+ * Questions and comments should be directed https://github.com/mautilus/sdk/issues
  *
  * You may obtain a copy of the License at LICENSE.txt
- ********************************************************
+ *******************************************************************************
  */
 
 /**
@@ -30,6 +32,10 @@ Template = (function(Events) {
 	};
 
 	$.extend(true, Template, Events, {
+		/**
+		 * Init Template object
+		 * @param {Object} [config={}] Template configuration
+		 */
 		init: function(config) {
 			/**
 			 * @property {Object} engine Engine instance (Mustache/Dust/Nunjucks/etc.)
@@ -40,9 +46,6 @@ Template = (function(Events) {
 			 * @property {Boolean} async (read-only) Whether template engine is asynchronous
 			 */
 			this.async = false;
-			
-			// engine instance
-			this.engine = null;
 			
 			// compiled templates
 			this.compiled = {};
@@ -133,7 +136,11 @@ Template = (function(Events) {
 			return this.engineCompile(tplName, html || '');
 		},
 		/**
-		 * @private
+         * Compile engine according to to defined engine
+         * @param {String} tplName Template name
+         * @param {String} html HTML where template be rendered
+         * @returns
+		 * @private {Boolean} if compiling was successful or not
 		 */
 		engineCompile: function(tplName, html){
 			if(this.config.engine === 'nunjucks'){

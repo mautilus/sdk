@@ -1,19 +1,17 @@
 /*
- * Mautilus, s.r.o., 2013
- * This file is part of MAUTILUS SMART TV SDK
- * 
- * Questions and comments should be directed to info@mautilus.com 
- * 
- * ======================================================================
- * THIS CODE AND INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY
- * KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
- * PARTICULAR PURPOSE.
- * ===================
+ *******************************************************************************
+ * Copyright (c) 2013 Mautilus, s.r.o. (Czech Republic)
+ * All rights reserved
+ *  
+ * Questions and comments should be directed https://github.com/mautilus/sdk/issues
+ *
+ * You may obtain a copy of the License at LICENSE.txt
+ *******************************************************************************
  */
 
 /** 
- * Application bootstrap, device detection and driver loading
+ * Application bootstrap, device detection and driver loading.
+ * This class is called at the beginning of the whole application
  * 
  * @author Mautilus s.r.o.
  * @class Main 
@@ -22,8 +20,17 @@
 
 Main = (function(global) {
 	var Main = {
+		/**
+		 * Initial function
+		 * 
+		 * @private
+		 */
 		init: function() {
 			var scope = this;
+			/**
+			 * @property {Array} device remember platform and it's version
+			 */            
+            this.device = ['default', '']; 
 
 			/**
 			 * @property {Boolean} isReady TRUE if the whole environment is ready
@@ -32,7 +39,7 @@ Main = (function(global) {
 
 			/**
 			 * @private
-			 * @property {Array} stack Callback stack for events
+			 * @property {Array} stack Callback stack for events. Each item contains Array ['eventname', callback, scope]
 			 */
 			this.stack = [];
 
@@ -50,14 +57,15 @@ Main = (function(global) {
 		},
 		/**
 		 * Push new callback to the onReady event
-		 * 
+         * 
 		 * @chainable
-		 * @param {Function} callback
-		 * @param {Object} scope
+		 * @param {Function} callback from initialized class
+		 * @param {Object} scope from from initialized class 
 		 */
 		ready: function(callback, scope) {
 			this.stack.push(['ready', callback, scope]);
 
+            // when Device initialization is done `Main.onReady` is triggered
 			if (this.isReady) {
 				this.onReady();
 			}
@@ -77,14 +85,17 @@ Main = (function(global) {
 		},
 		/**
 		 * Detects runtime platform and it's version, e.g. ['samsung', '2013']
+         * Platform which is called ´default´ is desktop browser or unknown platform
+         * 
+         * For the forcing HbbTV platform, you have to set CONFIG.HbbTV to true
 		 * 
 		 * @returns {Array}
 		 */
 		getDevice: function() {
 			if (CONFIG.HbbTV) {
 				var name = navigator.userAgent.match(/hbbtv\S*/i);   //e.g: HbbTV/1.2.1
-				var nameArr = name ? name[0].split("/") : [];
-				var version = nameArr.length > 1 ? nameArr[1] : "";
+				var nameArr = name ? name[0].split('/') : [];
+				var version = nameArr.length > 1 ? nameArr[1] : '';
 				return ['hbbtv', version];
 			}
 			else if (navigator.userAgent.indexOf('Maple 5') >= 0) {
@@ -96,7 +107,7 @@ Main = (function(global) {
 			else if (navigator.userAgent.indexOf('SmartTV; Maple2012') >= 0) {
 				return ['samsung', '2012'];
 			}
-			else if (navigator.userAgent.indexOf('Maple') >= 0) {
+			else if (navigator.userAgent.indexOf('SmartTV+2013; Maple2012') >= 0) {
 				return ['samsung', '2013'];
 			}
 			else if (navigator.userAgent.indexOf('SmartTV+2014; Maple2012') >= 0) {
@@ -105,7 +116,16 @@ Main = (function(global) {
 			else if (navigator.userAgent.indexOf('SmartTV+2015; Maple2012') >= 0) {
 				return ['samsung', '2015'];
 			}
+			else if (navigator.userAgent.indexOf('Maple') >= 0) {
+				return ['samsung', ''];   // to cover the new models comming from future
+			}
 			else if (navigator.userAgent.indexOf('Tizen') >= 0) {
+				if (navigator.userAgent.indexOf('Tizen 2.3') >= 0) {
+					return ['tizen', '2015'];
+				}
+				else if (navigator.userAgent.indexOf('Tizen 2.4.0') >= 0) {
+					return ['tizen', '2016'];
+				}
 				return ['tizen', '2015'];
 			}
 			else if (navigator.userAgent.indexOf('LG NetCast.TV-2011') >= 0) {
@@ -116,6 +136,9 @@ Main = (function(global) {
 			}
 			else if (navigator.userAgent.indexOf('LG NetCast.TV') >= 0) {
 				return ['lg', '2013'];
+			}
+			else if (navigator.userAgent.indexOf('LG SimpleSmart.TV-2016') >= 0) {
+				return ['lg', '2016'];
 			}
 			else if (navigator.userAgent.indexOf('NETTV\/3') >= 0) {
 				return ['philips', '2011'];
@@ -147,8 +170,12 @@ Main = (function(global) {
 			else if (navigator.userAgent.match(/playstation 4/gi)) {
 				return ['playstation', '4'];
 			}
-			else if (navigator.userAgent.indexOf('Web0S') >= 0) {
-				return ['webos', ''];
+            else if (navigator.userAgent.indexOf('Web0S') >= 0 && navigator.userAgent.indexOf('538.2') >= 0) {
+                return ['webos', '2.x'];
+            }
+            else if (navigator.userAgent.indexOf('Web0S') >= 0) {
+                // navigator.userAgent.indexOf('537.41') >= 0 for WebOS 1.0
+                return ['webos', '1.x'];
 			}
 			else if (navigator.userAgent.indexOf('Crosswalk') >= 0) {
 				return ['android', ((Android && Android.getManufacturer) ? Android.getManufacturer() : '')];
@@ -173,6 +200,8 @@ Main = (function(global) {
 			}, this);
 		},
 		/**
+         * event handler when the whole environment is ready. After that all classes in stack are also initialized 
+         * 
 		 * @private
 		 */
 		onReady: function() {
@@ -188,12 +217,16 @@ Main = (function(global) {
 			}
 		},
 		/**
+         * event handler after the DOM is ready
+         * 
 		 * @private
 		 */
 		onLoad: function() {
 			this.initDevice();
 		},
 		/**
+         * event handler when unload JavaScript event is triggered
+         * 
 		 * @private
 		 */
 		onUnload: function() {

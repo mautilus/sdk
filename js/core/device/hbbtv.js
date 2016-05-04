@@ -1,15 +1,12 @@
-/**
- * Mautilus, s.r.o., 2013
- * This file is part of MAUTILUS SMART TV SDK
+/*
+ *******************************************************************************
+ * Copyright (c) 2013 Mautilus, s.r.o. (Czech Republic)
+ * All rights reserved
+ *  
+ * Questions and comments should be directed https://github.com/mautilus/sdk/issues
  *
- * Questions and comments should be directed to info@mautilus.com
- *
- * ======================================================================
- * THIS CODE AND INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY
- * KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
- * PARTICULAR PURPOSE.
- * ===================
+ * You may obtain a copy of the License at LICENSE.txt
+ *******************************************************************************
  */
 
 /**
@@ -68,7 +65,7 @@ Device_Hbbtv = (function (Events) {
 		/**
 		 * To set keyset
 		 * @private
-		 * @param {Number} mask
+		 * @param {Number} mask Key set mask
 		 */
 		_setKeyset: function (mask) {
 			// for HbbTV 0.5
@@ -220,8 +217,8 @@ Device_Hbbtv = (function (Events) {
 		 * @private
 		 */
 		override: function () {
-			if (typeof Device_HbbTV_Player !== 'undefined' && Player) {
-				Player = $.extend(true, Player, Device_HbbTV_Player);
+			if (typeof Device_Hbbtv_Player !== 'undefined' && Player) {
+				Player = $.extend(true, Player, Device_Hbbtv_Player);
 			}
 		},
 		/**

@@ -1,10 +1,12 @@
 /*
- ********************************************************
- * Copyright (c) 2013 Mautilus s.r.o. (Czech Republic)
- * All rights reserved.
+ *******************************************************************************
+ * Copyright (c) 2013 Mautilus, s.r.o. (Czech Republic)
+ * All rights reserved
+ *  
+ * Questions and comments should be directed https://github.com/mautilus/sdk/issues
  *
  * You may obtain a copy of the License at LICENSE.txt
- ********************************************************
+ *******************************************************************************
  */
 
 /**
@@ -47,6 +49,8 @@ Device_Lg_Player = (function(Events) {
 		},
 
 		/**
+         * Function for creating player object
+         * 
 		 * @private
 		 */
 		createPlayer: function(drm){
@@ -73,6 +77,8 @@ Device_Lg_Player = (function(Events) {
 		},
 
 		/**
+         * Internal player timer
+         * 
 		 * @private
 		 */
 		tick: function() {
@@ -215,12 +221,18 @@ Device_Lg_Player = (function(Events) {
 		},
 
 		/**
+         * Get unique ESN code. It is used for DRM verification.
+         * 
 		 * @private
 		 */
 		getESN: function() {
-			return Device.getUID() + '|60';
+			return Device.getUID();
 		},
 
+        /**
+         * Handling changes in player state
+         * @private
+         */
 		onNativePlayStateChange: function(){
 			var state = this.PLAYER.playState;
 
@@ -261,22 +273,64 @@ Device_Lg_Player = (function(Events) {
 			}
 		},
 
+        /**
+         * Player error handler
+         * 
+         * @private
+         */	
 		onNativeError: function() {
-			var code = this.PLAYER.error, 
-			msg = 'Unknown Error';
+            var code = this.el.error,
+                msg = 'Unknown Error';
 
-			if (code === 0) {
-				msg = 'A/V format not supported';
+            if (code === 0) {
+                msg = 'A/V format not supported';
 
-			} else if (code === 1) {
-				msg = 'Cannot connect to server or connection lost';
+            } else if (code === 1) {
+                msg = 'Cannot connect to server or connection lost';
 
-			} else if (code === 1000) {
-				msg = 'File not found';
+            } else if (code === 2) {
+                msg = 'Unidentified error';
 
-			} else if (code === 1002) {
-				msg = 'DRM failure';
-			}
+            } else if (code === 1000) {
+                msg = 'File not found';
+
+            } else if (code === 1001) {
+                msg = 'Invalid protocol';
+
+            } else if (code === 1002) {
+                msg = 'DRM failure';
+
+            } else if (code === 1003) {
+                msg = 'Play list is empty';
+
+            } else if (code === 1004) {
+                msg = 'Unrecognized play list';
+
+            } else if (code === 1005) {
+                msg = 'Invalid ASX format';
+
+            } else if (code === 1006) {
+                msg = 'Error in downloading play list';
+
+            } else if (code === 1007) {
+                msg = 'Out of memory';
+
+            } else if (code === 1008) {
+                msg = 'Invalid URL list format';
+
+            } else if (code === 1100) {
+                msg = 'Unidentified WM-DRM error';
+
+            } else if (code === 1101) {
+                msg = 'Incorrect license in local license store';
+
+            } else if (code === 1102) {
+                msg = 'Fail in receiving correct license from server';
+
+            } else if (code === 1103) {
+                msg = 'Stored license is expired';
+
+            }
 
 			this.onError(code, msg);
 		}

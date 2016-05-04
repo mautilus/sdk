@@ -1,29 +1,26 @@
-/**
- * Mautilus, s.r.o., 2013
- * This file is part of MAUTILUS SMART TV SDK
+/*
+ *******************************************************************************
+ * Copyright (c) 2013 Mautilus, s.r.o. (Czech Republic)
+ * All rights reserved
+ *  
+ * Questions and comments should be directed https://github.com/mautilus/sdk/issues
  *
- * Questions and comments should be directed to info@mautilus.com
- *
- * ======================================================================
- * THIS CODE AND INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY
- * KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
- * PARTICULAR PURPOSE.
- * ===================
+ * You may obtain a copy of the License at LICENSE.txt
+ *******************************************************************************
  */
 
 /**
  * HbbTV Player class
  *
  * @author Mautilus s.r.o.
- * @class Device_HbbTV_Player
+ * @class Device_Hbbtv_Player
  * @extends Player
  */
 
-Device_HbbTV_Player = (function (Events) {
-	var Device_HbbTV_Player = {};
+Device_Hbbtv_Player = (function (Events) {
+	var Device_Hbbtv_Player = {};
 
-	$.extend(true, Device_HbbTV_Player, {
+	$.extend(true, Device_Hbbtv_Player, {
 		/**
 		 * @inheritdoc Player#initNative
 		 */
@@ -45,11 +42,11 @@ Device_HbbTV_Player = (function (Events) {
 		 * @inheritdoc Player#deinitNative
 		 */
 		deinitNative: function () {
-			console.log('[Device_HbbTV_Player] deinitNative process: '+ this.PLAYER);
+			console.log('[Device_Hbbtv_Player] deinitNative process: '+ this.PLAYER);
 			if (!this.PLAYER) {
 				return;
 			}
-			console.log('[Device_HbbTV_Player] deinitNative start');
+			console.log('[Device_Hbbtv_Player] deinitNative start');
 			try {
 				this.PLAYER.stop();
 			} catch(e) {
@@ -65,10 +62,12 @@ Device_HbbTV_Player = (function (Events) {
 			this.$videoContainer[0].innerHTML = '';
 			this.PLAYER = false;
 			this.type = '';
-			console.log('[Device_HbbTV_Player] deinitNative end');
+			console.log('[Device_Hbbtv_Player] deinitNative end');
 		},
 
 		/**
+         * Internal player timer
+         * 
 		 * @private
 		 */
 		tick: function () {
@@ -86,11 +85,13 @@ Device_HbbTV_Player = (function (Events) {
 		},
 
 		/**
+         * Function for creating player object 
+         * 
 		 * @private
-		 * @param {String} type - 'video/broadcast' or 'video/mp4'
+		 * @param {String} type Type of playable content 'video/broadcast' or 'video/mp4'
 		 */
 		createPlayer: function (type) {
-			console.log("[Device_HbbTV_Player] createPlayer xyz: " + type);
+			console.log("[Device_Hbbtv_Player] createPlayer: " + type);
 			if (this.PLAYER) {
 				this.deinitNative();
 			}
@@ -120,7 +121,7 @@ Device_HbbTV_Player = (function (Events) {
 //			obj.style.visibility = 'hidden';
 
 //			this.PLAYER.type = 'video/mp4';    // fireTV
-//			console.log("[Device_HbbTV_Player] setAttribute");
+//			console.log("[Device_Hbbtv_Player] setAttribute");
 
 
 			if(type === 'video/broadcast') {
@@ -130,6 +131,11 @@ Device_HbbTV_Player = (function (Events) {
 			}
 		},
 
+		/**
+         * Function for initializing broadcast player 
+         * 
+		 * @private
+		 */
 		initBroadcastPlayer: function() {
 			console.log('initBroadcastPlayer');
 			try {
@@ -144,6 +150,11 @@ Device_HbbTV_Player = (function (Events) {
 			}
 		},
 
+		/**
+         * Function for initializing AV player 
+         * 
+		 * @private
+		 */
 		initAVPlayer: function() {
 			var scope = this;
 			this.PLAYER.onPlayStateChange = function (state, error) {
@@ -160,7 +171,7 @@ Device_HbbTV_Player = (function (Events) {
 		 * @inheritdoc Player#native
 		 */
 		native: function (cmd, attrs) {
-			console.log("[Device_HbbTV_Player] cmd: " + cmd);
+			console.log("[Device_Hbbtv_Player] cmd: " + cmd);
 			var scope = this, url;
 
 			if (cmd === 'play') {
@@ -221,6 +232,8 @@ Device_HbbTV_Player = (function (Events) {
 		},
 
 		/**
+         * Get unique ESN code. It is used for DRM verification.
+         * 
 		 * @private
 		 */
 		getESN: function () {
@@ -228,11 +241,13 @@ Device_HbbTV_Player = (function (Events) {
 		},
 
 		/**
+         * Handling changes in player state
+         * 
 		 * @private
 		 */
 		onNativePlayStateChange: function (state, error) {
 			var state = this.PLAYER.playState;
-			console.log("[Device_HbbTV_Player] onNativePlayStateChange:: " + state);
+			console.log("[Device_Hbbtv_Player] onNativePlayStateChange:: " + state);
 
 			if (state == 0) {
 				//stopped
@@ -296,6 +311,6 @@ Device_HbbTV_Player = (function (Events) {
 		}
 	});
 
-	return Device_HbbTV_Player;
+	return Device_Hbbtv_Player;
 
 })(Events);

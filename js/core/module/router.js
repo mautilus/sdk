@@ -1,10 +1,12 @@
 /*
- ********************************************************
- * Copyright (c) 2013 Mautilus s.r.o. (Czech Republic)
- * All rights reserved.
+ *******************************************************************************
+ * Copyright (c) 2013 Mautilus, s.r.o. (Czech Republic)
+ * All rights reserved
+ *  
+ * Questions and comments should be directed https://github.com/mautilus/sdk/issues
  *
  * You may obtain a copy of the License at LICENSE.txt
- ********************************************************
+ *******************************************************************************
  */
 
 /**
@@ -51,6 +53,11 @@ Router = (function(Events, Deferrable) {
 		 * @param {Object} scene
 		 * @param {Array} arguments
 		 */
+
+		/**
+		 * Init Router object
+		 * @param {Object} [config={}] Router configuration
+		 */
 		init: function(config) {
 			this.configure(config);
 			
@@ -87,8 +94,8 @@ Router = (function(Events, Deferrable) {
 		/**
 		 * Go to the specified scene
 		 * 
-		 * @param {Boolean} [historyPush=false] Set to FALSE if you don't want to push this scene into a history stack
 		 * @param {String} name Scene's name
+		 * @param {Boolean} [historyPush=false] Set to FALSE if you don't want to push this scene into a history stack
 		 * @returns {Scene} Return FALSE if failed
 		 */
 		go: function(name) {
@@ -246,7 +253,7 @@ Router = (function(Events, Deferrable) {
 		/**
 		 * Check, if given scene name is the current active scene
 		 * 
-		 * @param {String} name
+		 * @param {String} name Check if scene with this name is active
 		 * @returns {Boolean}
 		 */	
 		isSceneActive: function(name){
@@ -261,7 +268,7 @@ Router = (function(Events, Deferrable) {
 		/**
 		 * Shift the last scene from a history
 		 * 
-		 * @param {String} [sceneName] sceneName
+		 * @param {String} [sceneName] sceneName Name of scene be shifted from history
 		 * @returns {Object}
 		 */
 		shiftHistory: function(sceneName){

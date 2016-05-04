@@ -1,10 +1,12 @@
 /*
- ********************************************************
- * Copyright (c) 2013 Mautilus s.r.o. (Czech Republic)
- * All rights reserved.
+ *******************************************************************************
+ * Copyright (c) 2013 Mautilus, s.r.o. (Czech Republic)
+ * All rights reserved
+ *  
+ * Questions and comments should be directed https://github.com/mautilus/sdk/issues
  *
  * You may obtain a copy of the License at LICENSE.txt
- ********************************************************
+ *******************************************************************************
  */
 
 // http://www.samsungdforum.com/TizenApiGuide/tizen3001/index.html#::AVPlay::AVPlayManager::prepare
@@ -33,6 +35,15 @@ Device_Tizen_Player = (function(Events) {
 			this.uhdMultiplier = (webapis.productinfo.isUdPanelSupported()) ? 1.5 : 1;   // ratio 1.5 for UHD models, 1.0 for normal model (used in .setDisplayRect())
 
 			this.$el.css({left : Math.round(this.left), top : Math.round(this.top), width: Math.round(this.width), height: Math.round(this.height)});
+			
+			this.multitasking = {
+                playerTime: 0,
+                playerState: null,
+                playbackSpeed: 1,
+                url: '',		// player url
+                verifyUrl: '',	// verification url for license
+                hidden: false
+			}; // object for remember data during app is hidden
 
 			this.PLAYER = Device.PLAYER;
 	
@@ -105,7 +116,21 @@ Device_Tizen_Player = (function(Events) {
 					Device.AUDIOCONTROL.setMute(false);
 				}
 				if (this.currentState !== this.STATE_IDLE) {
-					this.PLAYER.suspend();
+					if(this.drmType == 'widevine' || this.drmType == 'playready') {		// WIDEVINE || PLAYREADY DRM
+						this.multitasking.hidden = true;
+						if (this.url && this.currentTime) {
+			                this.multitasking.url = this.url;
+			                this.multitasking.playerState = this.currentState;
+			                this.multitasking.playerTime = this.currentTime / 1000;
+			                this.multitasking.playbackSpeed = this.playbackspeed;
+						}
+						
+						if(this.currentState != this.STATE_IDLE) {
+							this.native('stop');
+						}
+					} else {	// NO DRM
+						this.PLAYER.suspend();
+					}
 				}
 			}, this);
 			
@@ -116,11 +141,88 @@ Device_Tizen_Player = (function(Events) {
 			 * *PP*
 			 */
 			Device.on('resumeApp', function() {
+				var scope = this;
+				
 				if (this.isMute) {
 					Device.AUDIOCONTROL.setMute(true);
 				}
-				if (this.currentState !== this.STATE_IDLE) {
-					this.PLAYER.restore();
+				
+				try {
+					if (this.currentState !== this.STATE_IDLE) {
+						if(this.drmType == 'widevine' || this.drmType == 'playready') {		// WIDEVINE || PLAYREADY DRM
+							var verifyUrl = (this.multitasking.verifyUrl.length)? this.multitasking.verifyUrl : this.multitasking.url;
+							this.onReqVerifyPlayback(verifyUrl).done(function() {
+								// CUSTOM SOLUTIONS InstantON - PP
+			                    if(this.multitasking.state == this.STATE_PLAYING) {
+			                    	/* ************************************
+			                    	 * PLAYING
+			                    	 * ********************************** */
+			                    	
+			                    	var setplayback = function(state) {			// Playback Speed
+			                    		if(state == Player.STATE_PLAYING) {
+			                    			Player.off('statechange', setplayback);
+				                    		setTimeout(function() {
+				                    			if(scope.multitasking.playbackSpeed !== 1) {
+				                    				scope.playbackspeed = scope.multitasking.playbackSpeed;
+				                    				scope.PLAYER.setSpeed(scope.multitasking.playbackSpeed); // -16, -8, -4, -2, -1, 1, 2, 4, 8, 16
+					                    		}
+				                    		}, 500);
+			                    		}
+			                    	};
+			                    	
+			                    	// RUN
+			                    	Player.on('statechange', setplayback);
+			                    	setTimeout(function() {
+			                    		scope.native('play', {
+					                    	position: scope.multitasking.playerTime*1000,
+					                    	url: scope.url
+					                    });
+			                    	}, 500);
+			                    } else if(APP.multitasking.state == SDK.player.STATE_PAUSED) {
+			                    	/* ************************************
+			                    	 * PAUSED
+			                    	 * ********************************** */
+			                    	
+			                    	scope.PLAYER.open(scope.url);
+			                    	
+			                    	if(scope.drmType == 'playready') {			// PLAYREADY
+			                    		if (scope.customData) {
+											var drmParam = {
+												CustomData: scope.customData
+											};
+											Player.setDrmType('playready');
+											scope.PLAYER.setDrm("PLAYREADY", "SetProperties", JSON.stringify(drmParam));
+										}
+			                    	} else if(scope.drmType == 'widevine') {	// WIDEVINE
+			                    		scope.PLAYER.setStreamingProperty ('WIDEVINE', scope.prepareWidevine(scope.config.DRMconfig || {}));
+										
+										if (scope.customData) {
+											var drmParam = {
+												CustomData: scope.customData
+											};
+											Player.setDrmType('widevine');
+											scope.PLAYER.setDrm('WIDEVINE_CLASSIC', 'SetProperties', JSON.stringify(drmParam));
+										}
+			                    	}
+			                    	
+			                    	scope.PLAYER.prepareAsync(function() {
+										Player.PLAYER.setDisplayRect(scope.left * scope.uhdMultiplier, scope.top * scope.uhdMultiplier, scope.width * scope.uhdMultiplier, scope.height * scope.uhdMultiplier);
+										if(scope.multitasking.playerTime) {
+											Player.PLAYER.seekTo(scope.multitasking.playerTime*1000, function() {scope.trigger('seekSuccess');}, function() {scope.trigger('seekError');});
+										}
+										scope.state(scope.STATE_PAUSED);
+									});
+			                    }
+							}, this).fail(function() {
+								Developer.reload();
+							}, this);
+						} else {									// NO_DRM
+							this.PLAYER.restore();
+						}
+					}
+				} catch(e) {
+					console.warn(e);
+					Developer.reload();
 				}
 			}, this);
 	
@@ -139,57 +241,61 @@ Device_Tizen_Player = (function(Events) {
 			var scope = this;
 
 			if (cmd === 'play') {
-				if (attrs && attrs.url) {
-					console.network('PLAYER', this.url);
-					this.PLAYER.open(this.url);
-					
-					if(attrs.url.match(/\/manifest/i)) {
-						//playready
-						if (this.customData) {
-							var drmParam = {
-								//LicenseServer: this.config.DRMconfig.DRM_URL,
-								//DeleteLicenseAfterUse: true,
-								CustomData: this.customData
-							};
-							this.PLAYER.setDrm("PLAYREADY", "SetProperties", JSON.stringify(drmParam));
-						}
+				try {
+					if (attrs && attrs.url) {
+						this.url = attrs.url;
+						this.PLAYER.open(this.url);
+						console.network('PLAYER', this.url);
 						
-					} else if(attrs.url.match(/\.wvm/)) {
-						//widevine
-						this.PLAYER.setStreamingProperty ('WIDEVINE', this.prepareWidevine(this.config.DRMconfig || {}));
-						
-						if (this.customData) {
-							var drmParam = {
-								//LicenseServer: this.config.DRMconfig.DRM_URL,
-								//DeleteLicenseAfterUse: true,
-								CustomData: this.customData
-							};
-							this.PLAYER.setDrm('WIDEVINE_CLASSIC', 'SetProperties', JSON.stringify(drmParam));
+						if(attrs.url.match(/\/manifest/i)) {
+							//playready
+							if (this.customData) {
+								var drmParam = {
+									//LicenseServer: this.config.DRMconfig.DRM_URL,
+									//DeleteLicenseAfterUse: true,
+									CustomData: this.customData
+								};
+								Player.setDrmType('playready');
+								this.PLAYER.setDrm("PLAYREADY", "SetProperties", JSON.stringify(drmParam));
+							}
+							
+						} else if(attrs.url.match(/\.wvm/)) {
+							//widevine
+							this.PLAYER.setStreamingProperty ('WIDEVINE', this.prepareWidevine(this.config.DRMconfig || {}));
+							
+							if (this.customData) {
+								var drmParam = {
+									//LicenseServer: this.config.DRMconfig.DRM_URL,
+									//DeleteLicenseAfterUse: true,
+									CustomData: this.customData
+								};
+								Player.setDrmType('widevine');
+								this.PLAYER.setDrm('WIDEVINE_CLASSIC', 'SetProperties', JSON.stringify(drmParam));
+							}
 						}
-					}
-
-					this.PLAYER.prepareAsync(function() {
-						Player.PLAYER.setDisplayRect(scope.left * scope.uhdMultiplier, scope.top * scope.uhdMultiplier, scope.width * scope.uhdMultiplier, scope.height * scope.uhdMultiplier);
-						if (attrs && attrs.position) {
-							Player.PLAYER.seekTo(attrs.position, function() {scope.trigger('seekSuccess');}, function() {scope.trigger('seekError');});
-						}
-
-						scope.state(this.STATE_BUFFERING);
-						scope.PLAYER.play();
-
-					});
-
-				} else {
-					try {
+	
+						this.PLAYER.prepareAsync(function() {
+							Player.PLAYER.setDisplayRect(scope.left * scope.uhdMultiplier, scope.top * scope.uhdMultiplier, scope.width * scope.uhdMultiplier, scope.height * scope.uhdMultiplier);
+							if (attrs && attrs.position) {
+								Player.PLAYER.seekTo(attrs.position, function() {scope.trigger('seekSuccess');}, function() {scope.trigger('seekError');});
+							}
+	
+							scope.state(this.STATE_BUFFERING);
+							scope.PLAYER.play();
+	
+						});
+					} else {
 						if (attrs && attrs.position) {
 							this.PLAYER.seekTo(attrs.position, function() {scope.trigger('seekSuccess');}, function() {scope.trigger('seekError');});
 						}
 						this.PLAYER.play();
-					} catch(e){
-						console.warn(e);
+						// STATE_PLAYING
+						this.state(this.STATE_PLAYING);
 					}
-					// STATE_PLAYING
-					this.state(this.STATE_PLAYING);
+				
+				} catch(e){
+					console.warn(e);
+					Developer.reload();
 				}
 				return true;
 	
@@ -213,6 +319,7 @@ Device_Tizen_Player = (function(Events) {
 				return true;
 			
 			} else if (cmd === 'playbackSpeed') {
+				this.playbackspeed = attrs.speed;
 				return this.PLAYER.setSpeed(attrs.speed); // -16, -8, -4, -2, -1, 1, 2, 4, 8, 16
 	
 			} else if (cmd === 'show') {
@@ -305,6 +412,21 @@ Device_Tizen_Player = (function(Events) {
 		onDurationChange: function(duration) {
 			this.duration = Math.round(duration);
 			this.trigger('durationchange', this.duration);
+		},
+		
+		/**
+		 * Event for requirement verification URL.
+		 * Inside, the request must be downloaded license and set custom_data
+		 * Return is resolved or rejected promise.
+		 * 
+		 * @param {String} verifyUrl
+		 * @return {Promise} promise
+		 */
+		onReqVerifyPlayback: function(verifyUrl) {
+			return this.when(function(promise) {
+				 this.setCustomData('');
+				promise.resolve();
+			}, this);
 		},
 		/**
 		 * @private

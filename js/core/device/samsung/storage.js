@@ -1,10 +1,12 @@
 /*
- ********************************************************
- * Copyright (c) 2013 Mautilus s.r.o. (Czech Republic)
- * All rights reserved.
+ *******************************************************************************
+ * Copyright (c) 2013 Mautilus, s.r.o. (Czech Republic)
+ * All rights reserved
+ *  
+ * Questions and comments should be directed https://github.com/mautilus/sdk/issues
  *
  * You may obtain a copy of the License at LICENSE.txt
- ********************************************************
+ *******************************************************************************
  */
 
 /**
@@ -21,6 +23,9 @@ Device_Samsung_Storage = (function(Events) {
     };
 
     $.extend(true, Device_Samsung_Storage, {
+		/**
+		* @inheritdoc Storage#init
+		*/
 	init: function(config) {
 	    this.configure(config);
 
@@ -33,6 +38,7 @@ Device_Samsung_Storage = (function(Events) {
 	    this.data = this.readData();
 	},
 	/**
+     * Get data from the Samsung File System
 	 * @private
 	 */
 	readData: function() {
@@ -56,6 +62,7 @@ Device_Samsung_Storage = (function(Events) {
 	    return data || {};
 	},
 	/**
+     * Store data to the Samsung File System
 	 * @private
 	 */
 	writeData: function(data){

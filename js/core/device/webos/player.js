@@ -1,41 +1,43 @@
-/**
- ********************************************************
- * (c) 2013 Mautilus s.r.o. (Czech Republic)
- * All rights reserved.
+/*
+ *******************************************************************************
+ * Copyright (c) 2013 Mautilus, s.r.o. (Czech Republic)
+ * All rights reserved
+ *  
+ * Questions and comments should be directed https://github.com/mautilus/sdk/issues
  *
  * You may obtain a copy of the License at LICENSE.txt
- ********************************************************
+ *******************************************************************************
  */
 
 /**
  * Samsung Player class
  * 
  * @author Mautilus s.r.o.
- * @class Device_WebOS_Player
+ * @class Device_Webos_Player
  * @extends Player
  */
 
-Device_WebOS_Player = (function(Events, Deferrable) {
-	var Device_WebOS_Player = {
+Device_Webos_Player = (function(Events, Deferrable) {
+	var Device_Webos_Player = {
 	};
 
-	$.extend(true, Device_WebOS_Player, Deferrable, {
+	$.extend(true, Device_Webos_Player, Deferrable, {
 		/**
 		 * @inheritdoc Player#initNative
 		 */
 		initNative: function(config) {
 			/**
-			 * @property {String} DRM Type
+			 * @property {String} drmType DRM Type
 			 */
 			this.drmType = '';
 			
 			/**
-			 * @property {String} APP ID
+			 * @property {String} appId application id
 			 */
 			this.appId = '';
 			
 			/**
-			 * @property {String} DRM Client ID
+			 * @property {String} clientId DRM Client ID
 			 */
 			this.clientId = '';
 			
@@ -258,13 +260,13 @@ Device_WebOS_Player = (function(Events, Deferrable) {
 						"appId": scope.appId
 					},
 					onSuccess: function (result) {
-						console.log("[Device_WebOS_Player] loadDrmClient successful. clientId: " + result.clientId);
+						console.log("[Device_Webos_Player] loadDrmClient successful. clientId: " + result.clientId);
 						scope.clientId = result.clientId;
 						scope.isDrmClientLoaded = true;
 						promise.resolve(result);
 					},
 					onFailure: function (result) {
-						console.error("[Device_WebOS_Player] loadDrmClient failed. [" + result.errorCode + "] " + result.errorText);
+						console.error("[Device_Webos_Player] loadDrmClient failed. [" + result.errorCode + "] " + result.errorText);
 						promise.reject('Player.loadDrmClient onFailure: ' + '[' + result.errorCode + '] ' + result.errorText);	// Do something for error handling
 					}
 				});
@@ -275,7 +277,7 @@ Device_WebOS_Player = (function(Events, Deferrable) {
 		 * Unload DRM client
 		 * 
 		 * @private
-		 * @retrun {Promise}	promise.done({Object} result)
+		 * @return {Promise}	promise.done({Object} result)
 		 * 						promise.fail({String} description)
 		 */
 		unloadDrmClient: function() {
@@ -290,7 +292,7 @@ Device_WebOS_Player = (function(Events, Deferrable) {
 							promise.resolve(result);
 						},
 						onFailure: function (result) {
-							console.error("[Device_WebOS_Player] unloadDrmClient failed. [" + result.errorCode + "] " + result.errorText);
+							console.error("[Device_Webos_Player] unloadDrmClient failed. [" + result.errorCode + "] " + result.errorText);
 							// Do something for error handling
 							promise.reject('Player.unloadDrmClient onFailure: ' + '[' + result.errorCode + '] ' + result.errorText);
 						}
@@ -458,7 +460,7 @@ Device_WebOS_Player = (function(Events, Deferrable) {
 			
 			if(!options) {
 				options = {};
-				options.mediaTransportType = "URI";
+				options.mediaTransportType = String(url).match(/\.m3u8/) ? "HLS" : "URI";
 				options.option = {};
 			}
 			
@@ -493,6 +495,6 @@ Device_WebOS_Player = (function(Events, Deferrable) {
 		
 	});
 
-	return Device_WebOS_Player;
+	return Device_Webos_Player;
 
 })(Events, Deferrable);

@@ -1,14 +1,16 @@
 /*
- ********************************************************
- * Copyright (c) 2013 Mautilus s.r.o. (Czech Republic)
- * All rights reserved.
+ *******************************************************************************
+ * Copyright (c) 2013 Mautilus, s.r.o. (Czech Republic)
+ * All rights reserved
+ *  
+ * Questions and comments should be directed https://github.com/mautilus/sdk/issues
  *
  * You may obtain a copy of the License at LICENSE.txt
- ********************************************************
+ *******************************************************************************
  */
 
 /**
- * Scene abstract class
+ * Scene abstract class for each scene. It is recommended to use this abstract class.
  * 
  * @author Mautilus s.r.o.
  * @class Scene
@@ -17,23 +19,19 @@
  * @mixins Deferrable
  */
 
-Scene = (function(Events, Deferrable) {
-
-	/**
-	 * @property {Object} $el Scene's element, jQuery collection
-	 */
-	var Scene = function() {
-		this.config = {
+Scene = (function (Events, Deferrable) {
+    var Scene = function () {
+        this.config = {
 			/**
 			 * @cfg {Boolean} focusOnRender Whether call a focus method after scene is rendered
 			 */
-			focusOnRender: true
-		};
+            focusOnRender: true
+        };
 
-		this.construct.apply(this, arguments);
-		};
+        this.construct.apply(this, arguments);
+    };
 
-		$.extend(true, Scene.prototype, Events, Deferrable, {
+    $.extend(true, Scene.prototype, Events, Deferrable, {
 		/**
 		 * @event show
 		 * Will be called when scene is shown
@@ -81,9 +79,24 @@ Scene = (function(Events, Deferrable) {
 		 */
 
 		/**
-		 * @new
 		 * @property {Boolean} isActive TRUE, if this scene has been activated and is visible, this property is set when an 'activate' method if successfuly executed
 		 */
+
+        /**
+         * @property {Object} $el Scene's element, jQuery collection
+         */
+
+        /**
+         * @property {String} name Scene's name
+         */
+
+        /**
+         * @property {String} [id] Scene's identificator related to HTML element
+         */
+
+        /**
+         * @property {String} [cls] Scene's class related to HTML element
+         */
 
 		/**
 		 * Construct object
@@ -92,86 +105,90 @@ Scene = (function(Events, Deferrable) {
 		 * @param {String} name Unique name
 		 * @param {Object} [config={}] Config
 		 */
-		construct: function(name, config) {
-			if (!config && typeof name === 'object') {
-			config = $.extend(true, {}, name);
-			name = null;
-			}
+        construct: function (name, config) {
+            if (!config && typeof name === 'object') {
+                config = $.extend(true, {}, name);
+                name = null;
+            }
 
-			this.name = name;
-			this.resetProperties(config);
+            this.name = name;
+            this.resetProperties(config);
+            this.$el = this.create();
 
-			this.$el = this.create();
+            if (this.id) {
+                this.$el.attr('id', this.id);
+            }
 
-			if (this.id) {
-			this.$el.attr('id', this.id);
-			}
+            if (this.cls) {
+                this.$el.addClass(this.cls);
+            }
 
-			if (this.cls) {
-			this.$el.addClass(this.cls);
-			}
-
-			this.init.apply(this, arguments);
-			this.initEvents();
-			this.onLangChange(true, I18n.locale);
-		},
+            this.init.apply(this, arguments);
+            this.initEvents();
+            this.onLangChange(true, I18n.locale);
+        },
 		/**
-		 * Destruct object
+		 * Destruct object. It means calling deinitialization and destroying functions
 		 * 
 		 * @private
 		 */
-		desctruct: function() {
-			this.deinit.apply(this, arguments);
-			this.destroy();
-		},
+        desctruct: function () {
+            this.deinit.apply(this, arguments);
+            this.destroy();
+        },
 		/**
+         * Set properties to default values.
 		 * @private
+         * @param {Object} [config={}] Config
 		 */
-		resetProperties: function(config) {
-			this.config = $.extend(true, this.config, config || {});
-			this.id = this.config.id || null;
-			this.cls = this.config.cls || null;
-			this.isVisible = false;
-			this.isActive = false;
-		},
+        resetProperties: function (config) {
+            this.config = $.extend(true, this.config, config || {});
+            this.id = this.config.id || null;
+            this.cls = this.config.cls || null;
+            this.isVisible = false;
+            this.isActive = false;
+        },
 		/**
 		 * Bind listeners to the `key` event and some others
+         * Mouse (MRCU or some other "mouse" remote controllers) events (click or scroll) is binding here.  
 		 * 
 		 * @private
 		 */
-		initEvents: function() {
-			Control.on('key', this.onKeyDown, this);
+        initEvents: function () {
+            Control.on('key', this.onKeyDown, this);
 
-			if (typeof Mouse !== 'undefined') {
-				Mouse.on('click', function($el) {
-					if (!this.isVisible || !$el.belongsTo(this.$el)) {
-					return;
-				}
+            if (typeof Mouse !== 'undefined') {
+                Mouse.on('click', function ($el) {
+                    if (!this.isVisible || !$el.belongsTo(this.$el)) {
+                        return;
+                    }
 
-				return this.onClick.apply(this, arguments);
-			}, this);
+                    return this.onClick.apply(this, arguments);
+                }, this);
 
-			Mouse.on('scroll', function($el) {
-				if (!this.isVisible || !$el.belongsTo(this.$el)) {
-					return;
-					}
+                Mouse.on('scroll', function ($el) {
+                    if (!this.isVisible || !$el.belongsTo(this.$el)) {
+                        return;
+                    }
 
-					return this.onScroll.apply(this, arguments);
-				}, this);
-			}
+                    return this.onScroll.apply(this, arguments);
+                }, this);
+            }
 
-			Focus.on('focus', function($el) {
-				if (!this.isVisible || !$el.belongsTo(this.$el)) {
-					return;
-				}
+            // register of focus event
+            Focus.on('focus', function ($el) {
+                if (!this.isVisible || !$el.belongsTo(this.$el)) {
+                    return;
+                }
 
-				return this.onFocus.apply(this, arguments);
-			}, this);
+                return this.onFocus.apply(this, arguments);
+            }, this);
 
-			I18n.on('langchange', function() {
-				this.onLangChange.apply(this, arguments);
-			}, this);
-		},
+            // register of langchange event
+            I18n.on('langchange', function () {
+                this.onLangChange.apply(this, arguments);
+            }, this);
+        },
 		/**
 		 * This method is called every time, when the language of application is changed.
 		 * For change language, you gotta call function I18n.changeLanguage()
@@ -180,274 +197,295 @@ Scene = (function(Events, Deferrable) {
 		 * @param {Boolean} firstTime
 		 * @param {String} langCode
 		 */
-		onLangChange: function(firstTime, langCode) {
+        onLangChange: function (firstTime, langCode) {
 
-		},
+        },
 		/**
 		 * Initialise scene
+         * You can overwrite me in own scene class
 		 * 
 		 * @template
 		 */
-		init: function() {
+        init: function () {
 
-		},
+        },
 		/**
 		 * De-initialise scene
+         * You can overwrite me in own scene class
 		 * 
 		 * @template
 		 */
-		deinit: function() {
+        deinit: function () {
 
-		},
+        },
 		/**
 		 * Set focus to the scene
+         * You can overwrite me in own scene class
 		 * 
 		 * @template
 		 */
-		focus: function() {
+        focus: function () {
 
-		},
+        },
 		/**
 		 * Render scene
+         * It is recommended to render all visual components here.
+         * You can overwrite me in own scene class
 		 * 
 		 * @template
 		 */
-		render: function() {
+        render: function () {
 
-		},
+        },
 		/**
 		 * Remove scene's elements when scene is hiding
+         * You can overwrite me in own scene class
 		 * 
 		 * @template
 		 */
-		remove: function() {
+        remove: function () {
 
-		},
+        },
 		/**
 		 * Create scene's element, is called when scene is being constructed
+         * You can overwrite me in own scene class
 		 * 
 		 * @template
 		 * @returns {Object} Element, jQuery collection
 		 */
-		create: function() {
+        create: function () {
 
-		},
+        },
 		/**
 		 * Remove or hide scene's element, is called when scene is being destructed
+         * You can overwrite me in own scene class
 		 * 
 		 * @template
 		 * @return {Boolean/Promise} Return FALSE when you don't want to hide this scene, Promise may be also returned
 		 */
-		destroy: function() {
+        destroy: function () {
 
-		},
+        },
 		/**
 		 * Activate and focus scene when its shown
+         * You can overwrite me in own scene class
 		 * 
 		 * @template
 		 * @return {Boolean/Promise} Return FALSE when you don't want to show this scene, Promise may be also returned
 		 */
-		activate: function() {
+        activate: function () {
 
-		},
+        },
 		/**
 		 * Deactivate scene when its hidden
+         * You can overwrite me in own scene class
 		 * 
 		 * @template
 		 * @return {Boolean} Return FALSE when you don't want to destroy this scene when its hidden 
 		 */
-		deactivate: function() {
+        deactivate: function () {
 
-		},
+        },
 		/**
 		 * This method is called when and 'activate' method fails
+         * You can overwrite me in own scene class
 		 * 
 		 * @template
-		 * @new
 		 * @return {Boolean} If TRUE is returned, router will call goBack (default action)
 		 */
-		revert: function() {
-			return true;
-		},
+        revert: function () {
+            return true;
+        },
 		/**
 		 * Refresh is called by a Router when scene is already visible, you can call anytime you need
+         * You can overwrite me in own scene class
 		 * 
 		 * @template
 		 */
-		refresh: function() {
+        refresh: function () {
 
-		},
+        },
 		/**
 		 * Display scene's element and set `this.isVisible` to TRUE
 		 */
-		show: function() {
-			var args = arguments;
+        show: function () {
+            var args = arguments;
 
-			return this.when(function(promise) {
-			var activated;
+            return this.when(function (promise) {
+                var activated;
 
-			this.$el.show();
-			this.isVisible = true;
-			this.isActive = false;
-			this.trigger('show');
+                this.$el.show();
+                this.isVisible = true;
+                this.isActive = false;
+                this.trigger('show');
 
-			promise.fail(function() {
-				this.hide();
-			}, this);
+                promise.fail(function () {
+                    this.hide();
+                }, this);
 
-			activated = this.activate.apply(this, args);
+                activated = this.activate.apply(this, args);
 
-			if (activated instanceof Promise) {
-				activated.then(function(status) {
-		    var p_args = Array.prototype.slice.call(arguments, 1);	// PP!
-					this.isActive = status;
+                if (activated instanceof Promise) {
+                    activated.then(function (status) {
+                        var p_args = Array.prototype.slice.call(arguments, 1);
+                        this.isActive = status;
 
-					if (status) {
-			    promise.resolve.apply(promise, p_args);				// PP!
-					} else {
-						promise.reject();
-					}
-				}, this);
+                        if (status) {
+                            promise.resolve.apply(promise, p_args);
+                        } else {
+                            promise.reject();
+                        }
+                    }, this);
 
-			} else if (activated !== false) {
-				this.isActive = true;
-				promise.resolve();
+                } else if (activated !== false) {
+                    this.isActive = true;
+                    promise.resolve();
 
-			} else {
-				this.isActive = false;
-				promise.reject();
-			}
+                } else {
+                    this.isActive = false;
+                    promise.reject();
+                }
 
-			}, this);
-		},
+            }, this);
+        },
 		/**
 		 * Hide scene's element and set `this.isVisible` to FALSE
 		 */
-		hide: function() {
-			return this.when(function(promise) {
-			var deactivated;
+        hide: function () {
+            return this.when(function (promise) {
+                var deactivated;
 
-			promise.done(function() {
-				this.$el.hide();
-				this.isVisible = false;
-				this.trigger('hide');
-			}, this);
+                promise.done(function () {
+                    this.$el.hide();
+                    this.isVisible = false;
+                    this.trigger('hide');
+                }, this);
 
-			deactivated = this.deactivate();
+                deactivated = this.deactivate();
 
-			if (deactivated instanceof Promise) {
-				deactivated.then(function(status) {
-					if (status) {
-						this.isActive = false;
-						promise.resolve();
+                if (deactivated instanceof Promise) {
+                    deactivated.then(function (status) {
+                        if (status) {
+                            this.isActive = false;
+                            promise.resolve();
 
-					} else {
-						promise.reject();
-					}
-				}, this);
+                        } else {
+                            promise.reject();
+                        }
+                    }, this);
 
-			} else if (deactivated !== false) {
-				this.isActive = false;
-				promise.resolve();
+                } else if (deactivated !== false) {
+                    this.isActive = false;
+                    promise.resolve();
 
-			} else {
-				promise.reject();
-			}
+                } else {
+                    promise.reject();
+                }
 
-			}, this);
-		},
+            }, this);
+        },
 		/**
 		 * Test if this scene has focus (or any snippet inside this scene)
 		 * 
-		 * @returns {Boolean}
+		 * @returns {Boolean} Either TRUE if scene has focus or FALSE if scene has no focus 
 		 */
-		hasFocus: function() {
-			return Focus.isIn(this.$el);
-		},
+        hasFocus: function () {
+            return Focus.isIn(this.$el);
+        },
 		/**
 		 * Handles keyDown events
+         * Handling is executed only when scene has focus
+         * According keyCodes here are fired right events (for navigate keys or enter event etc.) 
 		 * 
+         * @fires beforekey
+         * @fires key
 		 * @private
 		 */
-		onKeyDown: function(keyCode, ev, stop) {
-			if (!this.isVisible) {
-				return;
-			}
+        onKeyDown: function (keyCode, ev, stop) {
+            if (!this.isVisible) {
+                return;
+            }
 
-			if (this.trigger('beforekey', keyCode, ev) === false) {
-				return false;
-			}
+            if (this.trigger('beforekey', keyCode, ev) === false) {
+                return false;
+            }
 
-			if (this.trigger('key', keyCode, ev) === false) {
-				return false;
+            if (this.trigger('key', keyCode, ev) === false) {
+                return false;
 
-			} else if (keyCode === Control.key.LEFT) {
-				return this.navigate('left', stop);
+            } else if (keyCode === Control.key.LEFT) {
+                return this.navigate('left', stop);
 
-			} else if (keyCode === Control.key.RIGHT) {
-				return this.navigate('right', stop);
+            } else if (keyCode === Control.key.RIGHT) {
+                return this.navigate('right', stop);
 
-			} else if (keyCode === Control.key.UP) {
-				return this.navigate('up', stop);
+            } else if (keyCode === Control.key.UP) {
+                return this.navigate('up', stop);
 
-			} else if (keyCode === Control.key.DOWN) {
-				return this.navigate('down', stop);
+            } else if (keyCode === Control.key.DOWN) {
+                return this.navigate('down', stop);
 
-			} else if (keyCode === Control.key.ENTER) {
-				return this.onEnter(Focus.focused, ev, stop);
+            } else if (keyCode === Control.key.ENTER) {
+                return this.onEnter(Focus.focused, ev, stop);
 
-			} else if (keyCode === Control.key.RETURN) {
-				return this.onReturn(Focus.focused, ev, stop);
-			}
-		},
+            } else if (keyCode === Control.key.RETURN) {
+                return this.onReturn(Focus.focused, ev, stop);
+            }
+        },
 		/**
 		 * Handles ENTER event
+         * You can overwrite me in own scene class
 		 * 
 		 * @template
 		 * @param {Object} $el Target element, jQuery collection
 		 * @param {Event} event
 		 */
-		onEnter: function($el, event) {
+        onEnter: function ($el, event) {
 
-		},
+        },
 		/**
 		 * Handles RETURN event
+         * You can overwrite me in own scene class
 		 * 
 		 * @template
 		 * @param {Object} $el Target element, jQuery collection
 		 * @param {Event} event
 		 */
-		onReturn: function($el, event) {
+        onReturn: function ($el, event) {
 
-		},
+        },
 		/**
 		 * Handles Click event when this scene is visible
 		 * 
 		 * @param {Object} $el Target element, jQuery collection
 		 * @param {Event} event Mouse event
+         * @fires click
 		 */
-		onClick: function($el, event) {
-			this.trigger('click', $el, event);
-		},
+        onClick: function ($el, event) {
+            this.trigger('click', $el, event);
+        },
 		/**
 		 * Handles Scroll event when this scene is visible
 		 * 
 		 * @param {Object} $el Target element, jQuery collection
 		 * @param {Number} delta, 1 or -1
 		 * @param {Event} event Mouse event
+         * @fires scroll
 		 */
-		onScroll: function($el, delta, event) {
-			this.trigger('scroll', $el, delta, event);
-		},
+        onScroll: function ($el, delta, event) {
+            this.trigger('scroll', $el, delta, event);
+        },
 		/**
 		 * Handles Focus event
+         * You can overwrite me in own scene class
 		 * 
 		 * @template
 		 * @param {Object} $el Target element, jQuery collection
+         * @fires focus
 		 */
-		onFocus: function($el) {
-			this.trigger('focus', $el);
-		},
+        onFocus: function ($el) {
+            this.trigger('focus', $el);
+        },
 		/**
 		 * Navigate in 4-way direction
 		 * 
@@ -455,9 +493,9 @@ Scene = (function(Events, Deferrable) {
 		 * @param {String} direction Possible values: 'left', 'right', 'up', 'down'
 		 * @return {Boolean} Return FALSE to prevent event from bubeling
 		 */
-		navigate: function(direction) {
+        navigate: function (direction) {
 
-		},
+        },
 		/**
 		 * Get all focusable elements inside this snippet. This takes currentyl focused
 		 * element and calculates new one. If the new sibling is not exits, new focus
@@ -470,19 +508,19 @@ Scene = (function(Events, Deferrable) {
 		 * @param {Object} parent jquery object. All focusable elements belongs only to this parent.
 		 * @returns {Object} jQuery collection
 		 */
-		getCircleFocusable: function(direction, parent) {
-			var els = $('.focusable', parent || this.$el).not('.disabled').filter(':visible'),
-				focusedIndex = Focus.focused ? els.index(Focus.focused) : -1;
-			if (focusedIndex != -1) {
-			focusedIndex += direction;
-			if (focusedIndex == -1)
-				return els.eq(els.length - 1);
-			else if (focusedIndex > els.length - 1)
-				return els.eq(0);
-			else
-				return els.eq(focusedIndex);
-			}
-		},
+        getCircleFocusable: function (direction, parent) {
+            var els = $('.focusable', parent || this.$el).not('.disabled').filter(':visible'),
+                focusedIndex = Focus.focused ? els.index(Focus.focused) : -1;
+            if (focusedIndex != -1) {
+                focusedIndex += direction;
+                if (focusedIndex == -1)
+                    return els.eq(els.length - 1);
+                else if (focusedIndex > els.length - 1)
+                    return els.eq(0);
+                else
+                    return els.eq(focusedIndex);
+            }
+        },
 		/**
 		 * Get all focusable elements inside this scene
 		 * 
@@ -491,64 +529,64 @@ Scene = (function(Events, Deferrable) {
 		 * @param {Object} [$el=this.$el] Limit search for just this specified element, jQuery collection
 		 * @returns {Object} jQuery collection
 		 */
-		getFocusable: function(index, fromCurrentlyFocused, $el) {
-			var els = $('.focusable', $el || this.$el).filter(':visible').not('.disabled'), focusedIndex, _index = index;
+        getFocusable: function (index, fromCurrentlyFocused, $el) {
+            var els = $('.focusable', $el || this.$el).filter(':visible').not('.disabled'), focusedIndex, _index = index;
 
-			if (fromCurrentlyFocused) {
-				focusedIndex = Focus.focused ? els.index(Focus.focused) : -1;
+            if (fromCurrentlyFocused) {
+                focusedIndex = Focus.focused ? els.index(Focus.focused) : -1;
 
-				if (typeof index !== 'undefined' && _index < 0) {
-					els = els.slice(0, (focusedIndex >= 0 ? focusedIndex : 1));
-					//_index += els.length;
+                if (typeof index !== 'undefined' && _index < 0) {
+                    els = els.slice(0, (focusedIndex >= 0 ? focusedIndex : 1));
+                    //_index += els.length;
 
-				} else {
-					els = els.slice(focusedIndex >= 0 ? focusedIndex : 0);
-				}
-			}
+                } else {
+                    els = els.slice(focusedIndex >= 0 ? focusedIndex : 0);
+                }
+            }
 
-			if (typeof _index !== 'undefined') {
-				return els.eq(_index >> 0);
-			}
+            if (typeof _index !== 'undefined') {
+                return els.eq(_index >> 0);
+            }
 
-			return els;
-		},
+            return els;
+        },
 		/*
 		 * This method is called, when you use Router.goBack on active scene, the 
 		 * last scene fires this method with the name of the current scene.
 		 * 
 		 * @param {String} sceneName
 		 */
-		onBeforeGoBack: function(fromScene) {
-		},
+        onBeforeGoBack: function (fromScene) {
+        },
 		/**
 		 * Replace in-text translations date-tr="..."
 		 */
-		replaceI18n: function() {
-			if (!this.$el) {
-				return false;
-			}
+        replaceI18n: function () {
+            if (!this.$el) {
+                return false;
+            }
 
-			this.$el.find('*[data-tr]').each(function() {
-				var str;
+            this.$el.find('*[data-tr]').each(function () {
+                var str;
 
-				if (this._translated) {
-					return;
-				}
+                if (this._translated) {
+                    return;
+                }
 
-				for (var i in this.attributes) {
-					if (this.attributes[i].name === 'data-tr') {
-						str = this.attributes[i].value;
-					}
-				}
+                for (var i in this.attributes) {
+                    if (this.attributes[i].name === 'data-tr') {
+                        str = this.attributes[i].value;
+                    }
+                }
 
-				if (str) {
-					this.innerHTML = __(str);
-					this._translated = true;
-				}
-			});
-		}
-	});
+                if (str) {
+                    this.innerHTML = __(str);
+                    this._translated = true;
+                }
+            });
+        }
+    });
 
-	return Scene;
+    return Scene;
 
 })(Events, Deferrable);

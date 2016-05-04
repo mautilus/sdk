@@ -1,10 +1,12 @@
 /*
- ********************************************************
- * Copyright (c) 2013 Mautilus s.r.o. (Czech Republic)
- * All rights reserved.
+ *******************************************************************************
+ * Copyright (c) 2013 Mautilus, s.r.o. (Czech Republic)
+ * All rights reserved
+ *  
+ * Questions and comments should be directed https://github.com/mautilus/sdk/issues
  *
  * You may obtain a copy of the License at LICENSE.txt
- ********************************************************
+ *******************************************************************************
  */
 
 /**
@@ -59,6 +61,8 @@ Device_Philips_Player = (function(Events) {
 		this.$el.remove();
 	},
 	/**
+     * Function for creating player object 
+     * 
 	 * @private
 	 */
 	createPlayer: function(type){
@@ -83,6 +87,8 @@ Device_Philips_Player = (function(Events) {
 		this.type = type || null;
 	},
 	/**
+     * Internal player timer
+     * 
 	 * @private
 	 */
 	tick: function() {
@@ -201,12 +207,16 @@ Device_Philips_Player = (function(Events) {
 		}
 	},
 	/**
+     * Get unique ESN code. It is used for DRM verification.
+     * 
 	 * @private
 	 */
 	getESN: function() {
-		return Device.getUID()+'|60';
+		return Device.getUID();
 	},
 	/**
+     * Handling changes in player state
+     * 
 	 * @private
 	 */
 	onNativePlayStateChange: function(){
@@ -249,6 +259,8 @@ Device_Philips_Player = (function(Events) {
 		}
 	},
 	/**
+     * Error related to DRM error
+     * 
 	 * @private
 	 */
 	onNativeDrmMessageResult: function(msgId, resultMsg, resultCode){
@@ -257,6 +269,8 @@ Device_Philips_Player = (function(Events) {
 		}
 	},
 	/**
+     * Player error handler
+     * 
 	 * @private
 	 */	
 	onNativeError: function(){

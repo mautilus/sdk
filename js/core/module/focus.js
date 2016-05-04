@@ -1,10 +1,12 @@
 /*
- ********************************************************
- * Copyright (c) 2013 Mautilus s.r.o. (Czech Republic)
- * All rights reserved.
+ *******************************************************************************
+ * Copyright (c) 2013 Mautilus, s.r.o. (Czech Republic)
+ * All rights reserved
+ *  
+ * Questions and comments should be directed https://github.com/mautilus/sdk/issues
  *
  * You may obtain a copy of the License at LICENSE.txt
- ********************************************************
+ *******************************************************************************
  */
 
 /**
@@ -55,6 +57,10 @@ Focus = (function(Events) {
 		 * @param {Object} element Element, jQuery colleciton
 		 */
 
+		/**
+		 * Init Focus object
+		 * @param {Object} [config={}] Focus configuration
+		 */
 		init: function(config) {
 			this.configure(config);
 
@@ -84,6 +90,9 @@ Focus = (function(Events) {
 		 * Move focus on given element
 		 * 
 		 * @param {HTMLElement} target DOM Element or jQuery collection
+         * @fires beforefocus
+         * @fires focusin
+         * @fires focus
 		 */
 		to: function(target) {
 			target = $(target).eq(0);
@@ -126,6 +135,7 @@ Focus = (function(Events) {
 		 * 
 		 * @chainable
 		 * @param {HTMLElement} el DOM Elemenet or jQuery collection
+         * @fires blur
 		 */
 		blur: function(el) {
 			if(! el){

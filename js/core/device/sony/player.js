@@ -1,18 +1,19 @@
 /*
- ********************************************************
- * Copyright (c) 2013 Mautilus s.r.o. (Czech Republic)
- * All rights reserved.
+ *******************************************************************************
+ * Copyright (c) 2013 Mautilus, s.r.o. (Czech Republic)
+ * All rights reserved
+ *  
+ * Questions and comments should be directed https://github.com/mautilus/sdk/issues
  *
  * You may obtain a copy of the License at LICENSE.txt
- ********************************************************
+ *******************************************************************************
  */
 
 /**
- * Media Player for Pilips platform. HTML5 player is used - works with fusion3 models
+ * Media Player for Sony platform. HTML5 player is used.
  * 
  * @author Mautilus s.r.o.
  * @class Device_Sony_Player
- * @singleton
  * @mixins Events
  * @extends Player
  */
@@ -143,7 +144,9 @@ Device_Sony_Player = (function(Events) {
 		 * Seek ended
 		 */
 
-
+		/**
+		 * @inheritdoc Player#init
+		 */
 		init: function(config) {
 			this.deinit();
 
@@ -261,7 +264,7 @@ Device_Sony_Player = (function(Events) {
 			});
 /*
 			this.el.addEventListener('loadedmetadata', function() {
-				alert("loadedmetadata");
+				console.log("loadedmetadata");
 
 			});
 */	

@@ -1,14 +1,17 @@
 /*
- ********************************************************
- * Copyright (c) 2013 Mautilus s.r.o. (Czech Republic)
- * All rights reserved.
+ *******************************************************************************
+ * Copyright (c) 2013 Mautilus, s.r.o. (Czech Republic)
+ * All rights reserved
+ *  
+ * Questions and comments should be directed https://github.com/mautilus/sdk/issues
  *
  * You may obtain a copy of the License at LICENSE.txt
- ********************************************************
+ *******************************************************************************
  */
 
 /**
  * Developer tools, press 0 (by default) key four times to display developer tools
+ * You can see console logs in special layer in the app.
  * 
  * @author Mautilus s.r.o.
  * @class Developer
@@ -58,6 +61,10 @@ Developer = (function() {
 	};
 
 	$.extend(true, Developer, {
+		/**
+		 * Init Developer object
+		 * @param {Object} [config={}] Developer configuration
+		 */
 		init: function(config) {
 			var onerror, scope = this;
 
@@ -229,6 +236,7 @@ Developer = (function() {
 			}
 		},
 		/**
+         * Loading console
 		 * @private
 		 * @param {String} addr URL of the remote console script
 		 */
@@ -280,12 +288,14 @@ Developer = (function() {
 			}
 		},
 		/**
-		 * Reload application
+		 * Reload application. Reaction for key 5
 		 */
 		reload: function() {
 			window.location.reload();
 		},
 		/**
+         * Handle keydown for Developer class.
+         * @param {Number} keyCode Key code identification
 		 * @private
 		 */
 		onKeyDown: function(keyCode) {
@@ -435,7 +445,7 @@ Developer = (function() {
 			}
 		},
 		/**
-		 * Execute unit tests
+		 * Execute unit tests. Reaction for key 6
 		 * 
 		 * @private
 		 */
@@ -454,7 +464,7 @@ Developer = (function() {
 			this.jasmineEnv.execute();
 		},
 		/**
-		 * Show/Hide device info
+		 * Show/Hide device info. Reaction for key 1
 		 * 
 		 * @private
 		 */
@@ -466,7 +476,7 @@ Developer = (function() {
 			}
 		},
 		/**
-		 * Show/Hide on-screen console
+		 * Show/Hide on-screen console. Reaction for key 2
 		 * 
 		 * @private
 		 */
@@ -478,7 +488,7 @@ Developer = (function() {
 			this.renderConsole();
 		},
 		/**
-		 * Show/Hide on-screen network console
+		 * Show/Hide on-screen network console. Reaction for key 3
 		 * 
 		 * @private
 		 */
@@ -490,7 +500,7 @@ Developer = (function() {
 			this.renderNetworkConsole();
 		},
 		/**
-		 * Show/Hide remote console IP setting
+		 * Show/Hide remote console IP setting. Reaction for key 4
 		 * 
 		 * @private
 		 */
@@ -526,6 +536,9 @@ Developer = (function() {
 			}
 		},
 		/**
+         * Rendering logs to the console
+         * 
+         * @param {String} type Type of rendering (differences are in e.g. color)
 		 * @private
 		 */
 		toConsole: function(type, args) {
@@ -568,6 +581,8 @@ Developer = (function() {
 			this.renderConsole();
 		},
 		/**
+         * Rendering logs to the network console
+         * 
 		 * @private
 		 */
 		toNetworkConsole: function(args) {
@@ -633,6 +648,7 @@ Developer = (function() {
 			return uid;
 		},
 		/**
+         * Render whole developer console
 		 * @private
 		 */
 		renderConsole: function() {
@@ -643,6 +659,7 @@ Developer = (function() {
 			this.updateNotifications();
 		},
 		/**
+         * Render network console
 		 * @private
 		 */
 		renderNetworkConsole: function() {
@@ -653,6 +670,8 @@ Developer = (function() {
 			this.updateNotifications();
 		},
 		/**
+         * Notification updates
+         * 
 		 * @private
 		 */
 		updateNotifications: function() {
@@ -689,6 +708,8 @@ Developer = (function() {
 			}
 		},
 		/**
+         * CSS styles for developer console
+         * 
 		 * @private
 		 */
 		appendUIStyles: function() {

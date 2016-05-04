@@ -1,14 +1,16 @@
 /*
- ********************************************************
- * Copyright (c) 2013 Mautilus s.r.o. (Czech Republic)
- * All rights reserved.
+ *******************************************************************************
+ * Copyright (c) 2013 Mautilus, s.r.o. (Czech Republic)
+ * All rights reserved
+ *  
+ * Questions and comments should be directed https://github.com/mautilus/sdk/issues
  *
  * You may obtain a copy of the License at LICENSE.txt
- ********************************************************
+ *******************************************************************************
  */
 
 /**
- * i18n module
+ * i18n module for available languages
  * 
  * @author Mautilus s.r.o.
  * @class I18n
@@ -55,6 +57,10 @@ I18n = (function(Events) {
 	};
 
 	$.extend(true, I18n, Events, {
+		/**
+		 * Initialise translation module
+		 * 
+		 */
 		init: function(config) {
 			this.configure(config);
 
@@ -103,6 +109,12 @@ I18n = (function(Events) {
 			return l;
 
 		},
+		/**
+		 * Translate HTML elements. It means this function select all tag with the attribute data-i18n and call translate
+		 * 
+		 * @param {Object} target jQuery collection what should be translated
+		 * @returns {String}
+		 */
 		translateHTML: function(target) {
 			var scope = this;
 			$('[data-i18n]', target).each(function() {
@@ -115,6 +127,12 @@ I18n = (function(Events) {
 				}
 			});
 		},
+		/**
+		 * Get language code ()
+		 * 
+		 * @param {String} langCode in format ISO 639-2
+		 * @returns {String} language code in format ISO 639-1
+		 */
 		getLanguage: function(langCode) {
 			for (var i in this.languages) {
 				if (this.languages[i][0] === langCode) {
@@ -141,7 +159,8 @@ I18n = (function(Events) {
 		/*
 		 * This functions tests, if the value contains Arabic signs
 		 * 
-		 * @returns {Boolean}
+         * @param {String} value string which be tested on arabic signs
+		 * @returns {Boolean} returns true if string is arabic or false if not 
 		 */
 		isArabic: function(value) {
 			patt = /[\u0600-\u06FF\u0750-\u077F]/;

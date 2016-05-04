@@ -1,14 +1,16 @@
 /*
- ********************************************************
- * Copyright (c) 2013 Mautilus s.r.o. (Czech Republic)
- * All rights reserved.
+ *******************************************************************************
+ * Copyright (c) 2013 Mautilus, s.r.o. (Czech Republic)
+ * All rights reserved
+ *  
+ * Questions and comments should be directed https://github.com/mautilus/sdk/issues
  *
  * You may obtain a copy of the License at LICENSE.txt
- ********************************************************
+ *******************************************************************************
  */
 
 /**
- * Deferrable abstract class
+ * Deferrable abstract class with methods to register multiple callbacks into queues and call these callbacks and relay the success or failure state of each called function
  * 
  * @author Mautilus s.r.o.
  * @class Deferrable
@@ -18,11 +20,12 @@
 Deferrable = (function() {
 	return {
 		/**
+         * @private
 		 * @property {Object} promises Deferrable promises
 		 */
 		promises: null,
 		/**
-		 * Push new Promise into the stack and return Promise
+		 * Push new Promise into the stack and return Promise in parameter
 		 * 
 		 * @private
 		 * @param {Promise} Promise
@@ -40,7 +43,6 @@ Deferrable = (function() {
 		/**
 		 * Reject all Promises in the stack
 		 * 
-		 * @returns {undefined}
 		 */
 		rejectAll: function() {
 			if(this.promises){
