@@ -180,6 +180,9 @@ Main = (function(global) {
 			else if (navigator.userAgent.indexOf('Crosswalk') >= 0) {
 				return ['android', ((Android && Android.getManufacturer) ? Android.getManufacturer() : '')];
 			}
+			else if (navigator.userAgent.indexOf('Hisense') >= 0) {
+				return ['hisense', ''];
+			}
 
 			return ['default', ''];
 		},

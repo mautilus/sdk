@@ -29,7 +29,8 @@ Device = (function(Events) {
 		isDUNEHD: false,
 		isVIERA: false,
 		isPlaystation: false,
-		isWEBOS: false
+		isWEBOS: false,
+		idHISENSE: false
     };
 
     $.extend(true, Device, Events, {
