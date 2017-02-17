@@ -13,25 +13,25 @@
  * HbbTV device, overrides Device
  *
  * @author Mautilus s.r.o.
- * @class Device_Hbbtv
+ * @class Device_HbbTV
  * @extends Device
  */
 
-Device_Hbbtv = (function (Events) {
-	var Device_Hbbtv = {
+Device_HbbTV = (function (Events) {
+	var Device_HbbTV = {
 		isHbbTV: true,
 		isFireTVPlugin : function() { return navigator.userAgent.indexOf('firetv-firefox-plugin') > -1 ? true : false; }
 	};
 
-	$.extend(true, Device_Hbbtv, Events, {
+	$.extend(true, Device_HbbTV, Events, {
 		/**
 		 * @inheritdoc Device#init
 		 */
 		init: function (callback, scope) {
-			// Hbbtv APPLICATION MANAGER AND CONFIGURATION
+			// HbbTV APPLICATION MANAGER AND CONFIGURATION
 			this.OIPF_CAP = this.loadObject('oipfCap', {
 				type: 'application/oipfCapabilities',
-				style: "position: absolute; left: 0; top: 0; width: 0; height: 0"
+				style: 'position: absolute; left: 0; top: 0; width: 0; height: 0'
 			});
 			this.OIPF_APP_MAN = this.loadObject('oipfAppMan', {type: 'application/oipfApplicationManager'});
 			this.OIPF_CONFIG = this.loadObject('oipfConfig', {type: 'application/oipfConfiguration'});
@@ -43,7 +43,7 @@ Device_Hbbtv = (function (Events) {
 				this.APP.activate();
 			} catch (e) {
 				// ignore e.g: SamsungTV
-				console.error("bad show or active app by oipfApplicationManager: " + e);
+				console.error('bad show or active app by oipfApplicationManager: ' + e);
 			}
 
 			// register keyset
@@ -72,13 +72,13 @@ Device_Hbbtv = (function (Events) {
 			try {
 				this.OIPF_CONFIG.keyset.value = mask;
 			} catch (e) {
-				console.error("bad register keys by oipfConfiguration 1: " + e);
+				console.error('bad register keys by oipfConfiguration 1: ' + e);
 			}
 
 			try {
 				this.OIPF_CONFIG.keyset.setValue(mask);
 			} catch (e) {
-				console.error("bad register keys by oipfConfiguration 2: " + e);
+				console.error('bad register keys by oipfConfiguration 2: ' + e);
 			}
 
 			// for HbbTV 1.0
@@ -86,7 +86,7 @@ Device_Hbbtv = (function (Events) {
 				this.APP.privateData.keyset.setValue(mask);
 				this.APP.privateData.keyset.value = mask;
 			} catch (e2) {
-				console.error("bad register keys: " + e);
+				console.error('bad register keys: ' + e);
 			}
 		},
 
@@ -107,21 +107,21 @@ Device_Hbbtv = (function (Events) {
 		 */
 		getFirmware: function () {
 			// @todo
-			return "";
+			return '';
 		},
 		/**
 		 * @inheritdoc Device#getUID
 		 */
 		getUID: function () {
 			// @todo
-			return "";
+			return '';
 		},
 		/**
 		 * @inheritdoc Device#getIP
 		 */
 		getIP: function () {
 			// @todo
-			return "";
+			return '';
 		},
 		/**
 		 * @inheritdoc Device#getDeviceName
@@ -136,7 +136,7 @@ Device_Hbbtv = (function (Events) {
 		 */
 		getCountry: function () {
 			// @todo
-			var country = "";
+			var country = '';
 			return country.toLowerCase();
 		},
 		/**
@@ -144,7 +144,7 @@ Device_Hbbtv = (function (Events) {
 		 */
 		getLanguage: function () {
 			// @todo
-			var language = "";
+			var language = '';
 			return language;
 		},
 		/**
@@ -158,7 +158,7 @@ Device_Hbbtv = (function (Events) {
 		 */
 		getTimeZoneOffset: function () {
 			// @todo
-			return "";
+			return '';
 		},
 		/**
 		 * @inheritdoc Device#checkNetworkConnection
@@ -217,8 +217,12 @@ Device_Hbbtv = (function (Events) {
 		 * @private
 		 */
 		override: function () {
-			if (typeof Device_Hbbtv_Player !== 'undefined' && Player) {
-				Player = $.extend(true, Player, Device_Hbbtv_Player);
+			if (typeof Device_HbbTV_Storage !== 'undefined' && Storage) {
+				Storage = $.extend(true, Storage, Device_HbbTV_Storage);
+			}
+			
+			if (typeof Device_HbbTV_Player !== 'undefined' && Player) {
+				Player = $.extend(true, Player, Device_HbbTV_Player);
 			}
 		},
 		/**
@@ -277,6 +281,6 @@ Device_Hbbtv = (function (Events) {
 		document.body = document.getElementsByTagName('body')[0];
 	}
 
-	return Device_Hbbtv;
+	return Device_HbbTV;
 
 })(Events);

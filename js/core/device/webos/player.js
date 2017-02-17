@@ -27,15 +27,13 @@ Device_Webos_Player = (function(Events, Deferrable) {
 		 */
 		initNative: function(config) {
 			/**
-			 * @property {String} drmType DRM Type
-			 */
-			this.drmType = '';
-			
-			/**
 			 * @property {String} appId application id
 			 */
 			this.appId = '';
-			
+			/**
+			 * @property {String} drmClientType Type of loaded DRM Client
+			 */
+			this.drmClientType = '';
 			/**
 			 * @property {String} clientId DRM Client ID
 			 */
@@ -48,10 +46,12 @@ Device_Webos_Player = (function(Events, Deferrable) {
 			this.$el.css("position", "absolute");
 
 			this.el.addEventListener('waiting', function() {
+				//console.log('[Device_Webos_Player] waiting');
 				scope.state(scope.STATE_BUFFERING);
 			});
 
 			this.el.addEventListener('playing', function() {
+				//console.log('[Device_Webos_Player] playing');
 				scope.state(scope.STATE_PLAYING);
 				
 				if(scope._seekOnPlay){
@@ -61,27 +61,40 @@ Device_Webos_Player = (function(Events, Deferrable) {
 			});
 
 			this.el.addEventListener('pause', function() {
+				//console.log('[Device_Webos_Player] pause');
 				if (!scope.duration || scope.duration > scope.currentTime) {
 					scope.state(scope.STATE_PAUSED);
 				}
 			});
 
 			this.el.addEventListener('ended', function() {
+				//console.log('[Device_Webos_Player] ended');
 				scope.onEnd();
+			});
+			
+			this.el.addEventListener('loadeddata', function() {
+				//console.log('[Device_Webos_Player] loadeddata');
+			});
+			
+			this.el.addEventListener('canplay', function () {
+				//console.log('[Device_Webos_Player] canplay');
+				scope.el.play();
 			});
 
 			this.el.addEventListener('durationchange', function() {
+				//console.log('[Device_Webos_Player] durationchange: ' + scope.el.duration);
 				scope.onDurationChange(scope.el.duration * 1000);
 			});
 
 			this.el.addEventListener('timeupdate', function() {
+				//console.log('[Device_Webos_Player] timeupdate: ' + scope.el.currentTime);
 				scope.onTimeUpdate(scope.el.currentTime * 1000);
 			});
 
-			this.el.addEventListener('error', function() {
+			this.el.addEventListener('error', function(e) {
+				console.log('[Device_Webos_Player] error: ' + e);  // e.target.error
 				scope.onError(0, '');
 			});
-			
 		},
 		
 		/**
@@ -94,21 +107,21 @@ Device_Webos_Player = (function(Events, Deferrable) {
 		native: function(cmd, attrs) {
 			var scope = this, url;
 			
-			var sendDrmMessage = function(clientId, customData) {
-				scope.sendDrmMessage(clientId, customData).done(function(result) {
+			var sendDrmMessage = function(clientId) {
+				scope.sendDrmMessage(clientId).done(function(result) {
+					var drmType = scope.drmConfig.type;
 					var options = {};
-					if(scope.drmType == 'playready') {
-						options.mediaTransportType = "URI";
+					if(drmType === 'PLAYREADY') {
 						options.option = {};
 						options.option.drm = {};
-						options.option.drm.type = scope.drmType;
+						options.option.drm.type = 'playready';
 						options.option.drm.clientId = scope.clientId;
 					}
-					if(scope.drmType == 'widevine') {
-						options.mediaTransportType = "WIDEVINE";
+					if(drmType === 'WIDEVINE') {
+						options.mediaTransportType = 'WIDEVINE';
 						options.option = {};
 						options.option.drm = {};
-						options.option.drm.type = scope.drmType;
+						options.option.drm.type = 'widevine';
 						options.option.drm.clientId = scope.clientId;
 					}
 					scope._play(url, options);
@@ -119,7 +132,7 @@ Device_Webos_Player = (function(Events, Deferrable) {
 			
 			var loadDrmClient = function(drmType) {
 				scope.loadDrmClient(drmType, webOS.fetchAppId()).done(function(result) {
-					sendDrmMessage(scope.clientId, scope.customData);
+					sendDrmMessage(scope.clientId);
 				}).fail(function() {
 					scope.onError(-1, 'loadDrmClient', arguments[0]);
 				});
@@ -127,14 +140,16 @@ Device_Webos_Player = (function(Events, Deferrable) {
 			
 			if (cmd === 'play') {
 				if (attrs && attrs.url) {
-					this._seekOnPlay = 0; // clear
-					if (attrs.url.match(/\/manifest/i)) {
+					url = attrs.url;
+					this._seekOnPlay = null; // clear
+					
+					var drmType = this.drmConfig.type;
+					if (drmType === 'PLAYREADY') {
 						// PlayReady DRM
-						url = attrs.url;
 						if(!this.isDrmClientLoaded) {
 							loadDrmClient('playready');
 						
-						} else if(this.isDrmClientLoaded && this.drmType != 'playready') {
+						} else if(this.isDrmClientLoaded && this.drmClientType !== 'playready') {
 							this.unloadDrmClient().done(function() {
 								loadDrmClient('playready');
 							}, this).fail(function() {
@@ -142,15 +157,14 @@ Device_Webos_Player = (function(Events, Deferrable) {
 							});
 						
 						} else {
-							sendDrmMessage(this.clientId, this.customData);
+							sendDrmMessage(this.clientId);
 						}
-					} else if (attrs.url.match(/\.wvm/)) {
+					} else if (drmType === 'WIDEVINE') {
 						// Widevine DRM
-						url = attrs.url;
 						if(!this.isDrmClientLoaded) {
 							loadDrmClient('widevine');
 						
-						} else if(this.isDrmClientLoaded && this.drmType != 'widevine') {
+						} else if(this.isDrmClientLoaded && this.drmClientType !== 'widevine') {
 							this.unloadDrmClient().done(function() {
 								loadDrmClient('widevine');
 							}, this).fail(function() {
@@ -158,12 +172,12 @@ Device_Webos_Player = (function(Events, Deferrable) {
 							});
 						
 						} else {
-							sendDrmMessage(this.clientId, {url: url});
+							sendDrmMessage(this.clientId);
 						}
 						
 					} else {
 						// NO DRM
-						this._play(attrs.url);
+						this._play(url);
 					}
 				} else {
 					this.el.play();
@@ -248,7 +262,7 @@ Device_Webos_Player = (function(Events, Deferrable) {
 		 * 						promise.fail({String} description)
 		 */
 		loadDrmClient: function(drmType, appId) {
-			this.drmType = drmType;
+			this.drmClientType = drmType;
 			this.appId = appId;
 			
 			return this.when(function(promise) {
@@ -256,7 +270,7 @@ Device_Webos_Player = (function(Events, Deferrable) {
 				var request = webOS.service.request("luna://com.webos.service.drm", {
 					method:"load",
 					parameters: {
-						"drmType": scope.drmType,
+						"drmType": drmType,
 						"appId": scope.appId
 					},
 					onSuccess: function (result) {
@@ -306,11 +320,10 @@ Device_Webos_Player = (function(Events, Deferrable) {
 		 * 
 		 * @private
 		 * @param {String} clientId
-		 * @param {String} customData
 		 * @return {Promise} 	promise.done({Object} result)
 		 * 						promise.fail({String} description)
 		 */
-		sendDrmMessage: function(clientId, customData) {
+		sendDrmMessage: function(clientId) {
 			return this.when(function(promise) {
 				var scope = this;
 				var msgId = '';
@@ -318,7 +331,8 @@ Device_Webos_Player = (function(Events, Deferrable) {
 				var drmSystemId = '';
 				var msg = '';
 				
-				if(this.drmType == 'playready') {
+				var drmType = this.drmConfig.type;
+				if(drmType === 'PLAYREADY') {
 					msgType = 'application/vnd.ms-playready.initiator+xml';     // Message type of DRM system
 					drmSystemId = 'urn:dvb:casystemid:19219';                   // Unique ID of DRM system
 					
@@ -341,38 +355,57 @@ Device_Webos_Player = (function(Events, Deferrable) {
 //					  </LicenseAcquisition> \
 //					</PlayReadyInitiator>";
 					
-					// Message for playready
-					msg = '<?xml version="1.0" encoding="utf-8"?>' +
-					'<PlayReadyInitiator xmlns="http://schemas.microsoft.com/DRM/2007/03/protocols/">' +
-						'<LicenseServerUriOverride>' +
-							'<LA_URL>http://sl.licensekeyserver.com/core/rightsmanager.asmx</LA_URL>' +
-						'</LicenseServerUriOverride>' +
-						'<SetCustomData>' +
-							'<CustomData>' + customData + '</CustomData>' +
-						'</SetCustomData>' +
-					'</PlayReadyInitiator>';
+					var drmOption = this.drmConfig.option || {};
+					var customData = typeof(drmOption.CustomData) !== 'undefined' ? drmOption.CustomData : '';
+					var licenseServer = typeof(drmOption.LicenseServer) !== 'undefined' ? drmOption.LicenseServer : '';
 					
-				} else if(this.drmType == 'widevine') {
+					// Message for PlayReady
+					msg  = '<?xml version="1.0" encoding="utf-8"?>';
+					msg += '<PlayReadyInitiator xmlns="http://schemas.microsoft.com/DRM/2007/03/protocols/">';
+					msg +=   '<LicenseServerUriOverride>';
+					msg +=     '<LA_URL>' + licenseServer + '</LA_URL>';
+					msg +=   '</LicenseServerUriOverride>';
+					msg +=   '<SetCustomData>';
+					msg +=     '<CustomData>' + customData + '</CustomData>';
+					msg +=   '</SetCustomData>';
+					msg += '</PlayReadyInitiator>';
+					
+				} else if(drmType === 'WIDEVINE') {
 					msgType = 'application/widevine+xml';       // Message type for widevine 'xml' 
 					drmSystemId = 'urn:dvb:casystemid:19156';   // Unique ID of DRM system
 					
-					// Message for widevine
-					msg = '<?xml version="1.0" encoding="utf-8"?>'+
-						'<WidevineCredentialsInfo xmlns="http://www.smarttv-alliance.org/DRM/widevine/2012/protocols/">'+
-						'<ContentURL>'+this.url+'</ContentURL>'+
-						'<DeviceID></DeviceID>'+
-						'<StreamID></StreamID>'+
-						'<ClientIP></ClientIP>'+
-						'<DRMServerURL>'+this.config.DRMconfig.DRM_URL+'</DRMServerURL>'+
-						'<DRMAckServerURL></DRMAckServerURL>'+
-						'<DRMHeartBeatURL>'+this.config.DRMconfig.HEARTBEAT_URL+'</DRMHeartBeatURL>'+
-						'<DRMHeartBeatPeriod>'+this.config.DRMconfig.HEARTBEAT_PERIOD+'</DRMHeartBeatPeriod>'+
-						'<UserData>'+this.config.DRMconfig.USER_DATA+'</UserData>'+
-						'<Portal>'+this.config.DRMconfig.PORTAL+'</Portal>'+
-						'<StoreFront></StoreFront>'+
-						'<BandwidthCheckURL></BandwidthCheckURL>'+
-						'<BandwidthCheckInterval></BandwidthCheckInterval>'+
-					'</WidevineCredentialsInfo >';
+					var drmOption = this.drmConfig.option || {};
+					var ContentURL = typeof(drmOption.ContentURL) !== 'undefined' ? drmOption.ContentURL : '';
+					var DRMServerURL = typeof(drmOption.DRMServerURL) !== 'undefined' ? drmOption.DRMServerURL : '';
+					var DeviceID = typeof(drmOption.DeviceID) !== 'undefined' ? drmOption.DeviceID : '';
+					var StreamID = typeof(drmOption.StreamID) !== 'undefined' ? drmOption.StreamID : '';
+					var ClientIP = typeof(drmOption.ClientIP) !== 'undefined' ? drmOption.ClientIP : '';
+					var DRMAckServerURL = typeof(drmOption.DRMAckServerURL) !== 'undefined' ? drmOption.DRMAckServerURL : '';
+					var DRMHeartBeatURL = typeof(drmOption.DRMHeartBeatURL) !== 'undefined' ? drmOption.DRMHeartBeatURL : '';
+					var DRMHeartBeatPeriod = typeof(drmOption.DRMHeartBeatPeriod) !== 'undefined' ? drmOption.DRMHeartBeatPeriod : '';
+					var UserData = typeof(drmOption.UserData) !== 'undefined' ? drmOption.UserData : '';
+					var Portal = typeof(drmOption.Portal) !== 'undefined' ? drmOption.Portal : '';
+					var StoreFront = typeof(drmOption.StoreFront) !== 'undefined' ? drmOption.StoreFront : '';
+					var BandwidthCheckURL = typeof(drmOption.BandwidthCheckURL) !== 'undefined' ? drmOption.BandwidthCheckURL : '';
+					var BandwidthCheckInterval = typeof(drmOption.BandwidthCheckInterval) !== 'undefined' ? drmOption.BandwidthCheckInterval : '';
+					
+					// Message for Widevine
+					msg  = '<?xml version="1.0" encoding="utf-8"?>';
+					msg += '<WidevineCredentialsInfo xmlns="http://www.smarttv-alliance.org/DRM/widevine/2012/protocols/">';
+					msg +=   '<ContentURL>'+ ContentURL +'</ContentURL>';
+					msg +=   '<DeviceID>'+ DeviceID +'</DeviceID>';
+					msg +=   '<StreamID>'+ StreamID +'</StreamID>';
+					msg +=   '<ClientIP>'+ ClientIP +'</ClientIP>';
+					msg +=   '<DRMServerURL>'+ DRMServerURL +'</DRMServerURL>';
+					msg +=   '<DRMAckServerURL>'+ DRMAckServerURL +'</DRMAckServerURL>';
+					msg +=   '<DRMHeartBeatURL>'+ DRMHeartBeatURL +'</DRMHeartBeatURL>';
+					msg +=   '<DRMHeartBeatPeriod>'+ DRMHeartBeatPeriod +'</DRMHeartBeatPeriod>';
+					msg +=   '<UserData>'+ UserData +'</UserData>';
+					msg +=   '<Portal>'+ Portal +'</Portal>';
+					msg +=   '<StoreFront>'+ StoreFront +'</StoreFront>';
+					msg +=   '<BandwidthCheckURL>'+ BandwidthCheckURL +'</BandwidthCheckURL>';
+					msg +=   '<BandwidthCheckInterval>'+ BandwidthCheckInterval +'</BandwidthCheckInterval>';
+					msg += '</WidevineCredentialsInfo >';
 				}
 					
 				var request = webOS.service.request("luna://com.webos.service.drm", {
@@ -384,11 +417,10 @@ Device_Webos_Player = (function(Events, Deferrable) {
 						"drmSystemId": drmSystemId
 					},
 					onSuccess: function (result) {
-						
-						if(scope.drmType === 'playready') {
+						if(drmType === 'PLAYREADY') {
 							//console.log("sendDrmMessage Success: Message ID: " + msgId);
-							var msgId = result.msgId;                    // only for PlayReady 
-							var resultCode = result.resultCode || '';    // only for PlayReady 
+							var msgId = result.msgId;                  // only for PlayReady 
+							var resultCode = result.resultCode || '';  // only for PlayReady 
 							
 							if (resultCode == 0){
 								promise.resolve(result);
@@ -397,13 +429,12 @@ Device_Webos_Player = (function(Events, Deferrable) {
 								// Do Handling DRM message error
 								promise.reject('Player.sendDrmMessage onSuccess: ' + '[' + resultCode + '] ' + 'DRM message error');
 							}
-						} else if (scope.drmType === 'widevine') {
+						} else if (drmType === 'WIDEVINE') {
 							promise.resolve(result);
 						}
-						
 					},
 					onFailure: function (result) {
-						if(scope.drmType === 'playready') {
+						if(drmType === 'PLAYREADY') {
 							scope.subscribeLicensingError(clientId, msgId);
 						}
 						// Do something for error handling
@@ -456,11 +487,20 @@ Device_Webos_Player = (function(Events, Deferrable) {
 		 * @param {Object} options
 		 */
 		_play: function(url, options) {
+			var mediaType = this.mediaOption.mediaType || this.deriveMediaType(url);
 			this.el.innerHTML = '';
 			
 			if(!options) {
 				options = {};
-				options.mediaTransportType = String(url).match(/\.m3u8/) ? "HLS" : "URI";
+				if(mediaType === 'HLS') {
+					options.mediaTransportType = "HLS";
+				} else if(mediaType === 'MP4'){
+					options.mediaTransportType = "URI";
+				} else if(mediaType === 'WIDEVINE') {
+					options.mediaTransportType = "WIDEVINE";
+				} else if(mediaType === 'SMOOTH_STREAMING') {
+					// nothing
+				}
 				options.option = {};
 			}
 			
@@ -468,20 +508,19 @@ Device_Webos_Player = (function(Events, Deferrable) {
 			var source = document.createElement("source");
 			
 			source.setAttribute('src', url);
-			if(String(url).match(/\/manifest/i)) {
+			
+			if(mediaType === 'SMOOTH_STREAMING') {
 				source.setAttribute('type', 'application/vnd.ms-sstr+xml;mediaOption=' + mediaOption);
-				//source.setAttribute('type', 'application/vnd.ms-playready.initiator+xml;mediaOption=' + mediaOption);
-			} else if(String(url).match(/\.wvm/)) {
+			} else if(mediaType === 'WIDEVINE') {
 				source.setAttribute('type', 'video/mp4;mediaOption=' + mediaOption);
-			} else if(String(url).match(/\.mp4/)) {
+			} else if(mediaType === 'MP4') {
 				source.setAttribute('type', 'video/mp4;mediaOption=' + mediaOption);
-			} else if(String(url).match(/\.m3u8/)) {
+			} else if(mediaType === 'HLS') {
 				source.setAttribute('type', 'application/vnd.apple.mpegurl;mediaOption=' + mediaOption);
 			}
 			
 			this.el.appendChild(source);
 			this.el.load();
-			this.el.play();
 		},
 		
 		/**

@@ -29,9 +29,9 @@ Device_Playstation = (function(Events) {
 			this.macaddress = '';
 			this.callbacks = new Array();
 
-			this.callbacks.push({command: 'networkStatusChange', callback: function(info) {
+			this.callbacks.push({command: 'networkStatusChange', callback: function(json) {
 					if (json.newState != json.previousState) {
-						this.status = json.newState;
+						this.status = (json.newState == 'connected') ? true : false ;
 						App.trigger('network', this.status);
 					}
 				}, remove: false});
@@ -197,21 +197,18 @@ Device_Playstation = (function(Events) {
 		 */
 		setKeys: function() {
 			Control.setKeys({
-				ONE: 116, //L1 for console ONE
-				TWO: 117, //R1 for console TWO
-				THREE: 115, //SELECT for console THREE
-				L3: 120,
-				FIVE : 121, //R3
-				RW: 118, //L2
-				FW: 119, //R2
+
 				TRIANGLE: 112,
 				SQUARE: 32,
+				//CIRCLE: 8, // BACKSPACE
+				//CROSS: 13, // ENTER
+
 				RIGHT: 39,
 				LEFT: 37,
 				UP: 38,
 				DOWN: 40,
-				RETURN: 8,
-				ENTER: 13,
+				RETURN: 8, // CIRCLE
+				ENTER: 13, // CROSS
 				PLAY: 128,
 				PAUSE: 130,
 				STOP: 129,
@@ -221,6 +218,7 @@ Device_Playstation = (function(Events) {
 				GREEN: 133,
 				YELLOW: 41,
 				BLUE: 42,
+
 				ZERO: 96,
 				// ONE: 97,
 				// TWO: 98,
@@ -231,6 +229,7 @@ Device_Playstation = (function(Events) {
 				SEVEN: 103,
 				EIGHT: 104,
 				NINE: 105,
+
 				PUP: 33,
 				PDOWN: 34,
 				PRECH: 46, // Delete
@@ -240,6 +239,14 @@ Device_Playstation = (function(Events) {
 				CLEAR: 12,
 				SUBTITLE: 47,
 				OPTIONS: 114,
+
+				L1: 116,
+				L2: 118,
+				L3: 120,
+				R1: 117,
+				R2: 119,
+				R3: 121,
+
 			});
 		},
 

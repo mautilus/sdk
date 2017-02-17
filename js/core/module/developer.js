@@ -135,18 +135,18 @@ Developer = (function() {
 			var scope = this;
 
 			if (typeof window.console === 'undefined') {
-			window.console = {
-				log: function() {
-				},
-				warn: function() {
-				},
-				info: function() {
-				},
-				error: function() {
-				},
-				network: function() {
-				}
-			};
+				window.console = {
+					log: function() {
+					},
+					warn: function() {
+					},
+					info: function() {
+					},
+					error: function() {
+					},
+					network: function() {
+					}
+				};
 
 			} else if (window.console.polyfilled) {
 				return;
@@ -208,16 +208,16 @@ Developer = (function() {
 		 */
 		offConsole: function() {
 			window.console = {
-			log: function() {
-			},
-			warn: function() {
-			},
-			info: function() {
-			},
-			error: function() {
-			},
-			network: function() {
-			}
+				log: function() {
+				},
+				warn: function() {
+				},
+				info: function() {
+				},
+				error: function() {
+				},
+				network: function() {
+				}
 			};
 		},
 		/**
@@ -298,7 +298,8 @@ Developer = (function() {
          * @param {Number} keyCode Key code identification
 		 * @private
 		 */
-		onKeyDown: function(keyCode) {
+		onKeyDown: function(keyCode,event,fromRC) {
+			var scope = this;
 			if (this.isActive) {
 				if (document.activeElement && document.activeElement.nodeName === 'INPUT') {
 					return;
@@ -315,15 +316,15 @@ Developer = (function() {
 						this.inputBuffer = this.inputBuffer.substr(0, this.inputBuffer.length - 1);
 
 					} else if (keyCode === Control.key.ENTER) {
-						this.config.console = 'http://' + this.inputBuffer + ':8383/';
+						this.config.console = 'http://' + this.inputBuffer + ':8080';
 						this.inputActive = false;
 
-					if (Storage) {
-						Storage.set('developer_console', this.inputBuffer);
-					}
+						if (Storage) {
+							Storage.set('developer_console', this.inputBuffer);
+						}
 
-					this.loadConsole(this.config.console);
-					this.showUI();
+						this.loadConsole(this.config.console);
+						this.showUI();
 
 					} else if (keyCode === Control.key.RETURN) {
 						this.uiToggleInputIP();
@@ -333,6 +334,10 @@ Developer = (function() {
 					this.$elContent.find('.developer-ui-ip').text(this.inputBuffer);
 
 					return false;
+				}
+
+				if (fromRC) {
+					return;
 				}
 
 				if (keyCode === Control.key.ZERO) {
@@ -393,6 +398,22 @@ Developer = (function() {
 				this.toggle();
 			}
 		},
+		
+		/**
+		 * Show remote console connected status
+		 */
+		remoteState: function(state) {
+			if (state) {
+				try {
+					this.$elConnected.show().html('&#10003');
+				} catch(e) {}
+			} else {
+				try {
+					this.$elConnected.hide().html('');
+				} catch(e) {}
+			}
+		},
+		
 		/**
 		 * Show developer UI
 		 * 
@@ -549,10 +570,10 @@ Developer = (function() {
 			for (var i in args) {
 				if (typeof args[i] === 'object') {
 					try {
-					args[i] = JSON.stringify(args[i]); // fix problems with jquery objects in console.log (cyclic structures)
+						args[i] = JSON.stringify(args[i]); // fix problems with jquery objects in console.log (cyclic structures)
 					}
-					catch (error) {
-					args[i] = "";
+						catch (error) {
+						args[i] = "";
 					}
 				}
 			}
@@ -653,7 +674,7 @@ Developer = (function() {
 		 */
 		renderConsole: function() {
 			if (this.onScreenConsole) {
-			this.$elContent.html(this.consoleStack);
+				this.$elContent.html(this.consoleStack);
 			}
 
 			this.updateNotifications();

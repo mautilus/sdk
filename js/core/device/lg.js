@@ -26,7 +26,6 @@ Device_Lg = (function(Events) {
 		 */
 		init: function(callback, scope) {
 			this.DEVICE = this.loadObject('DEVICE', 'application/x-netcast-info');
-			this.DRMAGENT = document.getElementById("drmAgent");
 
 			// override default modules
 			this.override();

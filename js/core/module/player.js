@@ -45,11 +45,7 @@ Player = (function(Events, Deferrable) {
 			/**
 			 * @cfg {Number} seekStep Default seek time (ms)
 			 */
-			seekStep: 20000,
-			/**
-			 * @cfg {Object} DRMconfig DRM (Widevine/Playerday) configuration
-			 */
-			DRMconfig: null
+			seekStep: 20000
 		}
 	};
 
@@ -147,10 +143,10 @@ Player = (function(Events, Deferrable) {
 		 * Seek ended
 		 */
 
-        /**
-         * Init Player object
-         * @param {Object} [config={}] Player configuration
-         */
+		/**
+		 * Init Player object
+		 * @param {Object} [config={}] Player configuration
+		 */
 		init: function(config) {
 			this.configure(config);
 
@@ -159,9 +155,17 @@ Player = (function(Events, Deferrable) {
 			 */
 			this.url = null;
 			/**
-			 * @property {Boolean} 
+			 * @property {Object} mediaOption Additional media content information
+			 * @property {String} mediaOption.mediaType Media type ('SMOOTH_STREAMING', 'WIDEVINE', 'MPEG-DASH', 'MP4', 'HLS')
+			 * @property {Boolean} [mediaOption.mode4K=false] Set to TV to play UHD content. It Has an effect only on Tizen platform.
+			 * @property {Boolean} mediaOption.isTimeshiftedLiveStream (experimental) If content is time shifted (only for live stream). It can fix issue with counting playback time on Samsung Orsay.
+			 * @private
 			 */
-			this.isTimeshiftedLiveStream = false;
+			this.mediaOption = {
+				isTimeshiftedLiveStream: false,
+				mediaType: '',
+				mode4K: false
+			};
 			/**
 			 * @property {Number} duration Media duration (ms)
 			 */
@@ -203,13 +207,15 @@ Player = (function(Events, Deferrable) {
 			 */
 			this.left = this.config.left;
 			/**
-			 * @property {String} customData DRM custom data
+			 * @property {Object} drmConfig DRM (Widevine/PlayReady/Verimatrix) configuration
+			 * @property {String} drmConfig.type DRM type ('PLAYREADY', 'WIDEVINE', 'VERIMATRIX' or '')
+			 * @property {Object} drmConfig.option DRM options. See [Player Guide](#!/guide/player)
+			 * @private
 			 */
-			this.customData = null;
-			/**
-			 * @property {String} DRM type custom data
-			 */
-			this.drmType = '';
+			this.drmConfig = {
+				type: '',
+				option: {}
+			};
 
 			this.initNative();
 
@@ -370,9 +376,9 @@ Player = (function(Events, Deferrable) {
 			}
 		},
 		/**
-         * Function is binded on duration change event
-         * @param {Number} duration Content duration
-         * @fires durationchange
+		 * Function is binded on duration change event
+		 * @param {Number} duration Content duration
+		 * @fires durationchange
 		 * @private
 		 */
 		onDurationChange: function(duration) {
@@ -382,9 +388,9 @@ Player = (function(Events, Deferrable) {
 			console.info("Player Info >>>\n" + " URL: " + this.url + "\n" + " Duration: " + this.duration);
 		},
 		/**
-         * Function is binded on time update event
-         * @param {Number} time Current time
-         * @fires timeupdate
+		 * Function is binded on time update event
+		 * @param {Number} time Current time
+		 * @fires timeupdate
 		 * @private
 		 */
 		onTimeUpdate: function(time) {
@@ -396,8 +402,8 @@ Player = (function(Events, Deferrable) {
 			}
 		},
 		/**
-         * Function is binded on end event
-         * @fires end
+		 * Function is binded on end event
+		 * @fires end
 		 * @private
 		 */
 		onEnd: function() {
@@ -411,31 +417,47 @@ Player = (function(Events, Deferrable) {
 			}
 		},
 		/**
-         * Function is binded on error event
-         * @param {Number} code Error code
-         * @param {String} msg Message
-         * @param {String} [details] Error details
-         * @fires error
+		 * Function is binded on error event
+		 * @param {Number} code Error code
+		 * @param {String} msg Message
+		 * @param {String} [details] Error details
+		 * @fires error
 		 * @private
 		 */
 		onError: function(code, msg, details) {
 			this.trigger('error', code, msg, details);
 		},
+		
 		/**
-	     * Triggered when DRM custom data are set
-	     * 
-	     * @param {String} customData DRM custom data
-	     * @template
-	     */
-	    onCustomData: function(customData) {
+		 * Determine the media type from given media URL
+		 * @param {String} url
+		 * @return {String} mediaType the one from 'SMOOTH_STREAMING', 'WIDEVINE', 'MPEG-DASH', 'MP4', 'HLS' or ''
+		 * @private
+		 */
+		deriveMediaType: function(url) {
+			var mediaType;
+			if(url.match(/\/manifest/i)) {
+				mediaType = 'SMOOTH_STREAMING';
+			} else if(url.match(/\.wvm/)) {
+				mediaType = 'WIDEVINE';
+			} else if(url.match('/\.mpd/')) {
+				mediaType = 'MPEG-DASH';
+			} else if(url.match(/\.mp4/)){
+				mediaType = 'MP4';
+			} else if(url.match(/\.m3u8/)) {
+				mediaType = 'HLS';
+			} else {
+				mediaType = '';  // unknown
+			}
+			return mediaType;
+		},
 
-	    },
 		/**
 		 * Set/Get current state
 		 *
 		 * @param {Number} state
-         * @returns current state
-         * @fires statechange
+		 * @returns current state
+		 * @fires statechange
 		 */
 		state: function(state) {
 			if (typeof state !== 'undefined') {
@@ -452,7 +474,7 @@ Player = (function(Events, Deferrable) {
 		},
 		/**
 		 * Reset all states and properties
-         * @fires reset
+		 * @fires reset
 		 */
 		reset: function() {
 
@@ -463,8 +485,6 @@ Player = (function(Events, Deferrable) {
 			this.speed = 1;
 			this.width = this.config.width;
 			this.height = this.config.height;
-			this.drmType = '';
-			this.customData = null;
 
 			this.trigger('reset');
 		},
@@ -475,7 +495,7 @@ Player = (function(Events, Deferrable) {
 		 * @param {Number} [height] Height of player
 		 * @param {Number} [left] Position from the left side
 		 * @param {Number} [top] Position from the top side
-         * @fires show
+		 * @fires show
 		 */
 		show: function(width, height, left, top) {
 			this.native('show', {
@@ -491,7 +511,7 @@ Player = (function(Events, Deferrable) {
 		},
 		/**
 		 * Hide player
-         * @fires hide
+		 * @fires hide
 		 */
 		hide: function() {
 			this.native('hide');
@@ -507,7 +527,7 @@ Player = (function(Events, Deferrable) {
 		 * Set media URL
 		 *
 		 * @param {String} url
-         * @fires url
+		 * @fires url
 		 */
 		setURL: function(url) {
 			this.reset();
@@ -516,33 +536,29 @@ Player = (function(Events, Deferrable) {
 			this.trigger('url', this.url);
 		},
 		/**
-		 * Set custom data for widevine/playready DRM
+		 * Set DRM configuration
 		 *
-		 * @param {String} customData Custom data related with DRM content
+		 * @param {Object} drmConfig DRM configuration hash. 
+		 * See {@link Player#property-drmConfig} or [Player Guide](#!/guide/player)
 		 */
-		setCustomData: function(customData) {
-			this.customData = customData || null;
-			this.trigger('customData', this.customData);
-		},
-		/**
-		 * Set DRM typ 'widevine'/'playready'
-		 *
-		 * @param {String} drmType
-		 */
-		setDrmType: function(drmType) {
-			this.drmType = drmType;
-			this.trigger('drmType', this.drmType);
+		setDrm: function(drmConfig) {
+			this.drmConfig = drmConfig || {};
+			this.trigger('drmConfig', this.drmConfig);
 		},
 		/**
 		 * Start playback
 		 *
 		 * @param {String} [url] Url what should be played
 		 * @param {Number} [position] Seek position (ms)
+		 * @param {Object} [mediaOption] Additional media content information
+		 * @param {String} [mediaOption.mediaType] Media type ('SMOOTH_STREAMING', 'WIDEVINE', 'MPEG-DASH', 'MP4', 'HLS')
+		 * @param {Boolean} [mediaOption.mode4K=false] Set to TV to play UHD content. It Has an effect only on Tizen platform.
+		 * @param {Boolean} [mediaOption.isTimeshiftedLiveStream = false] (experimental) If content is time shifted (only for live stream). 
+		 * It can fix issue with counting playback time on Samsung Orsay.
 		 * @param {Boolean} [looping] If content should play again in the loop
-         * @param {Boolean} [isTimeshiftedLiveStream] If content is time shifted (only for live streams)
-         * @fires play
+		 * @fires play
 		 */
-		play: function(url, position, looping, isTimeshiftedLiveStream) {
+		play: function(url, position, mediaOption, looping) {
 			if (!position && typeof url === 'number') {
 				position = url;
 				url = null;
@@ -555,7 +571,7 @@ Player = (function(Events, Deferrable) {
 
 				this.setURL(url);
 				this.looping = looping || false;
-				this.isTimeshiftedLiveStream = isTimeshiftedLiveStream || false;
+				this.mediaOption = mediaOption || {};
 			}
 
 			if (!this.url) {
@@ -577,7 +593,7 @@ Player = (function(Events, Deferrable) {
 		},
 		/**
 		 * Pause playback
-         * @fires pause
+		 * @fires pause
 		 */
 		pause: function() {
 			if (this.speed !== 1) {
@@ -589,7 +605,7 @@ Player = (function(Events, Deferrable) {
 		},
 		/**
 		 * Stop playback and reset player
-         * @fires stop
+		 * @fires stop
 		 */
 		stop: function() {
 			this.native('stop');
@@ -601,7 +617,7 @@ Player = (function(Events, Deferrable) {
 		 * Seek playback
 		 *
 		 * @param {Number} position Time position (ms)
-         * @fires seek
+		 * @fires seek
 		 */
 		seek: function(position) {
 			if (String(position).match(/\%/)) {
@@ -634,8 +650,8 @@ Player = (function(Events, Deferrable) {
 		 * movie does not play, this interval is cleared and seek-end is triggered.
 		 *
 		 * This functionality you can use for setting throbber progress inside video player.
-         * @private 
-         * @fires seek-end
+		 * @private 
+		 * @fires seek-end
 		 */
 		startSeek: function() {
 			var scope = this,
@@ -659,11 +675,11 @@ Player = (function(Events, Deferrable) {
 				}
 			}, 1000);
 		},
-        /**
-         * If seeking is finished then this is called
-         * @private 
-         * 
-         */
+		/**
+		 * If seeking is finished then this is called
+		 * @private 
+		 * 
+		 */
 		clearSeekInterval: function() {
 			// clear interval
 			if (this.triggerHandle) {
@@ -707,7 +723,7 @@ Player = (function(Events, Deferrable) {
 		 * Set playback speed
 		 *
 		 * @param {Number} speed
-         * @fires playbackspeed
+		 * @fires playbackspeed
 		 */
 		playbackSpeed: function(speed) {
 			speed = speed >> 0;
@@ -740,7 +756,7 @@ Player = (function(Events, Deferrable) {
 				index: index
 			});
 		},
-		/*
+		/**
 		 * Get current state in text form for debugging.
 		 *
 		 * @returns {String}
@@ -760,17 +776,17 @@ Player = (function(Events, Deferrable) {
 			}
 		},
 		/**
-	     * Get unique ESN code. It is used for DRM verification.
-	     * Default code!!!
-	     * 
+		 * Get unique ESN code. It is used for DRM verification.
+		 * 
+		 * @returns {String}
 		 * @private
 		 */
 		getESN: function() {
-			return(0123456789);
+			return Device.getUID();
 		},
 		/*
 		 * Mute audio
-         * @fires mute
+		 * @fires mute
 		 */
 		mute: function() {
 			this.native('mute');
@@ -778,7 +794,7 @@ Player = (function(Events, Deferrable) {
 		},
 		/*
 		 * Un-mute audio
-         * @fires unmute
+		 * @fires unmute
 		 */
 		unmute: function() {
 			this.native('unmute');
@@ -786,9 +802,9 @@ Player = (function(Events, Deferrable) {
 		},
 		/*
 		 * Volume content (Not yet fully supported)
-         * 
-         * @param {Number} direction + volume up or - volume down
-         * @param {Number} percent Hom much be volume changed
+		 * 
+		 * @param {Number} direction + volume up or - volume down
+		 * @param {Number} percent Hom much be volume changed
 		 */
 		volume: function (direction, percent) {
 			this.native('volume', { percent: percent, direction: direction });

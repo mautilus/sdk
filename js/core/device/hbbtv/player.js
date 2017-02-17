@@ -13,21 +13,21 @@
  * HbbTV Player class
  *
  * @author Mautilus s.r.o.
- * @class Device_Hbbtv_Player
+ * @class Device_HbbTV_Player
  * @extends Player
  */
 
-Device_Hbbtv_Player = (function (Events) {
-	var Device_Hbbtv_Player = {};
+Device_HbbTV_Player = (function (Events) {
+	var Device_HbbTV_Player = {};
 
-	$.extend(true, Device_Hbbtv_Player, {
+	$.extend(true, Device_HbbTV_Player, {
 		/**
 		 * @inheritdoc Player#initNative
 		 */
 		initNative: function () {
 			var scope = this;
 
-			$("body").append('<div id="vidcontainer" style="position: absolute; background: transparent; left: 0px; top: 0px; width: 1280px; height: 720px;"></div>');
+			$('body').append('<div id="vidcontainer" style="position: absolute; background: transparent; left: 0px; top: 0px; width: 1280px; height: 720px;"></div>');
 			this.$videoContainer = $('#vidcontainer');
 
 			this.createPlayer('video/broadcast');
@@ -42,32 +42,32 @@ Device_Hbbtv_Player = (function (Events) {
 		 * @inheritdoc Player#deinitNative
 		 */
 		deinitNative: function () {
-			console.log('[Device_Hbbtv_Player] deinitNative process: '+ this.PLAYER);
+			console.log('[Device_HbbTV_Player] deinitNative process: '+ this.PLAYER);
 			if (!this.PLAYER) {
 				return;
 			}
-			console.log('[Device_Hbbtv_Player] deinitNative start');
+			console.log('[Device_HbbTV_Player] deinitNative start');
 			try {
 				this.PLAYER.stop();
 			} catch(e) {
-				console.log("error PLAYER.stop(): " + e);
+				console.log('error PLAYER.stop(): ' + e);
 			}
 			this.PLAYER.data = '';
 			try {
 				this.PLAYER.release();
 			} catch(e) {
-				console.log("error PLAYER.release(): " + e);
+				console.log('error PLAYER.release(): ' + e);
 			}
 			//this.PLAYER.parentNode.removeChild(this.PLAYER); -- not working in FireTV
 			this.$videoContainer[0].innerHTML = '';
 			this.PLAYER = false;
 			this.type = '';
-			console.log('[Device_Hbbtv_Player] deinitNative end');
+			console.log('[Device_HbbTV_Player] deinitNative end');
 		},
 
 		/**
-         * Internal player timer
-         * 
+		 * Internal player timer
+		 * 
 		 * @private
 		 */
 		tick: function () {
@@ -85,13 +85,13 @@ Device_Hbbtv_Player = (function (Events) {
 		},
 
 		/**
-         * Function for creating player object 
-         * 
+		 * Function for creating player object 
+		 * 
 		 * @private
 		 * @param {String} type Type of playable content 'video/broadcast' or 'video/mp4'
 		 */
 		createPlayer: function (type) {
-			console.log("[Device_Hbbtv_Player] createPlayer: " + type);
+			console.log('[Device_HbbTV_Player] createPlayer: ' + type);
 			if (this.PLAYER) {
 				this.deinitNative();
 			}
@@ -105,7 +105,7 @@ Device_Hbbtv_Player = (function (Events) {
 				this.PLAYER.setAttribute('type', type);  // fireTV
 			} else {
 				// Samsung
-				strVideo = '<object id="video" type="'+type+'" width="1280" height="720" style="z-index: 1; position: absolute; left: 0px; top: 0px; width: 1280px; height: 720px; visibility: hidden; outline: transparent"></object>';
+				strVideo = '<object id="video" type="' + type + '" width="1280" height="720" style="z-index: 1; position: absolute; left: 0px; top: 0px; width: 1280px; height: 720px; visibility: hidden; outline: transparent"></object>';
 				this.$videoContainer[0].innerHTML = strVideo;
 				this.PLAYER = document.getElementById('video');
 			}
@@ -121,7 +121,7 @@ Device_Hbbtv_Player = (function (Events) {
 //			obj.style.visibility = 'hidden';
 
 //			this.PLAYER.type = 'video/mp4';    // fireTV
-//			console.log("[Device_Hbbtv_Player] setAttribute");
+//			console.log('[Device_HbbTV_Player] setAttribute');
 
 
 			if(type === 'video/broadcast') {
@@ -132,8 +132,8 @@ Device_Hbbtv_Player = (function (Events) {
 		},
 
 		/**
-         * Function for initializing broadcast player 
-         * 
+		 * Function for initializing broadcast player 
+		 * 
 		 * @private
 		 */
 		initBroadcastPlayer: function() {
@@ -151,8 +151,8 @@ Device_Hbbtv_Player = (function (Events) {
 		},
 
 		/**
-         * Function for initializing AV player 
-         * 
+		 * Function for initializing AV player 
+		 * 
 		 * @private
 		 */
 		initAVPlayer: function() {
@@ -171,14 +171,16 @@ Device_Hbbtv_Player = (function (Events) {
 		 * @inheritdoc Player#native
 		 */
 		native: function (cmd, attrs) {
-			console.log("[Device_Hbbtv_Player] cmd: " + cmd);
+			console.log('[Device_HbbTV_Player] cmd: ' + cmd);
 			var scope = this, url;
 
 			if (cmd === 'play') {
 				if (attrs && attrs.url) {
 					url = this.url;
+					this._seekOnPlay = null; // clear
 
 					console.network('PLAYER', this.url);
+
 					this.createPlayer('video/mp4');
 					this.PLAYER.style.visibility = 'visible';
 					this.PLAYER.data = url;
@@ -232,8 +234,8 @@ Device_Hbbtv_Player = (function (Events) {
 		},
 
 		/**
-         * Get unique ESN code. It is used for DRM verification.
-         * 
+		 * Get unique ESN code. It is used for DRM verification.
+		 * 
 		 * @private
 		 */
 		getESN: function () {
@@ -241,13 +243,13 @@ Device_Hbbtv_Player = (function (Events) {
 		},
 
 		/**
-         * Handling changes in player state
-         * 
+		 * Handling changes in player state
+		 * 
 		 * @private
 		 */
 		onNativePlayStateChange: function (state, error) {
 			var state = this.PLAYER.playState;
-			console.log("[Device_Hbbtv_Player] onNativePlayStateChange:: " + state);
+			console.log('[Device_HbbTV_Player] onNativePlayStateChange: ' + state);
 
 			if (state == 0) {
 				//stopped
@@ -274,43 +276,43 @@ Device_Hbbtv_Player = (function (Events) {
 				this.onEnd();
 			} else if (state == 6) {
 				// error
-				var errorno = isNaN(this.PLAYER.error) ? "" : this.PLAYER.error+'';
+				var errorno = isNaN(this.PLAYER.error) ? '' : this.PLAYER.error + '';
 				var errormsg = '';
 				switch(errorno) {
 					case '0':
-						errormsg = "A/V format not supported";
+						errormsg = 'A/V format not supported';
 						break;
 					case '1':
-						errormsg = "cannot connect to server or lost connection";
+						errormsg = 'cannot connect to server or lost connection';
 						break;
 					case '2':
-						errormsg = "unidentified error";
+						errormsg = 'unidentified error';
 						break;
 						// 3-6 are defined in OIPF annex B
 					case '3':
-						errormsg = "insufficient resources.";
+						errormsg = 'insufficient resources.';
 						break;
 					case '4':
-						errormsg = "content corrupt or invalid.";
+						errormsg = 'content corrupt or invalid.';
 						break;
 					case '5':
-						errormsg = "content not available.";
+						errormsg = 'content not available.';
 						break;
 					case '6':
-						errormsg = "content not available at given position.";
+						errormsg = 'content not available at given position.';
 						break;
 					    // defined in HbbTV for download content
 					case '7':
-						errormsg = "content blocked due to parental control.";
+						errormsg = 'content blocked due to parental control.';
 						break;
 				}
-				console.log("error no: " + errorno + ', msg: ' + errormsg);
+				console.log('error no: ' + errorno + ', msg: ' + errormsg);
 				this.onError(0, errorno);
 			}
-			//console.log("[onPlayStateChange] " + state + ", error: " + error);
+			//console.log('[onPlayStateChange] ' + state + ', error: ' + error);
 		}
 	});
 
-	return Device_Hbbtv_Player;
+	return Device_HbbTV_Player;
 
 })(Events);

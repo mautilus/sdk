@@ -16,25 +16,38 @@
 
 if (typeof jQuery !== 'undefined') {
 	jQuery.fn.extend({
-	/**
-	 * $().belongsTo() Check if subset belong to a specified parent element
-	 * 
-	 * @ignore
-	 * @param {Object} parent Parent element, HTMLElement or jQuery collection
-	 * @returns {Boolean}
-	 */
-	belongsTo: function(parent) {
-		var el = (parent && parent.nodeType ? parent : parent[0]),
-			parents = this.parents();
-
-		for (var i in parents) {
-			if (parents.hasOwnProperty(i) && parents[i] === el) {
-				return true;
+		/**
+		 * $().belongsTo() Check if subset belong to a specified parent element
+		 * 
+		 * @ignore
+		 * @param {Object} parent Parent element, HTMLElement or jQuery collection
+		 * @returns {Boolean}
+		 */
+		belongsTo: document && document.contains ? 
+			function(parent) {
+				// used native function 'node.contains()'
+				var parentEl = (parent && parent.nodeType ? parent : parent[0]),
+					currEl = this[0];
+				
+				if(parentEl && currEl) {
+					return parentEl.contains(currEl);
+				}
+				return false;
+			} :
+			function(parent) {
+				// traversing in cycle
+				var parentEl = (parent && parent.nodeType ? parent : parent[0]),
+					currEl = this[0];
+				
+				if (currEl) {
+					while ( (currEl = currEl.parentNode) ) {
+						if (currEl === parentEl) {
+							return true;
+						}
+					}
+				}
+				return false;
 			}
-		}
-
-		return false;
-	}
 	});
 }
 

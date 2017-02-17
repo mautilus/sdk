@@ -68,10 +68,19 @@ Device_Samsung_Player = (function(Events) {
 					this._accSeekTime = 0;    // milisec
 					this._realLastSeekBy = 0; // milisec
 					this._lastTime = null;    // milisec
-
-					if (this.customData) {
-						// set DRM custom data
-						this.el.Execute('SetPlayerProperty', '3', this.customData, this.customData.length);
+					
+					if(this.drmConfig.type === 'PLAYREADY') {
+						var drmConfigOption = this.drmConfig.option || {};
+						var customData = drmConfigOption.CustomData;
+						if (typeof(customData) !== 'undefined') {
+							// set DRM custom data
+							this.el.Execute('SetPlayerProperty', '3', customData, customData.length);
+						}
+						var licenseServer = drmConfigOption.LicenseServer;
+						if (typeof(licenseServer) !== 'undefined') {
+							// set DRM license server URL
+							this.el.Execute('SetPlayerProperty', '4', licenseServer, licenseServer.length);
+						}
 					}
 				}
 
@@ -176,9 +185,9 @@ Device_Samsung_Player = (function(Events) {
 		},
 
 		/**
-         * Appended flags related to type of content (HLS|Widewine|Playready|...)
-         * @param {String} url Url with playable content
-         * @returns prepared content URL
+		 * Appended flags related to type of content (HLS|Widewine|Playready|...)
+		 * @param {String} url Url with playable content
+		 * @returns {String} prepared content URL
 		 * @private
 		 */
 		prepareUrl: function(url) {
@@ -186,13 +195,16 @@ Device_Samsung_Player = (function(Events) {
 				return this.prepareUrlWidevine(url);
 			}
 
-			if (url.match(/\.wvm/) && !url.match(/\|COMPONENT\=WV/)) {
-				return this.prepareUrlWidevine($.extend(true, {}, this.config.DRMconfig || {}, {url: url}));
+			var mediaType = this.mediaOption.mediaType || this.deriveMediaType(url);
+			var drmType = this.drmConfig.type;
+			
+			if ((drmType === 'WIDEVINE' || mediaType === 'WIDEVINE') && !url.match(/\|COMPONENT\=WV/)) {
+				return this.prepareUrlWidevine($.extend(true, {}, this.drmConfig.option || {}, {url: url}));
 
-			} else if (url.match(/\.m3u8/) && !url.match(/\|COMPONENT\=HLS/)) {
+			} else if (mediaType === 'HLS' && !url.match(/\|COMPONENT\=HLS/)) {
 				url += '|COMPONENT=HLS';
 
-			} else if (this.customData && !url.match(/\|COMPONENT\=/)) {
+			} else if (drmType === 'PLAYREADY' && !url.match(/\|COMPONENT\=/)) {
 				url += '|COMPONENT=WMDRM';
 			}
 
@@ -200,9 +212,9 @@ Device_Samsung_Player = (function(Events) {
 		},
 
 		/**
-         * Added parameter for Widewine content url
-         * @param {Object} opts JSON with the widewine params
-         * @returns prepared content URL
+		 * Added parameter for Widewine content url
+		 * @param {Object} opts JSON with the widewine params
+		 * @returns {String} prepared content URL
 		 * @private
 		 */
 		prepareUrlWidevine: function(opts) {
@@ -210,12 +222,32 @@ Device_Samsung_Player = (function(Events) {
 
 			var optsStr = [];
 			var defaults = {
-					'DEVICE_ID': this.getESN(),
-					'DEVICE_TYPE_ID': 60,
-					'COMPONENT': 'WV'
+				'DEVICE_ID': this.getESN(),
+				'DEVICE_TYPE_ID': 60,
+				'COMPONENT': 'WV'
 			};
+			
+			var drmOptions = {};
+			if(typeof(opts.DeviceID) !== 'undefined') {
+				drmOptions.DEVICE_ID = opts.DeviceID;
+			}
+			if(typeof(opts.StreamID) !== 'undefined') {
+				drmOptions.STREAM_ID = opts.StreamID;
+			}
+			if(typeof(opts.DRMServerURL) !== 'undefined') {
+				drmOptions.DRM_URL = opts.DRMServerURL;
+			}
+			if(typeof(opts.Portal) !== 'undefined') {
+				drmOptions.PORTAL = opts.Portal;
+			}
+			if(typeof(opts.UserData) !== 'undefined') {
+				drmOptions.USER_DATA = opts.UserData;
+			}
+			if(typeof(opts.ClientIP) !== 'undefined') {
+				//??? drmOptions.IP_ADDR = opts.ClientIP;
+			}
 
-			opts = $.extend(true, {}, defaults, opts);
+			opts = $.extend(true, {}, defaults, drmOptions);
 
 			$.each(opts, function(k, v) {
 				if (k !== 'url') {
@@ -227,8 +259,8 @@ Device_Samsung_Player = (function(Events) {
 		},
 
 		/**
-         * Get unique ESN code. It is used for DRM verification.
-         * 
+		 * Get unique ESN code. It is used for DRM verification.
+		 * 
 		 * @private
 		 */
 		getESN: function() {
@@ -243,45 +275,45 @@ Device_Samsung_Player = (function(Events) {
 
 			return deviceId;
 		},
-        /**
-         * Handler for change duration
-         * 
-         * @param {Number} duration
-         * @private
-         * @fires durationchange
-         */
+		/**
+		 * Handler for change duration
+		 * 
+		 * @param {Number} duration
+		 * @private
+		 * @fires durationchange
+		 */
 		onDurationChange: function(duration) {
 			this.duration = Math.round(duration);
 			this.trigger('durationchange', this.duration);
 		},
 
-        /**
-         * Handler for start buffering
-         * 
-         * @private
-         */
+		/**
+		 * Handler for start buffering
+		 * 
+		 * @private
+		 */
 		OnBufferingStart: function() {
 			this.state(this.STATE_BUFFERING);
 		},
 
-        /**
-         * Handler for end buffering
-         * 
-         * @private
-         */
+		/**
+		 * Handler for end buffering
+		 * 
+		 * @private
+		 */
 		OnBufferingComplete: function() {
 			this.state(this.prevState !== this.STATE_BUFFERING ? this.prevState : this.STATE_PLAYING);
 		},
 
-        /**
-         * Handler for current player time
-         * 
-         * @param {Number} time Current player time 
-         * @private
-         */
+		/**
+		 * Handler for current player time
+		 * 
+		 * @param {Number} time Current player time 
+		 * @private
+		 */
 		OnCurrentPlayTime: function(time) {
 
-			if (this.isTimeshiftedLiveStream) {
+			if (this.mediaOption.isTimeshiftedLiveStream) {
 				this._lastSeekBy = (this._lastSeekBy || 0) * 1000; // to ms
 				this._accSeekTime = this._accSeekTime || 0;
 				this._realLastSeekBy = 0;
@@ -294,7 +326,7 @@ Device_Samsung_Player = (function(Events) {
 						this._lastSeekBy = 0;                                          // clear lastSeek					
 					}
 				}
-				// console.warn('SAM currTime: ' + toTimee(time) + ', duration: ' + this.duration + '(ms), isTimeShift: ' + this.isTimeshiftedLiveStream + ', lastSeekBy: ' + this._lastSeekBy + ', realLastSeekBy: ' + this._realLastSeekBy + ', accSeekTime: ' + this._accSeekTime);		
+				// console.warn('SAM currTime: ' + toTimee(time) + ', duration: ' + this.duration + '(ms), isTimeShift: ' + this.mediaOption.isTimeshiftedLiveStream + ', lastSeekBy: ' + this._lastSeekBy + ', realLastSeekBy: ' + this._realLastSeekBy + ', accSeekTime: ' + this._accSeekTime);		
 
 				this._lastTime = time;                      // save currTime
 				var corrTime = this.duration + this._accSeekTime;  // correct currTime
@@ -312,48 +344,48 @@ Device_Samsung_Player = (function(Events) {
 			}
 		},
 
-        /**
-         * Handler for Stream info. Called when information about stream are downloaded
-         * 
-         * @private
-         */
+		/**
+		 * Handler for Stream info. Called when information about stream are downloaded
+		 * 
+		 * @private
+		 */
 		OnStreamInfoReady: function() {
 			this.onDurationChange(this.el.Execute('GetDuration'));
 		},
 
-        /**
-         * Handler error (Stream not found)
-         * 
-         * @private
-         */
+		/**
+		 * Handler error (Stream not found)
+		 * 
+		 * @private
+		 */
 		OnStreamNotFound: function() {
 			this.onError(1, 'not_found');
 		},
 
-        /**
-         * Handler error (Network disconnted)
-         * 
-         * @private
-         */
+		/**
+		 * Handler error (Network disconnted)
+		 * 
+		 * @private
+		 */
 		OnNetworkDisconnected: function() {
 			this.onError(2, 'connection');
 		},
 
-        /**
-         * Handler error (Connection to the stream failed)
-         * 
-         * @private
-         */
+		/**
+		 * Handler error (Connection to the stream failed)
+		 * 
+		 * @private
+		 */
 		OnConnectionFailed: function() {
 			this.onError(2, 'connection');
 		},
 
-        /**
-         * Handler error (Problem with stream rendering)
-         * 
-         * @param {Number} errorCode Error code
-         * @private
-         */
+		/**
+		 * Handler error (Problem with stream rendering)
+		 * 
+		 * @param {Number} errorCode Error code
+		 * @private
+		 */
 		OnRenderError: function(errorCode) {
 			var msg = '';
 
@@ -370,24 +402,24 @@ Device_Samsung_Player = (function(Events) {
 			this.onError(3, 'render', msg);
 		},
 
-        /**
-         * Handler error (Problem with DRM)
-         * 
-         * @param {Number} errorCode Error code
-         * @private
-         */
+		/**
+		 * Handler error (Problem with DRM)
+		 * 
+		 * @param {Number} errorCode Error code
+		 * @private
+		 */
 		OnDRMError: function(errorCode) {
 			var msg = '';
 
 			this.onError(4, 'drm', msg);
 		},
 
-        /**
-         * Handler for custom events
-         * 
-         * @param {Number} code Code represents some relevant event
-         * @private
-         */
+		/**
+		 * Handler for custom events
+		 * 
+		 * @param {Number} code Code represents some relevant event
+		 * @private
+		 */
 		OnCustomEvent: function(code) {
 			this.onError(code, 'custom');
 		},
@@ -400,13 +432,13 @@ Device_Samsung_Player = (function(Events) {
 			this.trigger('playbackstart');
 		},
 
-        /**
-         * Handler for general events. It calls other funcions related to eventCode
-         * 
-         * @param {Number} eventCode Event code
-         * @param {Object} param Additional parameters related with this event
-         * @private
-         */
+		/**
+		 * Handler for general events. It calls other funcions related to eventCode
+		 * 
+		 * @param {Number} eventCode Event code
+		 * @param {Object} param Additional parameters related with this event
+		 * @private
+		 */
 		onEvent: function(eventCode, param) {
 			if (eventCode === 1 || eventCode === 2) {
 				// 2 = OnAuthenticationFailed

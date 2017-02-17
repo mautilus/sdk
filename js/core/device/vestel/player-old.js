@@ -235,6 +235,7 @@ Device_Vestel_Player_Old = (function(Events) {
 			if (cmd === 'play') {
 				var scope = this;
 				if (typeof attrs.url !== "undefined" && this.el.src !== this.url) {
+					this._seekOnPlay = null; // clear
 					console.network('PLAYER', this.url);
 					this.el.src = this.url;
 				}

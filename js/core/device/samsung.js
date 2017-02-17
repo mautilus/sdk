@@ -148,8 +148,10 @@ Device_Samsung = (function(Events) {
 	 * @inheritdoc Device#getDeviceName
 	 */
 	getDeviceName: function(stripSpaces) {
-	    var type = (window.location.search.match(/modelid=([\d\w\_]+_BD)/) ? 'Blu-ray' : 'TV'),
-		    name = 'Samsung ' + type + ' ' + Main.getDevice()[1];
+		var type = (window.location.search.match(/modelid=([\d\w\_]+_BD)/) ? 'Blu-ray' : 'TV'),
+			productCode = this.TV.GetProductCode(0) || '',
+			modelCode = this.NNAVI.GetModelCode() || '',
+			name = 'Samsung ' + type + ' ' + Main.getDevice()[1] + ', ' + productCode + ', ' + modelCode;
 
 	    if (stripSpaces) {
 			name = name.replace(/\s/g, '');

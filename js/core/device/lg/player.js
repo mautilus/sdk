@@ -19,10 +19,6 @@
 
 Device_Lg_Player = (function(Events) {
 	var Device_Lg_Player = {
-			/**
-			 * @property {String} drm Current DRM platform name
-			 */
-			drm: null
 	};
 
 	$.extend(true, Device_Lg_Player, {
@@ -32,7 +28,8 @@ Device_Lg_Player = (function(Events) {
 		 */
 		initNative: function() {
 			var scope = this;
-
+			
+			this.createDRMAgent();
 			this.createPlayer();
 
 			this.ticker = setInterval(function() {
@@ -49,18 +46,33 @@ Device_Lg_Player = (function(Events) {
 		},
 
 		/**
-         * Function for creating player object
-         * 
+		 * Function for creating player object
+		 * @param {String} [drmType=''] DRM type ('WIDEVINE', 'PLAYREADY', 'VERIMATRIX')
+		 * 
 		 * @private
 		 */
-		createPlayer: function(drm){
+		createPlayer: function(drmType){
 			var scope = this;
 
 			if (this.PLAYER){
 				this.deinitNative();
 			}
+			
+			var drmTypeValue = '';
+			switch(drmType) {
+				case 'PLAYREADY':  drmTypeValue = 'wm-drm'; break;     // meaning: WM-DRM 10 PD or PlayReady (default value)
+				case 'WIDEVINE':   drmTypeValue = 'widevine'; break;   // meaning: Widevine DRM and its adaptive/live streaming
+				case 'VERIMATRIX': drmTypeValue = 'verimatrix'; break; // meaning: Verimatrix DRM
+			}
+			
+			var mediaType = this.mediaOption.mediaType || this.deriveMediaType(this.url);
+			var mediaTypeValue = '';
+			switch(mediaType) {
+				case 'SMOOTH_STREAMING': mediaTypeValue = 'application/vnd.ms-sstr+xml'; break;
+				default: mediaTypeValue = 'application/x-netcast-av'; break;  // Media Type Resolving in LG Media Player Plugin
+			}
 
-			this.$el = $('<object id="LGPLAYER" type="application/x-netcast-av" ' + (drm ? 'drm_type="' + drm + '" ' : '')
+			this.$el = $('<object id="LGPLAYER" type="'+mediaTypeValue+'" ' + (drmTypeValue ? 'drm_type="' + drmTypeValue + '" ' : '')
 					+ 'data="" width="' + this.config.width + '" height="' + this.config.height + '" style="width:' + (this.config.width == 1280 ? 1279 : this.config.width) + 'px;height:' + this.config.height + 'px;'
 					+ 'top:' + this.config.top + 'px;left:' + this.config.left + 'px;'
 					+ 'position:absolute;z-index:0;visibility:hidden"></object>').appendTo('body');
@@ -70,15 +82,28 @@ Device_Lg_Player = (function(Events) {
 				scope.onNativePlayStateChange();
 			};
 
-			this.drm = drm || null;
-
 			Player.trigger('init');
+		},
+		
+		/**
+		 * Function for creating DRM Agent object
+		 */
+		createDRMAgent: function() {
+			$('body').append('<object id="drmplugin" type="application/oipfDrmAgent" style="visibility:hidden" width="0" height="0"></object>');
+			this.drmplugin = document.getElementById('drmplugin');
 
+			if (this.drmplugin) {
+				this.drmplugin.onDRMMessageResult = this.onDRMMessageResult;
+				this.drmplugin.onDRMRightsError = this.onDRMRightsError;
+			} else {
+				console.log('[Device_Lg_Player] DRM Plugin initialization failed!');
+				return false;
+			}
 		},
 
 		/**
-         * Internal player timer
-         * 
+		 * Internal player timer
+		 * 
 		 * @private
 		 */
 		tick: function() {
@@ -94,82 +119,98 @@ Device_Lg_Player = (function(Events) {
 		 * @inheritdoc Player#native
 		 */
 		native: function(cmd, attrs) {
-			var url, drmUrl;
+			var url;
 
 			if (cmd === 'play') {
 				if (attrs && attrs.url) {
 					url = this.url;
+					this._seekOnPlay = null; // clear
 
 					console.network('PLAYER', this.url);
 
-					if ((typeof url === 'object' && url && url.DRM_URL) || String(url).match(/\.wvm/)) {
-						// widevine
-						if (this.drm !== 'widevine') {
-							this.createPlayer('widevine');
-							this.show();
-						}
-
-						if (typeof url !== 'object') {
-							drmUrl = $.extend(true, {}, this.config.DRMconfig || {}, {url: url});
-
-						} else {
-							drmUrl = $.extend(true, {}, url);
-							url = drmUrl.url;
-						}
-
-						this.PLAYER.setWidevineDrmURL(drmUrl.DRM_URL);
-
-						if (this.customData) {
-							this.PLAYER.setWidevineUserData(this.customData);
-						}
-
-						this.PLAYER.setWidevinePortalID(drmUrl.PORTAL);
-						this.PLAYER.setWidevineDeviceType(60);
-						this.PLAYER.setWidevineDeviceID(this.getESN());
-
-					} else if (this.drm) {
-
-						// plain
-						this.createPlayer();
+					var drmType = this.drmConfig.type;
+					if (drmType === 'WIDEVINE') {
+						// Widevine
+						this.createPlayer('WIDEVINE');
 						this.show();
-					} else if (this.customData && Device.DRMAGENT) {
-						console.log("LG DRM");
+						
+						var drmConfigOption = this.drmConfig.option || {};
 
-						this.createPlayer();
+						if (typeof(drmConfigOption.DRMServerURL) !== 'undefined') {
+							this.PLAYER.setWidevineDrmURL(drmConfigOption.DRMServerURL);
+						}
+						if (typeof(drmConfigOption.UserData) !== 'undefined') {
+							this.PLAYER.setWidevineUserData(drmConfigOption.UserData);
+						}
+						if (typeof(drmConfigOption.Portal) !== 'undefined') {
+							this.PLAYER.setWidevinePortalID(drmConfigOption.Portal);
+						}
+						if (typeof(drmConfigOption.DeviceID) !== 'undefined') {
+							this.PLAYER.setWidevineDeviceID(drmConfigOption.DeviceID);
+						}
+						if (typeof(drmConfigOption.ClientIP) !== 'undefined') {
+							this.PLAYER.setWidevineClientIP(drmConfigOption.ClientIP);
+						}
+						if (typeof(drmConfigOption.StreamID) !== 'undefined') {
+							this.PLAYER.setWidevineStreamID(drmConfigOption.StreamID);
+						}
+						if (typeof(drmConfigOption.DRMAckServerURL) !== 'undefined') {
+							this.PLAYER.setWidevineDrmAckURL(drmConfigOption.DRMAckServerURL);
+						}
+						if (typeof(drmConfigOption.DRMHeartBeatURL) !== 'undefined') {
+							this.PLAYER.setWidevineHeartbeatURL(drmConfigOption.DRMHeartBeatURL);
+						}
+						if (typeof(drmConfigOption.DRMHeartBeatPeriod) !== 'undefined') {
+							this.PLAYER.setWidevineHeartbeatPeriod(drmConfigOption.DRMHeartBeatPeriod);
+						}
+						this.PLAYER.setWidevineDeviceType(60);   // accoring to LG API doc: "Device type (default value : 0)"
+						this.PLAYER.data = url;
+						this.PLAYER.play(1);
+						
+					} else if (drmType === 'PLAYREADY') {
+						// PlayReady
+						this.createPlayer('PLAYREADY');
+						this.show();
+						
+						var drmConfigOption = this.drmConfig.option || {};
+						var customData = typeof(drmConfigOption.CustomData) !== 'undefined' ? drmConfigOption.CustomData : '';
+						var licenseServer = typeof(drmConfigOption.LicenseServer) !== 'undefined' ? drmConfigOption.LicenseServer : '';
 
-						var msgType = "application/vnd.ms-playready.initiator+xml",
-							scope = this;
-						DRMSystemID = "urn:dvb:casystemid:19219",
-						msg =
-							'<?xml version="1.0" encoding="utf-8"?>' +
-							'<PlayReadyInitiator xmlns="http://schemas.microsoft.com/DRM/2007/03/protocols/">' +
-							'<SetCustomData>' +
-							'<CustomData>' + this.customData + '</CustomData>' +
-							'</SetCustomData>' +
-							'</PlayReadyInitiator>';
+						var scope = this;
+						var msgType = "application/vnd.ms-playready.initiator+xml";
+						var DRMSystemID = "urn:dvb:casystemid:19219";
+						var msg = '';
+						msg += '<?xml version="1.0" encoding="utf-8"?>';
+						msg += '<PlayReadyInitiator xmlns="http://schemas.microsoft.com/DRM/2007/03/protocols/">';
+						msg +=   '<SetCustomData>';
+						msg +=     '<CustomData>'+ customData +'</CustomData>';
+						msg +=   '</SetCustomData>';
+						msg +=   '<LicenseServerUriOverride>';
+						msg +=     '<LA_URL>' + licenseServer + '</LA_URL>';
+						msg +=    '</LicenseServerUriOverride>';
+						msg += '</PlayReadyInitiator>';
 
-						Device.DRMAGENT.onDRMMessageResult = function(msgId, resultMsg, resultCode) {
-							console.log("onDRMMessageResult " + resultCode);
+						this.drmplugin.onDRMMessageResult = function(msgId, resultMsg, resultCode) {
 							if (resultCode == 0) {
-								console.log("play url = " + url);
 								scope.PLAYER.data = url;
 								scope.PLAYER.play(1);
-								Player.sendDRMHeartbeat();
 							} else {
-								console.log("download failed. erreur:" + resultCode);
+								console.log("[Device_Lg_Player] onDRMMessageResult failed. error:" + resultCode);
+								scope.onDRMError(resultCode, resultMsg);
 							}
 						};
+						this.drmplugin.sendDRMMessage(msgType, msg, DRMSystemID);
 
-						console.log("SEND DRM " + msgType + this.customData + DRMSystemID);
-						Device.DRMAGENT.sendDRMMessage(msgType, msg, DRMSystemID);
-						return;
 					} else {
 						this.createPlayer();
+						this.show();
 						this.PLAYER.data = url;
+						this.PLAYER.play(1);
 					}
+				} else {
+					// resume
+					this.PLAYER.play(1);
 				}
-
-				this.PLAYER.play(1);
 
 				if (attrs && attrs.position) {
 					this._seekOnPlay = attrs.position;
@@ -221,18 +262,18 @@ Device_Lg_Player = (function(Events) {
 		},
 
 		/**
-         * Get unique ESN code. It is used for DRM verification.
-         * 
+		 * Get unique ESN code. It is used for DRM verification.
+		 * 
 		 * @private
 		 */
 		getESN: function() {
 			return Device.getUID();
 		},
 
-        /**
-         * Handling changes in player state
-         * @private
-         */
+		/**
+		 * Handling changes in player state
+		 * @private
+		 */
 		onNativePlayStateChange: function(){
 			var state = this.PLAYER.playState;
 
@@ -272,65 +313,96 @@ Device_Lg_Player = (function(Events) {
 				this.onNativeError();
 			}
 		},
+		
+		/**
+		 * @param {Number} resultCode
+		 * @param {String} resultMsg
+		 */
+		onDRMError: function(resultCode, resultMsg) {
+			var errorMsg, errorDetail;
+			switch(resultCode) {
+				case 1: 
+					errorMsg = 'Unknown Error';
+					errorDetail = 'SendDRMMessage() failed because an unspecified error occurred.';
+					break; 
+				case 2:
+					errorMsg = 'Cannot Process Request';
+					errorDetail = 'SendDRMMessage() failed because the DRM agent was unable to complete the necessary computations in the time allotted.';
+					break;
+				case 3:
+					errorMsg = 'Unknown MIME Type';
+					errorDetail = 'SendDRMMessage() failed because the specified Mime Type is unknown for the specified DRM system indicated in the MIME type';
+					break;
+				case 4:
+					errorMsg = 'User Consent Needed';
+					errorDetail = 'SendDRMMessage() failed because user consent is needed for that action';
+					break;
+				default:
+					errorMsg = 'Unknown Error';
+					errorDetail = 'SendDRMMessage() failed due to Unknown Error';
+					break;
+			}
+			this.onError('-1', errorMsg, errorDetail);
+		},
 
-        /**
-         * Player error handler
-         * 
-         * @private
-         */	
+		/**
+		 * Player error handler
+		 * 
+		 * @private
+		 */	
 		onNativeError: function() {
-            var code = this.el.error,
-                msg = 'Unknown Error';
+			var code = this.el.error,
+				msg = 'Unknown Error';
 
-            if (code === 0) {
-                msg = 'A/V format not supported';
+			if (code === 0) {
+				msg = 'A/V format not supported';
 
-            } else if (code === 1) {
-                msg = 'Cannot connect to server or connection lost';
+			} else if (code === 1) {
+				msg = 'Cannot connect to server or connection lost';
 
-            } else if (code === 2) {
-                msg = 'Unidentified error';
+			} else if (code === 2) {
+				msg = 'Unidentified error';
 
-            } else if (code === 1000) {
-                msg = 'File not found';
+			} else if (code === 1000) {
+				msg = 'File not found';
 
-            } else if (code === 1001) {
-                msg = 'Invalid protocol';
+			} else if (code === 1001) {
+				msg = 'Invalid protocol';
 
-            } else if (code === 1002) {
-                msg = 'DRM failure';
+			} else if (code === 1002) {
+				msg = 'DRM failure';
 
-            } else if (code === 1003) {
-                msg = 'Play list is empty';
+			} else if (code === 1003) {
+				msg = 'Play list is empty';
 
-            } else if (code === 1004) {
-                msg = 'Unrecognized play list';
+			} else if (code === 1004) {
+				msg = 'Unrecognized play list';
 
-            } else if (code === 1005) {
-                msg = 'Invalid ASX format';
+			} else if (code === 1005) {
+				msg = 'Invalid ASX format';
 
-            } else if (code === 1006) {
-                msg = 'Error in downloading play list';
+			} else if (code === 1006) {
+				msg = 'Error in downloading play list';
 
-            } else if (code === 1007) {
-                msg = 'Out of memory';
+			} else if (code === 1007) {
+				msg = 'Out of memory';
 
-            } else if (code === 1008) {
-                msg = 'Invalid URL list format';
+			} else if (code === 1008) {
+				msg = 'Invalid URL list format';
 
-            } else if (code === 1100) {
-                msg = 'Unidentified WM-DRM error';
+			} else if (code === 1100) {
+				msg = 'Unidentified WM-DRM error';
 
-            } else if (code === 1101) {
-                msg = 'Incorrect license in local license store';
+			} else if (code === 1101) {
+				msg = 'Incorrect license in local license store';
 
-            } else if (code === 1102) {
-                msg = 'Fail in receiving correct license from server';
+			} else if (code === 1102) {
+				msg = 'Fail in receiving correct license from server';
 
-            } else if (code === 1103) {
-                msg = 'Stored license is expired';
+			} else if (code === 1103) {
+				msg = 'Stored license is expired';
 
-            }
+			}
 
 			this.onError(code, msg);
 		}

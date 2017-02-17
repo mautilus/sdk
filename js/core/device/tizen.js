@@ -39,7 +39,7 @@ Device_Tizen = (function(Events) {
 		this.SYSTEM = tizen.systeminfo;
 		this.AVPLAYER = this.loadObject('av-player', {'type': 'application/avplayer', 'style': 'width: 0; height: 0;'});
 
-		stack.push('obj');
+		stack.push('property-LOCALE');
 		tizen.systeminfo.getPropertyValue('LOCALE', function(obj){
 			console.log('locale object is loaded fine');
 			self.LOCALE = obj;
@@ -47,6 +47,16 @@ Device_Tizen = (function(Events) {
 		}, function(error){
 			self.LOCALE = {};
 			console.error('locale object is not loaded ' + error.message);
+		});
+		
+		stack.push('property-DISPLAY');
+		tizen.systeminfo.getPropertyValue("DISPLAY", function(display){
+			console.log('display object is loaded fine');
+			self.DISPLAY = display;
+			stack.pop();
+		}, function(error) {
+			self.DISPLAY = {};
+			console.error('display object is not loaded ' + error.message);
 		});
 
 		onShow = function() {
@@ -194,7 +204,7 @@ Device_Tizen = (function(Events) {
 			 * *PP*
 			 */
 			document.addEventListener("visibilitychange", function() {
-				if(self.trigger('visibilitychange') === false) {
+				if(self.trigger('visibilitychange', !document.hidden) === false) {
 					return;
 				} else {
 					if (document.hidden) {
@@ -274,7 +284,7 @@ Device_Tizen = (function(Events) {
 	 * @inheritdoc Device#getDeviceName
 	 */
 	getDeviceName: function(stripSpaces) {
-		var name = 'Tizen ' + Main.getDevice()[1] + ', ' + this.MODEL.getModelCode() + ', ' + this.MODEL.getRealModel();
+		var name = 'Tizen ' + Main.getDevice()[1] + ', ' + this.MODEL.getRealModel() + ', ' + this.MODEL.getModelCode();
 
 		if (stripSpaces) {
 			name = name.replace(/\s/g, '');

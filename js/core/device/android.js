@@ -141,24 +141,6 @@ Device_Android = (function(Events) {
 		},
 
 		/**
-		 * @inheritdoc Device#getIP
-		 */
-		getIP: function() {
-			if (this.CONNECTIONMANAGER) {
-				var wired = this.CONNECTIONMANAGER.wired,
-					wifi = this.CONNECTIONMANAGER.wifi;
-
-				if (wired.state == 'connected') {
-					return wired.ipAddress;
-				} else if(wifi.state == 'connected') {
-					return wifi.ipAddress;
-				}
-			}
-
-			return '0.0.0.0';
-		},
-
-		/**
 		 * @inheritdoc Device#getDeviceName
 		 */
 		getDeviceName: function(stripSpaces) {
@@ -176,21 +158,6 @@ Device_Android = (function(Events) {
 		 */
 		getUID: function() {
 			return 'UID';
-		},
-
-		/**
-		 * @inheritdoc Device#checkNetworkConnection
-		 */
-		checkNetworkConnection: function(callback, scope) {
-			var status = true;
-
-			if (this.CONNECTIONMANAGER) {
-				status = this.CONNECTIONMANAGER.isInternetConnectionAvailable;
-			}
-
-			if (callback) {
-				callback.call(scope || this, status);
-			}
 		},
 
 		/**

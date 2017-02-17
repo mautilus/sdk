@@ -188,10 +188,6 @@ Device_Sony_Player = (function(Events) {
 			 * @property {Number} height Player height
 			 */
 			this.height = this.config.height;
-			/**
-			 * @property {String} customData DRM custom data
-			 */
-			this.customData = null;
 
 			this.initNative();
 
@@ -293,6 +289,7 @@ Device_Sony_Player = (function(Events) {
 			var scope = this;
 			if (cmd === 'play') {
 				if (typeof attrs !== "undefined" && typeof attrs.url !== "undefined" && this.el.src !== this.url) {
+					this._seekOnPlay = null; // clear
 					console.network('PLAYER', this.url);
 					this.el.src = this.url;
 				}
@@ -471,15 +468,6 @@ Device_Sony_Player = (function(Events) {
 			}
 
 			this.trigger('url', this.url);
-		},
-
-		/**
-		 * Setu custom data for widevine/playready DRM
-		 * 
-		 * @param {String} customData
-		 */
-		setCustomData: function(customData) {
-			this.customData = customData || null;
 		},
 
 		/**

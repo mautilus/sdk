@@ -170,15 +170,23 @@ Main = (function(global) {
 			else if (navigator.userAgent.match(/playstation 4/gi)) {
 				return ['playstation', '4'];
 			}
-            else if (navigator.userAgent.indexOf('Web0S') >= 0 && navigator.userAgent.indexOf('538.2') >= 0) {
-                return ['webos', '2.x'];
-            }
-            else if (navigator.userAgent.indexOf('Web0S') >= 0) {
-                // navigator.userAgent.indexOf('537.41') >= 0 for WebOS 1.0
-                return ['webos', '1.x'];
+			else if (navigator.userAgent.indexOf('Web0S') >= 0 && navigator.userAgent.indexOf('537.41') >= 0) {
+				return ['webos', '1.x'];
+			}
+			else if (navigator.userAgent.indexOf('Web0S') >= 0 && navigator.userAgent.indexOf('538.2') >= 0) {
+				return ['webos', '2.x'];
+			}
+			else if (navigator.userAgent.indexOf('Web0S') >= 0 && navigator.userAgent.indexOf('537.36') >= 0) {
+				return ['webos', '3.x'];
+			}
+			else if(navigator.userAgent.indexOf('Web0S') >= 0) {
+				return ['webos', ''];  // to cover the new models comming from future
 			}
 			else if (navigator.userAgent.indexOf('Crosswalk') >= 0) {
 				return ['android', ((Android && Android.getManufacturer) ? Android.getManufacturer() : '')];
+			}
+			else if (navigator.userAgent.indexOf('Hisense') >= 0) {
+				return ['hisense', ''];
 			}
 
 			return ['default', ''];

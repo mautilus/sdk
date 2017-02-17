@@ -32,17 +32,20 @@ Device_Tizen_Player = (function(Events) {
 			this.el = Device.AVPLAYER;
 			this.$el = $(this.el);
 			this.isMute = false;
-			this.uhdMultiplier = (webapis.productinfo.isUdPanelSupported()) ? 1.5 : 1;   // ratio 1.5 for UHD models, 1.0 for normal model (used in .setDisplayRect())
+			
+			var defaultResolutionWidth = 1280;   // default App resolution
+			this.uhdMultiplier = Device.DISPLAY.resolutionWidth / defaultResolutionWidth;
+			//this.uhdMultiplier = (webapis.productinfo.isUdPanelSupported()) ? 1.5 : 1;   // ratio 1.5 for UHD models, 1.0 for normal model (used in .setDisplayRect()) --> NOT WORKING on all Tizen TV 2016
 
 			this.$el.css({left : Math.round(this.left), top : Math.round(this.top), width: Math.round(this.width), height: Math.round(this.height)});
 			
 			this.multitasking = {
-                playerTime: 0,
-                playerState: null,
-                playbackSpeed: 1,
-                url: '',		// player url
-                verifyUrl: '',	// verification url for license
-                hidden: false
+				playerTime: 0,
+				playerState: null,
+				playbackSpeed: 1,
+				url: '',		// player url
+				verifyUrl: '',	// verification url for license
+				hidden: false
 			}; // object for remember data during app is hidden
 
 			this.PLAYER = Device.PLAYER;
@@ -58,22 +61,6 @@ Device_Tizen_Player = (function(Events) {
 				onbufferingcomplete: function() {
 					//console.log('[Device_Tizen_Player] onbufferingcomplete');
 					scope.OnBufferingComplete();
-					scope.OnStreamInfoReady();
-					
-					if(scope.currentTime === 0) {
-						try {
-							console.info("Player Info >>>\n"
-								+ " URL: " + (Player.url) + "\n"
-								+ " Duration: " + Player.PLAYER.getDuration() + "\n"
-								//+ " Resolution: " + Player.el.Execute('GetVideoResolution') + "\n"
-								//+ " Bitrates: " + Player.PLAYER.getStreamingProperty("AVAILABLE_BITRATE") + "\n"
-								+ " Current Bandwidth: " + Player.PLAYER.getStreamingProperty ("CURRENT_BANDWITH") + "\n"
-								+ " Audio tracks: " + JSON.stringify(scope.PLAYER.getTotalTrackInfo()) + "\n"
-								);
-	
-						} catch (e) {
-						}
-					}
 				},
 				onstreamcompleted: function() {
 					// console.log("[Device_Tizen_Player] onstreamcompleted");
@@ -100,6 +87,11 @@ Device_Tizen_Player = (function(Events) {
 					console.log("[Device_Tizen_Player] DRM callback: " + drmType + ", data: " + JSON.stringify(drmData));
 				},			
 				onerror : function(type, data) {
+					if(document.hidden) {
+						// Tizen2015 - ignore error - when multitasking is done during PLAYER.prepareAsync is running (during initial loading video)
+						console.log("[Device_Tizen_Player] Ignored Error " + type + ", data: " + data);
+						return;
+					}
 					console.log("[Device_Tizen_Player] Error " + type + ", data: " + data);
 					scope.onError(type, data);
 				}
@@ -116,20 +108,24 @@ Device_Tizen_Player = (function(Events) {
 					Device.AUDIOCONTROL.setMute(false);
 				}
 				if (this.currentState !== this.STATE_IDLE) {
-					if(this.drmType == 'widevine' || this.drmType == 'playready') {		// WIDEVINE || PLAYREADY DRM
+					var drmType = this.drmConfig.type;
+					if(drmType === 'WIDEVINE' || drmType === 'PLAYREADY') {   // WIDEVINE || PLAYREADY DRM
 						this.multitasking.hidden = true;
 						if (this.url && this.currentTime) {
-			                this.multitasking.url = this.url;
-			                this.multitasking.playerState = this.currentState;
-			                this.multitasking.playerTime = this.currentTime / 1000;
-			                this.multitasking.playbackSpeed = this.playbackspeed;
+							this.multitasking.url = this.url;
+							this.multitasking.playerState = this.currentState;
+							this.multitasking.playerTime = this.currentTime / 1000;
+							this.multitasking.playbackSpeed = this.playbackspeed;
 						}
 						
-						if(this.currentState != this.STATE_IDLE) {
+						var year = Main.getDevice()[1];
+						if(year === '2015') {
+							this.native('suspend');
+						} else {
 							this.native('stop');
 						}
 					} else {	// NO DRM
-						this.PLAYER.suspend();
+						this.native('suspend');
 					}
 				}
 			}, this);
@@ -149,75 +145,86 @@ Device_Tizen_Player = (function(Events) {
 				
 				try {
 					if (this.currentState !== this.STATE_IDLE) {
-						if(this.drmType == 'widevine' || this.drmType == 'playready') {		// WIDEVINE || PLAYREADY DRM
+						var drmType = this.drmConfig.type;
+						if(drmType === 'WIDEVINE' || drmType === 'PLAYREADY') {   // WIDEVINE || PLAYREADY DRM
 							var verifyUrl = (this.multitasking.verifyUrl.length)? this.multitasking.verifyUrl : this.multitasking.url;
 							this.onReqVerifyPlayback(verifyUrl).done(function() {
+								drmType = this.drmConfig.type;
 								// CUSTOM SOLUTIONS InstantON - PP
-			                    if(this.multitasking.state == this.STATE_PLAYING) {
-			                    	/* ************************************
-			                    	 * PLAYING
-			                    	 * ********************************** */
-			                    	
-			                    	var setplayback = function(state) {			// Playback Speed
-			                    		if(state == Player.STATE_PLAYING) {
-			                    			Player.off('statechange', setplayback);
-				                    		setTimeout(function() {
-				                    			if(scope.multitasking.playbackSpeed !== 1) {
-				                    				scope.playbackspeed = scope.multitasking.playbackSpeed;
-				                    				scope.PLAYER.setSpeed(scope.multitasking.playbackSpeed); // -16, -8, -4, -2, -1, 1, 2, 4, 8, 16
-					                    		}
-				                    		}, 500);
-			                    		}
-			                    	};
-			                    	
-			                    	// RUN
-			                    	Player.on('statechange', setplayback);
-			                    	setTimeout(function() {
-			                    		scope.native('play', {
-					                    	position: scope.multitasking.playerTime*1000,
-					                    	url: scope.url
-					                    });
-			                    	}, 500);
-			                    } else if(APP.multitasking.state == SDK.player.STATE_PAUSED) {
-			                    	/* ************************************
-			                    	 * PAUSED
-			                    	 * ********************************** */
-			                    	
-			                    	scope.PLAYER.open(scope.url);
-			                    	
-			                    	if(scope.drmType == 'playready') {			// PLAYREADY
-			                    		if (scope.customData) {
-											var drmParam = {
-												CustomData: scope.customData
-											};
-											Player.setDrmType('playready');
-											scope.PLAYER.setDrm("PLAYREADY", "SetProperties", JSON.stringify(drmParam));
+								if(this.multitasking.state === this.STATE_PLAYING) {
+									/* ************************************
+									 * PLAYING
+									 * ********************************** */
+									var setplayback = function(state) {			// Playback Speed
+										if(state == Player.STATE_PLAYING) {
+											Player.off('statechange', setplayback);
+											setTimeout(function() {
+												if(scope.multitasking.playbackSpeed !== 1) {
+													scope.playbackspeed = scope.multitasking.playbackSpeed;
+													scope.PLAYER.setSpeed(scope.multitasking.playbackSpeed); // -16, -8, -4, -2, -1, 1, 2, 4, 8, 16
+												}
+											}, 500);
 										}
-			                    	} else if(scope.drmType == 'widevine') {	// WIDEVINE
-			                    		scope.PLAYER.setStreamingProperty ('WIDEVINE', scope.prepareWidevine(scope.config.DRMconfig || {}));
+									};
+									
+									// RUN
+									Player.on('statechange', setplayback);
+									setTimeout(function() {
+										scope.native('play', {
+											position: scope.multitasking.playerTime*1000,
+											url: scope.url
+										});
+									}, 500);
+								} else if(APP.multitasking.state === SDK.player.STATE_PAUSED) {
+									/* ************************************
+									 * PAUSED
+									 * ********************************** */
+									scope.PLAYER.open(scope.url);
+									
+									if(drmType === 'PLAYREADY') {
+										var drmConfigOption = scope.drmConfig.option || {};
+										var customData = typeof(drmConfigOption.CustomData) !== 'undefined' ? drmConfigOption.CustomData : '';
+										var licenseServer = typeof(drmConfigOption.LicenseServer) !== 'undefined' ? drmConfigOption.LicenseServer : '';
 										
-										if (scope.customData) {
+										var drmParam = {};
+										drmParam.DeleteLicenseAfterUse = true;
+										if(typeof(customData) !== 'undefined') {
+											drmParam.CustomData = customData;
+										}
+										if(typeof(licenseServer) !== 'undefined') {
+											drmParam.LicenseServer = licenseServer;
+										}
+										scope.PLAYER.setDrm("PLAYREADY", "SetProperties", JSON.stringify(drmParam));
+										
+									} else if(drmType === 'WIDEVINE') {
+										var drmConfigOption = scope.drmConfig.option || {};
+										scope.PLAYER.setStreamingProperty ('WIDEVINE', scope.prepareWidevine(drmConfigOption || {}));
+										
+										var userData = typeof(drmConfigOption.UserData) !== 'undefined' ? drmConfigOption.UserData : '';
+										if(typeof(userData) !== 'undefined') {
 											var drmParam = {
-												CustomData: scope.customData
+												//LicenseServer: this.drmConfig.option.DRMServerURL,
+												//DeleteLicenseAfterUse: true,
+												CustomData: userData
 											};
-											Player.setDrmType('widevine');
 											scope.PLAYER.setDrm('WIDEVINE_CLASSIC', 'SetProperties', JSON.stringify(drmParam));
 										}
-			                    	}
-			                    	
-			                    	scope.PLAYER.prepareAsync(function() {
+									}
+
+									scope.state(scope.STATE_PAUSED); // Multitasking
+									scope.PLAYER.prepareAsync(function() {
 										Player.PLAYER.setDisplayRect(scope.left * scope.uhdMultiplier, scope.top * scope.uhdMultiplier, scope.width * scope.uhdMultiplier, scope.height * scope.uhdMultiplier);
 										if(scope.multitasking.playerTime) {
 											Player.PLAYER.seekTo(scope.multitasking.playerTime*1000, function() {scope.trigger('seekSuccess');}, function() {scope.trigger('seekError');});
 										}
-										scope.state(scope.STATE_PAUSED);
 									});
-			                    }
+								}
 							}, this).fail(function() {
 								Developer.reload();
 							}, this);
-						} else {									// NO_DRM
-							this.PLAYER.restore();
+						} else {
+							// NO_DRM
+							this.native('restore');
 						}
 					}
 				} catch(e) {
@@ -244,45 +251,57 @@ Device_Tizen_Player = (function(Events) {
 				try {
 					if (attrs && attrs.url) {
 						this.url = attrs.url;
-						this.PLAYER.open(this.url);
-						console.network('PLAYER', this.url);
 						
-						if(attrs.url.match(/\/manifest/i)) {
+						console.network('PLAYER', this.url);
+						this.PLAYER.open(this.url);
+						
+						var drmType = this.drmConfig.type;
+						if(drmType === 'PLAYREADY') {
 							//playready
-							if (this.customData) {
-								var drmParam = {
-									//LicenseServer: this.config.DRMconfig.DRM_URL,
-									//DeleteLicenseAfterUse: true,
-									CustomData: this.customData
-								};
-								Player.setDrmType('playready');
-								this.PLAYER.setDrm("PLAYREADY", "SetProperties", JSON.stringify(drmParam));
+							var drmConfigOption = this.drmConfig.option || {};
+							var customData = typeof(drmConfigOption.CustomData) !== 'undefined' ? drmConfigOption.CustomData : '';
+							var licenseServer = typeof(drmConfigOption.LicenseServer) !== 'undefined' ? drmConfigOption.LicenseServer : '';
+							
+							var drmParam = {};
+							drmParam.DeleteLicenseAfterUse = true;
+							if(typeof(customData) !== 'undefined') {
+								drmParam.CustomData = customData;
 							}
+							if(typeof(licenseServer) !== 'undefined') {
+								drmParam.LicenseServer = licenseServer;
+							}
+							this.PLAYER.setDrm("PLAYREADY", "SetProperties", JSON.stringify(drmParam));
 							
-						} else if(attrs.url.match(/\.wvm/)) {
+						} else if(drmType === 'WIDEVINE') {
 							//widevine
-							this.PLAYER.setStreamingProperty ('WIDEVINE', this.prepareWidevine(this.config.DRMconfig || {}));
+							var drmConfigOption = this.drmConfig.option || {};
+							this.PLAYER.setStreamingProperty ('WIDEVINE', this.prepareWidevine(drmConfigOption || {}));
 							
-							if (this.customData) {
+							var userData = typeof(drmConfigOption.UserData) !== 'undefined' ? drmConfigOption.UserData : '';
+							if(typeof(userData) !== 'undefined') {
 								var drmParam = {
-									//LicenseServer: this.config.DRMconfig.DRM_URL,
+									//LicenseServer: this.drmConfig.option.DRMServerURL,
 									//DeleteLicenseAfterUse: true,
-									CustomData: this.customData
+									CustomData: userData
 								};
-								Player.setDrmType('widevine');
 								this.PLAYER.setDrm('WIDEVINE_CLASSIC', 'SetProperties', JSON.stringify(drmParam));
 							}
 						}
-	
+						
+						if(this.mediaOption.mode4K) {
+							console.log('[Device_Tizen_Player] SET_MODE_4K');
+							webapis.avplay.setStreamingProperty("SET_MODE_4K", "TRUE");
+						}
+						
+						scope.state(this.STATE_BUFFERING);
 						this.PLAYER.prepareAsync(function() {
 							Player.PLAYER.setDisplayRect(scope.left * scope.uhdMultiplier, scope.top * scope.uhdMultiplier, scope.width * scope.uhdMultiplier, scope.height * scope.uhdMultiplier);
 							if (attrs && attrs.position) {
 								Player.PLAYER.seekTo(attrs.position, function() {scope.trigger('seekSuccess');}, function() {scope.trigger('seekError');});
 							}
 	
-							scope.state(this.STATE_BUFFERING);
+							scope.OnStreamInfoReady();   // duration can be get after prepare complete
 							scope.PLAYER.play();
-	
 						});
 					} else {
 						if (attrs && attrs.position) {
@@ -295,7 +314,7 @@ Device_Tizen_Player = (function(Events) {
 				
 				} catch(e){
 					console.warn(e);
-					Developer.reload();
+					this.onError('-1', e);
 				}
 				return true;
 	
@@ -319,6 +338,11 @@ Device_Tizen_Player = (function(Events) {
 				return true;
 			
 			} else if (cmd === 'playbackSpeed') {
+				// Speed range for Tizen can be limited based on the type of stream playing:
+				// Widevine         -32 ~ +32
+				// SmoothStreaming  -16 ~ +16
+				// http(s)          -8 ~ +8
+				// HLS              Not supported
 				this.playbackspeed = attrs.speed;
 				return this.PLAYER.setSpeed(attrs.speed); // -16, -8, -4, -2, -1, 1, 2, 4, 8, 16
 	
@@ -344,7 +368,21 @@ Device_Tizen_Player = (function(Events) {
 				if (typeof Device.screensaver == 'function') {
 					Device.screensaver();
 				}
-	
+				
+			} else if(cmd === 'suspend') {
+				this.PLAYER.suspend();
+				
+			} else if(cmd === 'restore') {
+				try {
+					this.PLAYER.restore();
+				} catch(e) { console.warn('[Device_Tizen_Player] restore failed: ' + e); }
+
+				try {
+					if(Player.currentState !== Player.STATE_PAUSED && webapis.avplay.getState() !== 'PLAYING') {
+						this.PLAYER.play();
+					}
+				} catch(e) { console.warn('[Device_Tizen_Player] restore play failed: ' + e); }
+			
 			} else if (cmd === 'setVideoDimensions') {
 				// done with this.PLAYER.setDisplayMethod('PLAYER_DISPLAY_MODE_LETTER_BOX'); in init
 	
@@ -372,12 +410,11 @@ Device_Tizen_Player = (function(Events) {
 		/**
 		 * @private
 		 * @param {Object} opts
-		 * @param {String} opts.DEVICE_ID
-		 * @param {Number} opts.DEVICE_TYPE_ID
-		 * @param {String} opts.DRM_URL
-		 * @param {String} opts.USER_DATA
-		 * @param {String} opts.PORTAL
-		 * @param {String} opts.HEARTBEAT_URL (optional)
+		 * @param {String} opts.DeviceID
+		 * @param {String} opts.StreamID
+		 * @param {String} opts.DRMServerURL
+		 * @param {String} opts.UserData
+		 * @param {String} opts.Portal
 		 */
 		prepareWidevine: function(opts) {
 			var optsStr = [];
@@ -386,7 +423,27 @@ Device_Tizen_Player = (function(Events) {
 				'DEVICE_TYPE_ID': 60
 			};
 	
-			opts = $.extend(true, {}, defaults, opts);
+			var drmOptions = {};
+			if(typeof(opts.DeviceID) !== 'undefined') {
+				drmOptions.DEVICE_ID = opts.DeviceID;
+			}
+			if(typeof(opts.StreamID) !== 'undefined') {
+				drmOptions.STREAM_ID = opts.StreamID;
+			}
+			if(typeof(opts.DRMServerURL) !== 'undefined') {
+				drmOptions.DRM_URL = opts.DRMServerURL;
+			}
+			if(typeof(opts.Portal) !== 'undefined') {
+				drmOptions.PORTAL = opts.Portal;
+			}
+			if(typeof(opts.UserData) !== 'undefined') {
+				drmOptions.USER_DATA = opts.UserData;
+			}
+			if(typeof(opts.ClientIP) !== 'undefined') {
+				//??? drmOptions.IP_ADDR = opts.ClientIP;
+			}
+			
+			opts = $.extend(true, {}, defaults, drmOptions);
 	
 			$.each(opts, function(k, v) {
 				optsStr.push(k + '=' + v);
@@ -459,6 +516,18 @@ Device_Tizen_Player = (function(Events) {
 		 */
 		OnStreamInfoReady: function() {
 			this.onDurationChange(this.PLAYER.getDuration());
+			
+			try {
+				console.info("Player Info >>>\n"
+					+ " URL: " + (Player.url) + "\n"
+					+ " Duration: " + Player.PLAYER.getDuration() + "\n"
+					//+ " Resolution: " + Player.el.Execute('GetVideoResolution') + "\n"
+					//+ " Bitrates: " + Player.PLAYER.getStreamingProperty("AVAILABLE_BITRATE") + "\n"
+					+ " Current Bandwidth: " + Player.PLAYER.getStreamingProperty ("CURRENT_BANDWITH") + "\n"
+					+ " Audio tracks: " + JSON.stringify(scope.PLAYER.getTotalTrackInfo()) + "\n"
+				);
+			} catch (e) {
+			}
 		}
 	
 	});

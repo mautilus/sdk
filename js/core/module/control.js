@@ -34,9 +34,9 @@ Control = (function(Events) {
 		 * Key map, contains key:value pairs for key codes, e.g. {LEFT:37,...}
 		 */
 		key: {}
-		};
+	};
 
-		$.extend(true, Control, Events, {
+	$.extend(true, Control, Events, {
 		/**
 		 * @event beforekey
 		 * Will be called before a `key` event
@@ -184,6 +184,22 @@ Control = (function(Events) {
 			return false;
 		},
 		/**
+		 * Test if given keycode is navigation key (left, right, up or down arrow)
+		 * 
+		 * @param {Number} keycode
+		 * @returns {Boolean}
+		 */
+		isNavigationalArrow: function(keycode) {
+			if (keycode === this.key.LEFT
+				|| keycode === this.key.RIGHT
+				|| keycode === this.key.UP
+				|| keycode === this.key.DOWN) {
+				return true;
+			}
+			
+			return false;
+		},
+		/**
 		 * Test if given keycode is media keys (Play, Pause, FF, etc.)
 		 * 
 		 * @param {Number} keycode
@@ -233,11 +249,11 @@ Control = (function(Events) {
 		},
 		/**
 		 * Handles keyDown events
-         * 
+		 * 
 		 * @param {Object} $el Target element, jQuery collection
 		 * @private
 		 */
-		onKeyDown: function(ev) {
+		onKeyDown: function(ev,rc) {
 			var keyCode;
 
 			if (typeof ev === 'object') {
@@ -247,11 +263,18 @@ Control = (function(Events) {
 				keyCode = ev;
 			}
 
-			if (keyCode === this.key.RETURN) {
+			if (typeof ev === 'object' && keyCode === this.key.RETURN) {
 				ev.preventDefault();
 			}
 
-			if (this.trigger('beforekey', keyCode, ev) === false) {
+			if (Device.isHISENSE && this.isNavigationalArrow(keyCode)) {
+				// Preventing default spatial navigation handling by Opera TV. (It triggers
+				// undesirable 'mousemove' event if some DOM elements have a registered 'click' events)
+				// source: https://dev.opera.com/tv/functional-keys-in-opera-tv-browsers/
+				ev.preventDefault();  
+			}
+
+			if (this.trigger('beforekey', keyCode, ev, rc) === false) {
 				return;
 			}
 
