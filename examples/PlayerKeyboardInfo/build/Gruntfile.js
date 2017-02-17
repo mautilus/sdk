@@ -39,29 +39,9 @@ module.exports = function(grunt, projectPath) {
 						dest: 'output/source/*',
 						filter: 'isFile'
 					},
-					// Samsung
 					{
 						expand: true,
-						src: ['../config.xml'],
-						dest: 'output/source/*',
-						filter: 'isFile'
-					},
-					{
-						expand: true,
-						src: ['../widget.info'],
-						dest: 'output/source/*',
-						filter: 'isFile'
-					},
-					// LG
-					{
-						expand: true,
-						src: ['../developer.test'],
-						dest: 'output/source/*',
-						filter: 'isFile'
-					},
-					{
-						expand: true,
-						src: ['../manifest.xml'],
+						src: ['../configurations/**/*'],
 						dest: 'output/source/*',
 						filter: 'isFile'
 					},
@@ -87,18 +67,21 @@ module.exports = function(grunt, projectPath) {
 						dest: 'output/source/*'
 					}
 				]
+			},
+			project: {
+				files: [
+					{expand: true, cwd: '../../../', src: ['js/core/**',], dest: 'output/source/'},
+					{expand: true, cwd: '../../../', src: ['css/keyboard.css',], dest: 'output/source/'},
+					{expand: true, cwd: '../', src: ['**/*', '!build/**'], dest: 'output/source/'}
+				]
 			}
 		},
 
 		'string-replace': {
-			ver: {
+			version: {
 				files: [
 					{
 						src: ['output/source/config.js'],
-						dest: './'
-					},
-					{
-						src: ['output/source/config.xml'],
 						dest: './'
 					}
 				],
@@ -106,11 +89,37 @@ module.exports = function(grunt, projectPath) {
 					replacements: [{
 							pattern: /version:.*\'(.*)\'/,
 							replacement: 'version: \'<%= pkg.version %> [<%= grunt.template.today("dd.mm.yyyy") %>]\''
-						}, {
+						}
+					]
+				}
+			},
+			versionSamsung: {
+				files: [
+					{
+						src: ['output/source/configurations/samsung/config.xml'],
+						dest: './'
+					}
+				],
+				options: {
+					replacements: [{
 							pattern: /(<ver itemtype="string">)(.*)(<\/ver>)/,
 							replacement: '$1<%= pkg.version %>$3'
 						}
 					]
+				}
+			},
+			versionTizen: {
+				files: [
+					{
+						src: ['output/source/configurations/tizen/config.xml'],
+						dest: './'
+					}
+				],
+				options: {
+					replacements: [{
+						pattern: / version="(.*)" viewmodes/,
+						replacement: ' version="<%= pkg.version %>" viewmodes'
+					}]
 				}
 			},
 			indexSamsung: {
@@ -145,6 +154,21 @@ module.exports = function(grunt, projectPath) {
 					replacements: [{
 							pattern: /js\/source\.min\.js/,
 							replacement: 'js/source.min.lg.js'
+						}
+					]
+				}
+			},
+			indexJSPaths: {
+				files: [
+					{src: ['output/source/index.html'], dest: './'}
+				],
+				options: {
+					replacements: [{
+							pattern: /..\/..\/js\/core/g,
+							replacement: 'js/core'
+						}, {
+							pattern: /..\/..\/css/g,
+							replacement: 'css'
 						}
 					]
 				}
@@ -398,7 +422,7 @@ module.exports = function(grunt, projectPath) {
 							'!developer.test',
 							'!manifest.xml',
 							'!configurations/**',
-							'!icon/**',
+							'!icons/**',
 							'!index.*',
 							'!js/source.*'
 						],
@@ -418,9 +442,15 @@ module.exports = function(grunt, projectPath) {
 					},
 					{
 						expand: true,
-						cwd: 'output/source/icon/samsung',
+						cwd: 'output/source/icons/samsung',
 						src: ['*'],
-						dest: './icon/samsung'
+						dest: './icons/samsung'
+					},
+					{
+						expand: true,
+						cwd: 'output/source/configurations/samsung/',
+						src: ['*'],
+						dest: './'
 					}
 				]
 			},
@@ -441,7 +471,7 @@ module.exports = function(grunt, projectPath) {
 							'!developer.test',
 							'!manifest.xml',
 							'!configurations/**',
-							'!icon/**',
+							'!icons/**',
 							'!index.*',
 							'!js/source.*'
 						],
@@ -461,9 +491,15 @@ module.exports = function(grunt, projectPath) {
 					},
 					{
 						expand: true,
-						cwd: 'output/source/icon/tizen',
+						cwd: 'output/source/icons/tizen',
 						src: ['*'],
-						dest: './icon/tizen'
+						dest: './icons/tizen'
+					},
+					{
+						expand: true,
+						cwd: 'output/source/configurations/tizen/',
+						src: ['*'],
+						dest: './'
 					}
 				]
 			},
@@ -482,7 +518,7 @@ module.exports = function(grunt, projectPath) {
 						src: [
 							'**/*', '!config.xml',
 							'!configurations/**',
-							'!icon/**',
+							'!icons/**',
 							'!index.*',
 							'!js/source.*'
 						],
@@ -505,6 +541,29 @@ module.exports = function(grunt, projectPath) {
 						cwd: 'output/source/icons/lg',
 						src: ['*'],
 						dest: './lgapps/installed/312151/'
+					},
+					{
+						expand: true,
+						cwd: 'output/source/configurations/lg/',
+						src: ['*'],
+						dest: './lgapps/installed/312151/'
+					}
+				]
+			},
+			
+			project: {
+				options: {
+					archive: function () {
+						var pkg = grunt.file.readJSON('./package.json');
+						return pkg.packagename + '_ver_' + pkg.version.replace(/\./gi, '_') + '_project.zip';
+					}
+				},
+				files: [
+					{
+						expand: true,
+						cwd: 'output/source/',
+						src: ['**/*'],
+						dest: './'
 					}
 				]
 			}
@@ -515,8 +574,10 @@ module.exports = function(grunt, projectPath) {
 
 	grunt.registerTask('default', [
 			'clean',
-			'copy',
-			'string-replace:ver',
+			'copy:main',
+			'string-replace:version',
+			'string-replace:versionSamsung',
+			'string-replace:versionTizen',
 			'processhtml',
 			'cssmin',
 			'htmlmin',
@@ -528,8 +589,14 @@ module.exports = function(grunt, projectPath) {
 			'compress:samsung',
 			'compress:tizen',
 			'compress:lg',
-			'clean'
+			'clean',
+			'assembleProject'
 		]
 	);
+	
+	grunt.registerTask('assembleProject', 'Construct the project', function() {
+		var taskList = ['clean', 'copy:project', 'string-replace:indexJSPaths', 'compress:project', 'clean'];
+		grunt.task.run(taskList);
+	});
 
 };

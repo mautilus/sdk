@@ -1,7 +1,7 @@
 {
   "name": "PlayerKeyboardInfo",
   "author": "Mautilus, s.r.o.",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "packagename": "PlayerKeyboardInfo",
   "devDependencies": {
     "grunt": "^0.4.5",
