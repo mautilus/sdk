@@ -47,18 +47,29 @@ Device_Webos = (function(Events) {
 			    // init connection manager
 			    this.initConnectionManager();
 			    
-			    // init webOS events
+			    // init webOS events - webOSLaunch
 		    	document.addEventListener('webOSLaunch', function() {
 			       scope.trigger('webOSLaunch');
 			    }, true);
 			    
+		    	// init webOS events - webOSRelaunch
 			    document.addEventListener('webOSRelaunch', function() {
 			    	scope.trigger('webOSRelaunch');
 			    }, true);
 			    
-			    document.addEventListener('visibilityChange', function() {
-			    	scope.trigger('visibilityChange');
-			    }, true);
+			    var hidden = "", visibilityChange = "";
+				if (typeof document.hidden !== "undefined") {   // To support the standard web browser engine
+					hidden = "hidden";
+					visibilityChange = "visibilitychange";
+				} else if (typeof document.webkitHidden !== "undefined") {   // To support the webkit engine - LG webOS
+					hidden = "webkitHidden";
+					visibilityChange = "webkitvisibilitychange";
+				}
+				
+				// init webOS events - visibilityChange
+				document.addEventListener(visibilityChange, function() {
+					scope.trigger('visibilitychange', !document[hidden]);  // visible - true, hidden - false
+				}, true);
 			    
 			    // init Router go event
 			    Router.on('scene', function() {
@@ -257,7 +268,12 @@ Device_Webos = (function(Events) {
 		 * @inheritdoc Device#getDeviceName
 		 */
 		getDeviceName: function(stripSpaces) {
-		    var name = webOS.device.modelNameAscii + ' ' + webOS.device.platformVersion;
+			// webOS 1.x - {modelName: 'LGE Open webOS Device', modelNameAscii: 'webOS Device', platformVersion: '3.10.19-32.afro.5', ...}
+			// webOS 2.x - {modelName: 'webOS.TV', modelNameAscii: '', platformVersion: '3.16.0-61.beehive4tv.3', ...}
+			// webOS 3.x - {modelName: '43UH6107-ZB', modelNameAscii: undefined, platformVersion: '03.05.01', ...}
+			var model = webOS.device.modelName || webOS.device.modelNameAscii;
+			var webOSVersion = Main.getDevice()[1];
+			var name = 'LG webOS ' + webOSVersion + ', ' +model + ', ' + webOS.device.platformVersion;
 
 		    if (stripSpaces) {
 			name = name.replace(/\s/g, '');
