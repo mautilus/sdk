@@ -23,15 +23,38 @@ The SDK is delivered with two examples, which are showing use of the virtual key
 
 ### 5. Current version
 
-Version: 2.0.230 
+Version: 2.1.292 
+
+Release notes 2.1.292:
+
+-	Samsung Tizen 2016 support added
+-	LG webOS 3.x support added
+-	Enhancement of SONY PlayStation 3/4 drivers
+-	Hisense Vidaa 2015 and 2016 TV support added
+-	Improved SDK Documentation (How to use DRM, VAST module guide)
+-	The support for 4K playback on Samsung Tizen TVs added
+-	Method Player.play() improved and extended
+-	DRM support improved and simplified (method Player.setDRM())
+-	Video player improvements and fixes
+-	The VAST standard is supported in following scope:
+    * VAST 3.0 is supported, see [specification](http://www.iab.com/guidelines/digital-video-ad-serving-template-vast-3-0/)
+    * `InLine`, `Wrapper` (VAST servers could be chained) and `Error` elements are supported 
+    * `Linear` ad types are supported
+    * `Duration` and `MediaFiles` elements are supported for `Linear` ads
+    * Only MPEG-4 progressive download ad video playback is supported
+    * Skippable ads are supported (see chapter 2.3.2 of the VAST 3.0 specification) 
+    * `Impression` element is supported
+    * Tracking of following events is supported: `start`, `firstQuartile`, `midpoint`, `thirdQuartile`, `complete`, `skip` 
+    * Support for tracking of multiple events and impressions
+
 
 Release notes 2.0.230:
 
--	Instant On feature on Tizen 
+-	Instant On feature on Samsung Tizen 
 -	Improved help generation
 -	New example (3PlayersDemo)
 -	Added support for LG NetCast Simple SmartTV 2016
--	Added support for LG webOS 3.x (2016) (not fully tested)
+-	Added support for LG webOS 3.x (2016)
 
 Release notes 2.0.220:
 
@@ -55,9 +78,10 @@ Release notes 2.0.188:
 Currently supported platforms:
                             
 -	Samsung SmartTV/Orsay (2012, 2013, 2014, 2015)
--	Samsung Tizen (2015)
+-	Samsung Tizen (2015, 2016)
 -	LG NetCast 3.x+ (2012, 2013, 2014, 2015)
--	LG webOS 1.x, 2.x (2014, 2015)
+-	LG Simple SmartTV 2016
+-	LG webOS 1.x, 2.x, 3.x (2014, 2015, 2016)
 -	Philips NetTV 4.x+ (2013, 2014, 2015)
 -	Sony BRAVIA (2012, 2013, 2014, 2015)
 -	Panasonic VIERA (2012, 2013, 2014)
@@ -65,41 +89,32 @@ Currently supported platforms:
 -	VESTEL
 -	DuneHD
 -	Arris/KreaTV (limited support) 
-- HbbTV 1.1.1 and 1.2.1
+-	HbbTV 1.1.1 and 1.2.1
+-	Hisense Vidaa (2015, 2016)
 
-### 6. Roadmap
-
-For public release is planned:
-
--	Enhancement of SONY PlayStation 3/4 drivers 
--	Adding of the Hisense TV support
--	Android TV (WebView) support
-- New examples (grid, Instant On)
--	LG WebOS 3.0 2016 support
--	Samsung Tizen 2016 support
--	Limited VAST support
--	Finalize documentation
-
-### 7. References
+### 6. Projects, which use the SDK
             
 -	VOYO (CEE countries)
 -	icflix (MENA)
--	ShowMax (South Africa)
--	FILMIN (Spain)
+-	ShowMax (70+ countries)
+-	FILMIN (Spain, Mexico, Portugal)
 -	Virtual Radio OE3 (Austria)
 -	ChannelLive (USA)
 -	Stream.cz (Czech Republic, Slovakia)
 -	HBO.GO (Europe)
 -	Telefonica O2TV (Czech Republic)
 -	DittoTV (India)
--	Mobily (Saudi Arabia)
-- Markíza HbbTV (Slovakia) [link](http://www.broadbandtvnews.com/2016/05/02/first-hbbtv-app-for-tv-markiza/)
-- HbbTV advertisements - Hyundai, Vodafone (Czech Republic) [link](http://www.broadbandtvnews.com/2016/01/27/key-hbbtv-ad-test-in-czech-republic/)
-- Frekvence 1 / Lagardère (Czech Republic, Slovakia)
-- Smart TV/HbbTV white-label [link](http://www.iptv-news.com/2016/04/delivering-ott-and-hbbtv-front-end-applications-reliably-and-quickly/)
+-	Mobily mView (Saudi Arabia)
+-	Sledovani.tv (Czech Republic, Slovakia) [link](http://www.samsung.com/cz/experience/tv/smarttv/aplikace-sledovanitv.html)
+-	RFE/RL (Many countries) [link](http://www.broadbandtvnews.com/2014/09/22/rferl-to-go-worldwide-on-smart-tvs/)
+-	4K Telekom (Slovakia) [link](http://www.broadbandtvnews.com/2016/08/05/4k-streaming-first-in-cee/)
+-	Markíza HbbTV (Slovakia) [link](http://www.broadbandtvnews.com/2016/05/02/first-hbbtv-app-for-tv-markiza/)
+-	HbbTV advertisements - Hyundai, Vodafone (Czech Republic) [link](http://www.broadbandtvnews.com/2016/01/27/key-hbbtv-ad-test-in-czech-republic/)
+-	Frekvence 1 / Lagardère (Czech Republic, Slovakia)
+-	Smart TV/HbbTV white-label
 -	and many more ...
 
-### 8. License
+### 7. License
 
 SDK is licensed under [New BSD License](https://en.wikipedia.org/wiki/BSD_licenses):
 
@@ -127,7 +142,7 @@ SDK is licensed under [New BSD License](https://en.wikipedia.org/wiki/BSD_licens
     NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
     POSSIBILITY OF SUCH DAMAGE.
     
-### 9. Contact
+### 8. Contact
 
 - E-mail: [technical_support@mautilus.com](mailto:technical_support@mautilus.com)
 - Web: [www.mautilus.com](http://www.mautilus.com)
